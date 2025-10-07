@@ -1,0 +1,32 @@
+{# ================== budgetline_confirm_delete.html ================== #}
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--danger:#dc2626;--bg:#f1f5f9;--radius:25px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease;}
+.card-header{background:#fff;padding:.5rem 1rem;border-bottom:1px solid #e5e7eb;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--danger);} 
+.card-body{padding:0.5rem 1rem;display:flex;flex-direction:column;gap:0.5rem;}
+.btn{border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;font-size:.8rem;cursor:pointer;transition:background .15s,transform .15s;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{opacity:.9;transform:translateY(-2px);}
+.btn-secondary{background:#6b7280;color:#fff;}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{const c=document.querySelector('.card');if(c){setTimeout(()=>{c.style.opacity='1';c.style.transform='translateY(0)';},80);}});
+</script>
+<div class="card">
+  <div class="card-header"><h2>🗑️ Futa Budget Line</h2></div>
+  <div class="card-body">
+    <p>Una uhakika unataka kufuta <strong>{{ object.name }}</strong>? Hatua hii haiwezi kurudishwa.</p>
+    <form method="post">{% csrf_token %}
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+        <button type="submit" class="btn btn-danger">Ndiyo, futa</button>
+        <a href="{% url 'budgetline_list' %}" class="btn btn-secondary">Ghairi</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

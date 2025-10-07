@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Select Subjects for Result Creation
+{% endblock title %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="header-section">
+    <h3 class="single-line-text">
+        <span class="emoji">📚</span> Select Subjects
+    </h3>
+    <p class="text-center text-muted">
+        <i class="fas fa-users me-1"></i> You selected <b>{{ count }} students</b> from the previous page.
+    </p>
+</div>
+
+<!-- Form Section -->
+<form method="POST" class="form-section">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- Session Field -->
+    <div class="form-group">
+        <label for="{{ form.session.id_for_label }}" class="form-label fw-semibold text-secondary">
+            <i class="fas fa-calendar-alt me-1"></i> {{ form.session.label }}
+        </label>
+        {{ form.session|add_class:"form-select shadow-sm rounded-pill" }}
+        <small class="text-danger">{{ form.session.errors }}</small>
+    </div>
+
+    <!-- Term Field -->
+    <div class="form-group">
+        <label for="{{ form.term.id_for_label }}" class="form-label fw-semibold text-secondary">
+            <i class="fas fa-layer-group me-1"></i> {{ form.term.label }}
+        </label>
+        {{ form.term|add_class:"form-select shadow-sm rounded-pill" }}
+        <small class="text-danger">{{ form.term.errors }}</small>
+    </div>
+
+    <!-- Exam Field -->
+    <div class="form-group">
+        <label for="{{ form.exam.id_for_label }}" class="form-label fw-semibold text-secondary">
+            <i class="fas fa-clipboard-list me-1"></i> {{ form.exam.label }}
+        </label>
+        {{ form.exam|add_class:"form-select shadow-sm rounded-pill" }}
+        <small class="text-danger">{{ form.exam.errors }}</small>
+    </div>
+
+    <!-- Subjects Field -->
+    <div class="subjects-container">
+        <label for="{{ form.subjects.id_for_label }}" class="form-label fw-semibold text-secondary">
+            <i class="fas fa-book me-1"></i> {{ form.subjects.label }}
+        </label>
+        <div class="subjects-list">
+            {% for choice in form.subjects %}
+                <div class="form-check form-check-inline">
+                    {{ choice.tag }}
+                    <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                </div>
+            {% endfor %}
+        </div>
+        <small class="text-danger">{{ form.subjects.errors }}</small>
+    </div>
+
+    <!-- Hidden Fields -->
+    <input type="hidden" name="finish" value="True">
+    <input type="hidden" name="students" value="{{ students }}">
+
+    <!-- Submit Button -->
+    <div class="text-center">
+        <button type="submit" class="btn btn-success create-button">
+            <i class="fas fa-check-circle me-1"></i> Create
+        </button>
+    </div>
+</form>
+
+<!-- Additional CSS -->
+<style>
+    :root {
+        --carrot: #ff6f61;
+        --carrot-dark: #e65a50;
+        --gradient-start: #f3f4f6;
+        --gradient-end: #d1d5db;
+    }
+
+    body {
+        background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .dark-mode body {
+        background: linear-gradient(180deg, #2b2b2b, #1e1e1e);
+    }
+
+    .header-section {
+        text-align: center;
+    }
+
+    .single-line-text {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--carrot);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+        font-size: 1rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dark-mode .text-muted {
+        color: #a0a0a0 !important;
+    }
+
+    .form-section {
+        background: transparent; /* Kept transparent */
+        border-radius: 0; /* Kept no border radius */
+        padding: 0; /* Kept no padding */
+        box-shadow: none; /* Kept no shadow */
+        max-width: 800px; /* Increased for wider form fields */
+        margin: 0 auto;
+    }
+
+    .dark-mode .form-section {
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem; /* Added minimal margin for readability */
+        padding: 0;
+    }
+
+    .form-label {
+        font-size: 1.2rem; /* Increased font size */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #4a4a4a;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dark-mode .form-label {
+        color: #d1d1d1;
+    }
+
+    .form-select, .form-check-input {
+        border-radius: 25px;
+        padding: 0.5rem 1rem; /* Added internal padding for better appearance */
+        font-size: 1.1rem; /* Increased font size */
+        transition: all 0.3s ease;
+        border: 1px solid #ced4da;
+        width: 100%; /* Made dropdowns wider */
+        max-width: 100%; /* Ensure they don't exceed container */
+    }
+
+    .form-select:hover, .form-check-input:hover {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-select:focus {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        outline: none;
+    }
+
+    .subjects-container {
+        max-height: 200px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        margin: 0;
+        padding: 0;
+    }
+
+    .subjects-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem; /* Added small gap for spacing */
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-check-inline {
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-check-label {
+        font-size: 1rem; /* Increased font size */
+        margin-left: 0.5rem; /* Added spacing between checkbox and label */
+        padding: 0.25rem 0; /* Added minimal padding for better appearance */
+        color: #4a4a4a;
+    }
+
+    .dark-mode .form-check-label {
+        color: #d1d1d1;
+    }
+
+    .create-button {
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+        border-radius: 25px;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin: 0;
+    }
+
+    .create-button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        margin: 0;
+        padding: 0;
+        display: block;
+    }
+
+    /* iPhone-like Interface Adjustments */
+    @media (max-width: 768px) {
+        .single-line-text {
+            font-size: 1.25rem;
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+        }
+
+        .form-section {
+            padding: 0; /* Kept no padding */
+            margin: 0; /* Kept no margin */
+        }
+
+        .form-label {
+            font-size: 1rem;
+        }
+
+        .form-select, .form-check-label {
+            font-size: 0.875rem;
+        }
+
+        .form-select, .form-check-input {
+            padding: 0.25rem 0.5rem; /* Adjusted internal padding for mobile */
+        }
+
+        .create-button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .subjects-container {
+            max-height: 150px;
+        }
+
+        .subjects-list {
+            gap: 0.25rem; /* Adjusted gap for mobile */
+        }
+    }
+</style>
+
+<!-- JavaScript to Add Classes to Checkboxes -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Add classes to all checkbox inputs in the subjects field
+        const checkboxes = document.querySelectorAll('.subjects-list input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.classList.add('form-check-input', 'shadow-sm');
+        });
+    });
+</script>
+{% endblock content %}

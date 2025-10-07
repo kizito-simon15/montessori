@@ -1,0 +1,94 @@
+{% extends "bursor/bursor_base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h1 class="mb-4" style="color: deepskyblue;">Property List</h1>
+            <!-- Search input -->
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by name">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Description</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="propertyTableBody">
+                    {% for property in properties %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td> <!-- Serial number column -->
+                        <td>{{ property.name }}</td>
+                        <td>{{ property.quantity }}</td>
+                        <td>{{ property.description }}</td>
+                        <td>
+                            <a href="{% url 'bursor_property_detail' pk=property.pk %}" class="btn btn-primary">
+                                <i class="fa fa-eye"></i> <!-- Eye icon -->
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr id="totalRow" style="display: none;">
+                        <td style="color: brown;">Total Quantity:</td>
+                        <td id="totalQuantity" style="color: blue;"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById('searchInput');
+    const propertyTableBody = document.getElementById('propertyTableBody');
+    const totalRow = document.getElementById('totalRow');
+    const totalQuantity = document.getElementById('totalQuantity');
+
+    const calculateTotalQuantity = () => {
+        const visibleProperties = propertyTableBody.querySelectorAll('tr:not([style*="display: none"])');
+        let total = 0;
+
+        for (let property of visibleProperties) {
+            const quantity = parseInt(property.getElementsByTagName('td')[2].innerText);
+            if (!isNaN(quantity)) {
+                total += quantity;
+            }
+        }
+
+        totalQuantity.innerText = total;
+        if (total > 0) {
+            totalRow.style.display = '';
+        } else {
+            totalRow.style.display = 'none';
+        }
+    };
+
+    searchInput.addEventListener('input', function() {
+        const searchQuery = this.value.toLowerCase();
+        const properties = propertyTableBody.getElementsByTagName('tr');
+
+        for (let property of properties) {
+            const propertyName = property.getElementsByTagName('td')[1].innerText.toLowerCase();
+            if (propertyName.includes(searchQuery)) {
+                property.style.display = '';
+            } else {
+                property.style.display = 'none';
+            }
+        }
+
+        calculateTotalQuantity();
+    });
+
+    calculateTotalQuantity();
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+{% block title %}Maria Montessori Dashboard • Analytics 📈{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --clr-primary: #1d4ed8; /* Vibrant Blue */
+  --clr-accent: #93c5fd; /* Light Blue */
+  --clr-complementary: #2dd4bf; /* Teal */
+  --clr-neutral: #1f2937; /* Dark Gray */
+  --clr-light: #f8fafc; /* Light Background */
+}
+
+html, body {
+  margin: 0;
+  background: linear-gradient(135deg, var(--clr-light), #e0f2fe);
+  font-family: Inter, sans-serif;
+  font-size: 15px;
+}
+
+h2, h5 {
+  margin: 0;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--clr-neutral), var(--clr-primary));
+  color: #fff;
+  padding: 1.8rem 1.5rem;
+  border-radius: 0 0 22px 22px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.hero small {
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+.kpi-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1.8rem 0;
+}
+
+.kpi {
+  flex: 1 1 175px;
+  background: linear-gradient(135deg, #fff, var(--clr-light));
+  border-radius: 16px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s;
+}
+
+.kpi:hover {
+  transform: translateY(-5px);
+}
+
+.kpi h4 {
+  font-size: 0.95rem;
+  color: var(--clr-neutral);
+  margin: 0.25rem 0 0.4rem;
+}
+
+.kpi span {
+  font-weight: 800;
+  color: var(--clr-primary);
+  font-size: 1.55rem;
+}
+
+.kpi .description {
+  font-size: 0.82rem;
+  color: var(--clr-complementary);
+}
+
+.chart-box {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.chart-box:hover {
+  transform: translateY(-5px);
+}
+
+.chart-box header {
+  padding: 0.7rem 1.1rem;
+  font-weight: 700;
+  color: var(--clr-neutral);
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(145deg, var(--clr-light), #fff);
+}
+
+.fin {
+  background: linear-gradient(135deg, #fff, var(--clr-light));
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 1.4rem;
+}
+
+.fin p {
+  color: var(--clr-neutral);
+  font-size: 1rem;
+}
+
+.fin .text-primary {
+  color: var(--clr-primary) !important;
+}
+
+.fin .text-success {
+  color: var(--clr-complementary) !important;
+}
+
+.fin .text-danger {
+  color: #dc2626 !important;
+}
+
+canvas.big {
+  width: 100% !important;
+  max-width: 920px;
+  height: 46vh;
+  max-height: 420px;
+  min-height: 220px;
+}
+
+@media (max-width: 768px) {
+  canvas.big {
+    height: 34vh;
+  }
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3 animate__animated animate__fadeIn">
+  <!-- hero -->
+  <div class="hero">
+    <img src="{% static 'img/logo.png' %}" alt="Maria Montessori Logo" loading="lazy">
+    <div>
+      <h2 class="fw-bold">📊 Maria Montessori Dashboard</h2>
+      <small>Nursery, Pre and Primary School</small>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-wrap">
+    {% for t,v,d,i in kpi_cards %}
+    <div class="kpi">
+      <h4>{{ i }} {{ t }}</h4>
+      <span>{{ v|intcomma }}</span>
+      {% if d %}<div class="description">{{ d }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- charts row 1 -->
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="chart-box">
+        <header>📆 Monthly Cash-Flow ({{ THIS_YEAR }})</header>
+        <div class="p-3"><canvas id="stackBar" class="big"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="chart-box">
+        <header>💸 Income vs Net / Cash-out</header>
+        <div class="p-3"><canvas id="lineCash" class="big"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- charts row 2 -->
+  <div class="row g-3 mt-3">
+    <div class="col-lg-4">
+      <div class="chart-box">
+        <header>🎂 Student Composition</header>
+        <div class="p-3"><canvas id="pieStudents" class="big"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="chart-box">
+        <header>🛠️ Payroll & Purchases</header>
+        <div class="p-3"><canvas id="payBar" class="big"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="chart-box">
+        <header>🏷️ Invoice Count</header>
+        <div class="p-3"><canvas id="invBar" class="big"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- finance summary -->
+  <div class="row g-3 mt-4">
+    <div class="col-md-6">
+      <div class="fin">
+        <h5 class="fw-bold mb-3">💰 Finance Summary ({{ THIS_YEAR }})</h5>
+        <p>Total Income <span class="text-success">TSh {{ total_income|intcomma }}</span></p>
+        <p>Total Cash-out <span class="text-danger">TSh {{ total_expense|intcomma }}</span></p>
+        <p>Balance <span class="text-primary">TSh {{ net_balance|intcomma }}</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
+
+<!-- tiny “no-data” plugin -->
+<script>
+Chart.register({
+  id: "nodata",
+  afterDraw(c) {
+    if (c.data.datasets.some(ds => ds.data.some(v => v))) return;
+    const { ctx, chartArea: { left, top, width, height } } = c;
+    ctx.save();
+    ctx.font = "600 15px Inter";
+    ctx.fillStyle = "#94a3b8";
+    ctx.textAlign = "center";
+    ctx.fillText("No data for this period", left + width / 2, top + height / 2);
+    ctx.restore();
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  /* — helpers — */
+  const lab = {{ bar_labels_income|safe }};
+  const inc = {{ bar_vals_income|safe }};
+  const exp = {{ line_vals_expense|safe }};
+  const kbuy = {{ bar_vals_kitchen|safe }};
+  const sbuy = {{ bar_vals_seasonal_buy|safe }};
+  const pfee = {{ bar_vals_processing_fee|safe }};
+  const payr = {{ bar_vals_payroll|safe }};
+  const cashO = {{ line_vals_cash_out|safe }};
+  const nett = {{ line_vals_net|safe }};
+  const icnt = {{ bar_vals_invoices|safe }};
+  const pieL = {{ pie_labels|safe }};
+  const pieV = {{ pie_values|safe }};
+
+  /* stacked cash-out bar */
+  new Chart("stackBar", {
+    type: "bar",
+    data: {
+      labels: lab,
+      datasets: [
+        { label: "Direct Exp.", data: exp, backgroundColor: "#1d4ed8" },
+        { label: "Kitchen Buy", data: kbuy, backgroundColor: "#2dd4bf" },
+        { label: "Seasonal Buy", data: sbuy, backgroundColor: "#60a5fa" },
+        { label: "Proc. Fee", data: pfee, backgroundColor: "#5eead4" },
+        { label: "Payroll", data: payr, backgroundColor: "#93c5fd" }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: "top" } },
+      scales: {
+        y: { stacked: true, beginAtZero: true, title: { display: true, text: "TZS" } },
+        x: { stacked: true }
+      }
+    }
+  });
+
+  /* income / cash-out / net line */
+  new Chart("lineCash", {
+    type: "line",
+    data: {
+      labels: lab,
+      datasets: [
+        { label: "Income", data: inc, borderColor: "#2dd4bf", backgroundColor: "rgba(45, 212, 191, .15)", borderWidth: 2, tension: .25, fill: true },
+        { label: "Cash-out", data: cashO, borderColor: "#1d4ed8", backgroundColor: "rgba(29, 78, 216, .15)", borderWidth: 2, tension: .25, fill: true },
+        { label: "Net", data: nett, borderColor: "#1f2937", borderDash: [6, 4], borderWidth: 2, tension: .25, fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: "bottom" } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  /* payroll + seasonal + proc bar */
+  new Chart("payBar", {
+    type: "bar",
+    data: {
+      labels: lab,
+      datasets: [
+        { label: "Payroll", data: payr, backgroundColor: "#1d4ed8" },
+        { label: "Seasonal Buy", data: sbuy, backgroundColor: "#2dd4bf" },
+        { label: "Proc. Fee", data: pfee, backgroundColor: "#60a5fa" }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: "top" } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  /* invoice count simple bar */
+  new Chart("invBar", {
+    type: "bar",
+    data: {
+      labels: lab,
+      datasets: [{ label: "Invoices", data: icnt, backgroundColor: "#2dd4bf" }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  /* student pie */
+  new Chart("pieStudents", {
+    type: "doughnut",
+    data: {
+      labels: pieL,
+      datasets: [{
+        data: pieV,
+        backgroundColor: ["#1d4ed8", "#2dd4bf", "#60a5fa", "#5eead4", "#93c5fd"]
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: "60%",
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
+});
+</script>
+{% endblock %}

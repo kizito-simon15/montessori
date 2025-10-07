@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Event Details{% endblock %}
+
+{% block content %}
+<!-- Load AOS library for animations -->
+<link href="{% static 'css/aos.css' %}" rel="stylesheet">
+<script src="{% static 'js/aos.js' %}"></script>
+
+<style>
+    /* General Styling */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        background-color: #f4f7fa;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Event Title */
+    .event-title {
+        font-size: 2em;
+        color: #ffffff;
+        background: linear-gradient(135deg, #007bff, #3a86ff);
+        padding: 15px;
+        text-align: center;
+        font-weight: 700;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Event Details Styling */
+    .event-detail {
+        color: #333;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+    }
+
+    .event-detail strong {
+        color: #007bff;
+        font-weight: 600;
+    }
+
+    /* Participants List */
+    .participants-list {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .participants-list li {
+        padding: 8px 12px;
+        background-color: #f1f1f1;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        color: #555;
+    }
+
+    /* Action Buttons */
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-primary, .btn-danger {
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 20px;
+        text-align: center;
+        font-weight: 600;
+        color: #fff;
+        transition: background-color 0.3s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: #34c759;
+    }
+
+    .btn-primary:hover {
+        background-color: #28a745;
+    }
+
+    .btn-danger {
+        background-color: #ff3b30;
+    }
+
+    .btn-danger:hover {
+        background-color: #d32f2f;
+    }
+</style>
+
+<script>
+    // Initialize AOS for smooth animations
+    AOS.init({ once: true });
+</script>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+    <!-- Event Title -->
+    <h1 class="event-title">{{ event.title }}</h1>
+
+    <!-- Event Details -->
+    <p class="event-detail">
+        <strong>Description:</strong> {{ event.description }}
+    </p>
+    <p class="event-detail">
+        <strong>Date:</strong> {{ event.date|date:"F d, Y" }}
+    </p>
+    <p class="event-detail">
+        <strong>Location:</strong> {{ event.location }}
+    </p>
+
+    <p class="event-detail">
+      <strong>Participants:</strong> {{ event.participants }}
+  </p>
+    <!-- Action Buttons -->
+    <div class="btn-container" data-aos="fade-up" data-aos-duration="1000">
+        <a href="{% url 'event_update' event.pk %}" class="btn btn-primary">Update Event</a>
+        <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">Delete Event</a>
+    </div>
+</div>
+{% endblock %}

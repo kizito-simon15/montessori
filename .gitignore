@@ -1,0 +1,27 @@
+# Python & virtual-envs
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.env/
+*.egg-info/
+pip-wheel-metadata/
+
+# Django runtime
+*.sqlite3
+staticfiles/
+media/
+
+# ML artefacts
+*.pt
+*.pth
+*.h5
+*.ckpt
+models/
+data/
+
+# Logs, IDE, OS cruft
+*.log
+.DS_Store
+.idea/
+.vscode/

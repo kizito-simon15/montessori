@@ -1,0 +1,423 @@
+<!-- templates/students_alevel/student_form.html -->
+{% extends "base.html" %}
+{% load static widget_tweaks %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} A-Level Student{% endblock %}
+{% block breadcrumb %}
+    <a href="{% url 'dashboard' %}">Home</a> > <a href="{% url 'students_alevel:alevel-student-list' %}">A-Level Students</a> > {% if form.instance.pk %}Edit{% else %}Add{% endif %} Student
+{% endblock %}
+{% block content %}
+<style>
+    .form-control, .form-select {
+        color: deepskyblue;
+        border-radius: 50px;
+        border: 1px solid #ccc;
+    }
+    .form-control::placeholder {
+        color: #8fcceb;
+    }
+    .input-group-text {
+        border-radius: 50px 0 0 50px;
+        background: #eaf7ff;
+        border: none;
+        font-size: 1.1rem;
+    }
+    .icon-status { color: #009688; }
+    .icon-firstname { color: #3f51b5; }
+    .icon-middle { color: #9c27b0; }
+    .icon-surname { color: #e91e63; }
+    .icon-gender { color: #ff9800; }
+    .icon-dob { color: #795548; }
+    .icon-doa { color: #4caf50; }
+    .icon-father { color: #2196f3; }
+    .icon-mother { color: #2196f3; }
+    .icon-class { color: #673ab7; }
+    .icon-registration { color: #009688; }
+    .icon-address { color: #8bc34a; }
+    .icon-others { color: #4caf50; }
+    .icon-passport { color: #ff9800; }
+    .icon-parentid { color: #9e9e9e; }
+    .card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .card-header {
+        background: #0d6efd;
+        color: #fff;
+        border-radius: 20px 20px 0 0;
+    }
+    .btn-primary {
+        background-color: #478ed1;
+        border-color: #478ed1;
+        font-weight: 600;
+        border-radius: 50px;
+    }
+    .btn-primary:hover {
+        background-color: #3569a5;
+        border-color: #3569a5;
+    }
+    .btn-secondary {
+        font-weight: 600;
+        border-radius: 50px;
+    }
+    .form-check-input:checked {
+        background-color: #478ed1;
+        border-color: #478ed1;
+    }
+</style>
+
+<div class="container-fluid my-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h2 class="mb-0" style="font-size: 1.5rem; font-weight: 600;">
+                {% if form.instance.pk %}
+                    <i class="fas fa-user-edit"></i> Update A-Level Student
+                {% else %}
+                    <i class="fas fa-user-plus"></i> Add New A-Level Student
+                {% endif %}
+            </h2>
+        </div>
+        <div class="card-body" style="background: #f9f9f9;">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger mb-4">
+                    <strong>Form Errors:</strong>
+                    <ul class="mb-0">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="row g-4" id="studentForm">
+                {% csrf_token %}
+
+                <!-- Row 1: Registration Number, Current Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.registration_number.id_for_label }}" class="form-label fw-bold">Registration Number <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card icon-registration"></i></span>
+                        {% render_field form.registration_number class="form-control" %}
+                    </div>
+                    {% if form.registration_number.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.registration_number.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Unique ID for the student</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.current_status.id_for_label }}" class="form-label fw-bold">Current Status <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-toggle-on icon-status"></i></span>
+                        {% render_field form.current_status class="form-select" %}
+                    </div>
+                    {% if form.current_status.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.current_status.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Active/Inactive</small>
+                    {% endif %}
+                </div>
+
+                <!-- Row 2: Firstname, Middle Name, Surname -->
+                <div class="col-md-4">
+                    <label for="{{ form.firstname.id_for_label }}" class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user icon-firstname"></i></span>
+                        {% render_field form.firstname class="form-control" %}
+                    </div>
+                    {% if form.firstname.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.firstname.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">e.g. John</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.middle_name.id_for_label }}" class="form-label fw-bold">Middle Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tag icon-middle"></i></span>
+                        {% render_field form.middle_name class="form-control" %}
+                    </div>
+                    {% if form.middle_name.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.middle_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Optional</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.surname.id_for_label }}" class="form-label fw-bold">Surname <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-circle icon-surname"></i></span>
+                        {% render_field form.surname class="form-control" %}
+                    </div>
+                    {% if form.surname.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.surname.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">e.g. Doe</small>
+                    {% endif %}
+                </div>
+
+                <!-- Row 3: Gender, Date of Birth, Date of Admission -->
+                <div class="col-md-4">
+                    <label for="{{ form.gender.id_for_label }}" class="form-label fw-bold">Gender <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-venus-mars icon-gender"></i></span>
+                        {% render_field form.gender class="form-select" %}
+                    </div>
+                    {% if form.gender.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.gender.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Male/Female</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label fw-bold">Date of Birth <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-birthday-cake icon-dob"></i></span>
+                        {% render_field form.date_of_birth class="form-control" %}
+                    </div>
+                    {% if form.date_of_birth.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.date_of_birth.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">YYYY-MM-DD</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.date_of_admission.id_for_label }}" class="form-label fw-bold">Date of Admission <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-plus icon-doa"></i></span>
+                        {% render_field form.date_of_admission class="form-control" %}
+                    </div>
+                    {% if form.date_of_admission.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.date_of_admission.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">When student joined</small>
+                    {% endif %}
+                </div>
+
+                <!-- Row 4: Father's Mobile, Mother's Mobile, Current Class -->
+                <div class="col-md-4">
+                    <label for="{{ form.father_mobile_number.id_for_label }}" class="form-label fw-bold">Father's Mobile Number <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone icon-father"></i></span>
+                        {% render_field form.father_mobile_number class="form-control" %}
+                    </div>
+                    {% if form.father_mobile_number.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.father_mobile_number.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">+255XXXXXXXXX</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.mother_mobile_number.id_for_label }}" class="form-label fw-bold">Mother's Mobile Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone icon-mother"></i></span>
+                        {% render_field form.mother_mobile_number class="form-control" %}
+                    </div>
+                    {% if form.mother_mobile_number.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.mother_mobile_number.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">+255XXXXXXXXX (optional)</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.current_class.id_for_label }}" class="form-label fw-bold">Current Class</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-school icon-class"></i></span>
+                        {% render_field form.current_class class="form-select select2" %}
+                    </div>
+                    {% if form.current_class.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.current_class.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Select the current class</small>
+                    {% endif %}
+                </div>
+
+                <!-- Row 5: Address, Others -->
+                <div class="col-md-6">
+                    <label for="{{ form.address.id_for_label }}" class="form-label fw-bold">Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt icon-address"></i></span>
+                        {% render_field form.address class="form-control" %}
+                    </div>
+                    {% if form.address.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.address.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">e.g. 123 Apple St</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.others.id_for_label }}" class="form-label fw-bold">Additional Information</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-info-circle icon-others"></i></span>
+                        {% render_field form.others class="form-control" %}
+                    </div>
+                    {% if form.others.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.others.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Any extra notes</small>
+                    {% endif %}
+                </div>
+
+                <!-- Row 6: Passport Photo, Parent Student ID, Completed Switch -->
+                <div class="col-md-4">
+                    <label for="{{ form.passport.id_for_label }}" class="form-label fw-bold">Passport Photo</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-image icon-passport"></i></span>
+                        {% render_field form.passport class="form-control" %}
+                    </div>
+                    {% if form.passport.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.passport.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Upload .jpg or .png</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.parent_student_id.id_for_label }}" class="form-label fw-bold">Parent Student ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card icon-parentid"></i></span>
+                        {% render_field form.parent_student_id class="form-control" %}
+                    </div>
+                    {% if form.parent_student_id.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.parent_student_id.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Optional</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4 d-flex align-items-center">
+                    <div class="form-check form-switch" style="padding-top: 25px;">
+                        {% render_field form.completed class="form-check-input" %}
+                        <label for="{{ form.completed.id_for_label }}" class="form-check-label fw-bold">Completed</label>
+                    </div>
+                    {% if form.completed.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.completed.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4 py-2">
+                        {% if form.instance.pk %}
+                            <i class="fas fa-save"></i> Save
+                        {% else %}
+                            <i class="fas fa-plus-circle"></i> Add Student
+                        {% endif %}
+                        <span class="loading-spinner"></span>
+                    </button>
+                    <a class="btn btn-secondary px-4 py-2 ms-2" href="{% url 'students_alevel:alevel-student-list' %}">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+    });
+
+    $('#studentForm').on('submit', function() {
+        $(this).find('button[type="submit"]').prop('disabled', true).find('.loading-spinner').css('visibility', 'visible');
+    });
+
+    $('#id_father_mobile_number').on('input', function() {
+        const value = $(this).val();
+        const errorDiv = $(this).next('.text-danger');
+        if (!value.startsWith('+255') || value.length !== 13) {
+            if (!errorDiv.length) {
+                $(this).after('<small class="text-danger">Father\'s mobile number must start with +255 and be 13 digits.</small>');
+            }
+        } else {
+            errorDiv.remove();
+        }
+    });
+
+    $('#id_registration_number').on('input', function() {
+        const value = $(this).val();
+        const errorDiv = $(this).next('.text-danger');
+        if (!/^[a-zA-Z0-9]+$/.test(value)) {
+            if (!errorDiv.length) {
+                $(this).after('<small class="text-danger">Registration number must be alphanumeric.</small>');
+            }
+        } else {
+            errorDiv.remove();
+        }
+    });
+});
+</script>
+{% endblock %}

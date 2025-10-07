@@ -1,0 +1,136 @@
+{# apps/finance/templates/finance/receipt.html #}
+{% extends "base.html" %}
+{% load widget_tweaks humanize static %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light dark}
+  body{font-family:"Inter",system-ui,sans-serif}
+  .fieldset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+  .chip{padding:.6rem 1rem;border-radius:6px;font-weight:600}
+  .chip.expected{background:#e9ecef}
+  .chip.paid{background:#d1e7dd}
+  .chip.balance{background:#ffe5d0}
+  @media (prefers-color-scheme:dark){
+      .chip.expected{background:#495057;color:#f8f9fa}
+      .chip.paid{background:#0f5132;color:#d1e7dd}
+      .chip.balance{background:#664d03;color:#fff3cd}
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header bg-transparent border-0">
+    <h2 class="mb-0">
+      {% if form.instance.pk %}✏️ Hariri Risiti
+      {% elif invoice %}➕ Ongeza Risiti
+      {% else %}➕ Malipo ya Mwanafunzi{% endif %}
+    </h2>
+  </div>
+
+  <div class="card-body">
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger small">
+        {% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <fieldset class="mb-4">
+        <legend class="fs-5 fw-semibold">📝 Taarifa za Risiti</legend>
+        <div class="fieldset-grid">
+
+          {# ——— Amount ——— #}
+          <div>
+            <label for="id_amount_paid" class="form-label">💰 Kiasi Kilicholipwa</label>
+            {{ form.amount_paid|add_class:"form-control"|attr:"placeholder:0.00" }}
+            <small class="text-danger amount-error"></small>
+            <small class="text-muted d-block">
+              Kiasi cha juu: 
+              {% if invoice %}
+                {{ invoice.overall_balance|floatformat:2|intcomma }}
+              {% else %}
+                {{ max_payable|floatformat:2|intcomma }}
+              {% endif %} TZS
+            </small>
+          </div>
+
+          {# ——— Date ——— #}
+          <div>
+            <label class="form-label">📅 Tarehe ya Malipo</label>
+            {{ form.date_paid|add_class:"form-control" }}
+          </div>
+
+          {# ——— Method ——— #}
+          <div>
+            <label class="form-label">💳 Njia</label>
+            {{ form.payment_method|add_class:"form-select" }}
+          </div>
+
+          {# ——— Reference ——— #}
+          <div>
+            <label class="form-label">🔢 Rejea (Ref No.)</label>
+            {{ form.transaction_reference|add_class:"form-control"|attr:"autocomplete:off" }}
+          </div>
+
+          {# ——— Comment ——— #}
+          <div style="grid-column:1/-1">
+            <label class="form-label">📝 Maelezo</label>
+            {{ form.comment|add_class:"form-control" }}
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-primary" type="submit">💾 Hifadhi Risiti</button>
+        <a href="{% url 'invoice-list' %}" class="btn btn-outline-secondary">❌ Ghairi</a>
+      </div>
+    </form>
+
+    {# ——— Summary ——— #}
+    <section class="mt-4">
+      {% if invoice %}
+        {% include "finance/_invoice_summary.html" with inv=invoice %}
+      {% else %}
+        <h3 class="fs-5 mb-3">📊 Muhtasari wa Salio — {{ student.firstname }} {{ student.surname }}</h3>
+        <div class="summary-grid">
+          <div class="chip expected">Expected<br>{{ total_expected|intcomma }} TZS</div>
+          <div class="chip paid">Paid<br>{{ total_paid|intcomma }} TZS</div>
+          <div class="chip balance">Balance<br>{{ max_payable|intcomma }} TZS</div>
+        </div>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script defer>
+  // hard-limit amount field on the client (optional)
+  (function() {
+    const amt = document.getElementById("id_amount_paid");
+    if (!amt) return;
+    const hardCap = 999999999.99;        // same as HARD_CAP
+    const softCap = parseFloat(amt.dataset.max || hardCap);
+
+    amt.addEventListener("input", e => {
+      const v = parseFloat(e.target.value.replace(/,/g,"")) || 0;
+      const error = document.querySelector(".amount-error");
+      if (v > softCap) {
+        error.textContent = `Kiasi kimezidi salio la ${softCap.toLocaleString("en-US")} TZS`;
+      } else if (v > hardCap) {
+        error.textContent = "Kiasi kimezidi kikomo cha mfumo";
+      } else {
+        error.textContent = "";
+      }
+    });
+  })();
+</script>
+{% endblock %}

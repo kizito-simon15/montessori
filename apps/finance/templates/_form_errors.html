@@ -1,0 +1,17 @@
+{% comment %}
+Reusable partial – shows non-field form errors inside a coloured
+call-out with an emoji.  Include from any template:
+
+    {% include "_form_errors.html" with form=form %}
+{% endcomment %}
+
+{% if form.non_field_errors %}
+  <div class="alert alert-danger shadow-sm d-flex gap-2 align-items-start mb-3">
+    <span style="font-size:1.4rem">⚠️</span>
+    <ul class="mb-0 ps-2">
+      {% for err in form.non_field_errors %}
+        <li>{{ err }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

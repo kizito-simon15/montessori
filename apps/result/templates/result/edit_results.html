@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Update Results
+{% endblock title %}
+
+{% block content %}
+<div style="font-family: 'Arial', sans-serif; padding: 20px; background: linear-gradient(to bottom, #ffffff, #f9f9f9); border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+    <h2 style="text-align: center; color: #1abc9c; font-weight: bold; margin-bottom: 20px;">
+        <i class="fas fa-edit" style="color: #f39c12;"></i> Update Results
+    </h2>
+
+    <form method="GET" style="background: #16a085; padding: 20px; border-radius: 15px; color: white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <div style="flex: 1; min-width: 200px;">
+                <label for="class_select" style="font-weight: bold; display: block;">
+                    <i class="fas fa-chalkboard"></i> Select Class:
+                </label>
+                <select name="class_select" id="class_select" style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: white; color: #16a085;">
+                    <option value="">All Classes</option>
+                    {% for student_class in student_classes %}
+                    <option value="{{ student_class.id }}" {% if request.GET.class_select == student_class.id|stringformat:"s" %}selected{% endif %}>{{ student_class.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label for="subject_select" style="font-weight: bold; display: block;">
+                    <i class="fas fa-book"></i> Select Subject:
+                </label>
+                <select name="subject_select" id="subject_select" style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: white; color: #16a085;">
+                    <option value="">All Subjects</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if request.GET.subject_select == subject.id|stringformat:"s" %}selected{% endif %}>{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label for="student_name" style="font-weight: bold; display: block;">
+                    <i class="fas fa-user"></i> Enter Student Name:
+                </label>
+                <input type="text" name="student_name" id="student_name" placeholder="Enter student name"
+                    value="{{ request.GET.student_name }}" style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: white; color: #16a085;">
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <input type="submit" value="Search"
+                style="padding: 10px 30px; border: none; border-radius: 30px; background-color: white; color: #16a085; font-size: 16px; cursor: pointer; transition: all 0.3s;">
+        </div>
+    </form>
+
+    <!-- Delete Filtered Results Button -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="{% url 'delete-page-results' %}?class_select={{ request.GET.class_select }}&subject_select={{ request.GET.subject_select }}&student_name={{ request.GET.student_name }}"
+            style="padding: 10px 30px; border: none; border-radius: 30px; background-color: #e74c3c; color: white; font-size: 16px; font-weight: bold; text-decoration: none; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); transition: all 0.3s;">
+            <i class="fas fa-trash-alt"></i> Delete Filtered Results
+        </a>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        {% if formset.non_form_errors %}
+        <div style="background-color: #e74c3c; color: white; padding: 10px; border-radius: 10px; margin-bottom: 20px;">
+            {{ formset.non_form_errors }}
+        </div>
+        {% endif %}
+
+        <div style="overflow-x: auto; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead style="background-color: #f39c12; color: white;">
+                    <tr>
+                        <th style="padding: 12px; text-align: center;">Serial Number</th>
+                        <th style="padding: 12px; text-align: center;">Name</th>
+                        <th style="padding: 12px; text-align: center;">Subject</th>
+                        <th style="padding: 12px; text-align: center;">Test Score</th>
+                        <th style="padding: 12px; text-align: center;">Exam Score</th>
+                        <th style="padding: 12px; text-align: center;">
+                            <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)">
+                            Delete
+                        </th>
+                        <th style="padding: 12px; text-align: center;">Class</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for form in formset %}
+                    <tr style="background-color: {% cycle '#ecf0f1' '#dfe6e9' %}; transition: background-color 0.3s;">
+                        <td style="padding: 10px; text-align: center;">{{ forloop.counter }}</td>
+                        <td style="padding: 10px; text-align: center; color: #2980b9; font-weight: bold;">
+                            <i class="fas fa-user-circle" style="color: #27ae60;"></i> {{ form.instance.student }}
+                        </td>
+                        <td style="padding: 10px; text-align: center;">
+                            <i class="fas fa-book" style="color: #9b59b6;"></i> {{ form.instance.subject }}
+                        </td>
+                        <td style="padding: 10px; text-align: center;">
+                            {{ form.test_score | add_class:"input-field" }}
+                            {% if form.errors.test_score %}
+                            <div style="color: red; font-size: 12px;">{{ form.errors.test_score }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 10px; text-align: center;">
+                            {{ form.exam_score | add_class:"input-field" }}
+                            {% if form.errors.exam_score %}
+                            <div style="color: red; font-size: 12px;">{{ form.errors.exam_score }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 10px; text-align: center;">{{ form.DELETE }}</td>
+                        <td style="padding: 10px; text-align: center;">
+                            <i class="fas fa-chalkboard-teacher" style="color: #e67e22;"></i> {{ form.instance.current_class }}
+                        </td>
+                        <!-- Include hidden id field -->
+                        {{ form.id }}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit"
+                style="padding: 10px 30px; border: none; border-radius: 30px; background-color: #e67e22; color: white; font-size: 16px; cursor: pointer; transition: all 0.3s;">
+                <i class="fas fa-save"></i> Save
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Style input fields
+    document.querySelectorAll(".input-field").forEach(field => {
+        field.style.borderRadius = "5px";
+        field.style.padding = "5px 10px";
+        field.style.border = "1px solid #ddd";
+        field.style.backgroundColor = "#dff9fb";
+        field.style.transition = "all 0.3s";
+
+        field.addEventListener("focus", () => {
+            field.style.borderColor = "#00cec9";
+            field.style.boxShadow = "0 0 5px rgba(0, 206, 201, 0.5)";
+        });
+
+        field.addEventListener("blur", () => {
+            field.style.borderColor = "#ddd";
+            field.style.boxShadow = "none";
+        });
+    });
+
+    // Select All functionality for DELETE checkboxes
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('input[name$="-DELETE"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+</script>
+{% endblock content %}

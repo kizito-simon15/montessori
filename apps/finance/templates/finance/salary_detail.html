@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Salary Slip{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--indigo:#6366f1;--cerise:#e11d48;--mint:#10b981;--violet:#8b5cf6;--paper:#f9fafb;--fg:#0f172a;}
+body{font-family:Inter,system-ui,sans-serif;background:var(--paper);color:var(--fg)}*{box-sizing:border-box}
+.bg-bubble,.bg-bubble:before{position:fixed;z-index:-1;border-radius:50%;filter:blur(90px) saturate(160%)}
+.bg-bubble{width:380px;height:380px;background:var(--indigo);top:-90px;left:-90px;opacity:.55}
+.bg-bubble:before{content:"";width:280px;height:280px;background:var(--cerise);bottom:-40px;right:-40px;opacity:.45}
+.wrap{display:flex;justify-content:center;padding:3.5rem .9rem}
+.card{background:hsla(0,0%,100%,.60);backdrop-filter:blur(32px);border:1px solid rgba(255,255,255,.45);
+      border-radius:28px;width:100%;max-width:700px;box-shadow:0 12px 32px rgba(0,0,0,.12);overflow:hidden;position:relative}
+.banner{background:linear-gradient(135deg,var(--indigo),var(--violet));padding:1.8rem 2.2rem;color:#fff;position:relative}
+.banner h1{margin:0;font-size:1.55rem;font-weight:800;letter-spacing:-.5px}
+.banner small{font-size:.8rem;font-weight:600;opacity:.9}
+.banner img{height:54px;width:54px;border-radius:50%;object-fit:cover;border:3px solid #fff;
+            box-shadow:0 0 0 3px rgba(0,0,0,.1);position:absolute;right:2.2rem;top:1.55rem}
+.net-chip{position:absolute;top:100%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:50px;
+          padding:.55rem 1.9rem;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:.45rem;
+          box-shadow:0 4px 18px rgba(0,0,0,.10)}
+.net-chip span{font-size:1.45rem;color:var(--mint);letter-spacing:-.5px}
+.inner{padding:4.2rem 2.6rem 2.6rem;font-size:.84rem}
+.tbl{width:100%;border-collapse:collapse;margin:.85rem 0}
+.tbl th{font-size:.78rem;font-weight:700;color:#64748b;padding:.35rem 0;text-align:left}
+.tbl td{padding:.35rem 0;white-space:nowrap}
+.tbl .amt{text-align:right;font-variant-numeric:tabular-nums}
+.divide{border-top:1px dashed #e2e8f0;margin:.95rem 0}
+.earn .amt{color:var(--indigo)} .ded .amt{color:var(--cerise)}
+.total-row .amt{font-weight:800}
+.sign{display:flex;justify-content:space-between;margin-top:2.2rem;font-size:.78rem}
+.sign div{border-top:1px solid #cbd5e1;padding-top:.35rem;width:45%;text-align:center}
+.print-btn{display:inline-flex;align-items:center;gap:.35rem;margin-top:1.9rem;font-weight:700;font-size:.85rem;
+           padding:.6rem 1.6rem;border-radius:28px;border:none;background:var(--indigo);color:#fff;cursor:pointer;transition:.15s}
+.print-btn:hover{filter:brightness(.93)}
+@media print{body{background:#fff}.wrap{padding:0}.card{box-shadow:none;border:none;max-width:none}
+             .bg-bubble,.print-btn{display:none}}
+</style>
+{% endblock %}
+
+{% block content %}
+<span class="bg-bubble"></span>
+<div class="wrap">
+  <div class="card" id="slip-card">
+    <div class="banner">
+      <h1>S A LARY  S L I P</h1>
+      <small>{{ object.month|date:"F Y" }}</small>
+      <img src="{{ logo_url }}" alt="logo">
+      <div class="net-chip" title="Net Pay">💸 <span>{{ object.net_salary|floatformat:0|intcomma }}</span></div>
+    </div>
+
+    <div class="inner">
+      <table class="tbl">
+        <tbody>
+          <tr><th>Staff</th><td>{{ object.staff.firstname }} {{ object.staff.surname }}</td></tr>
+          <tr><th>Staff ID</th><td>{{ object.staff.staff_id }}</td></tr>
+          <tr><th>Issued on</th><td>{{ object.issued_date|date:"d M Y" }}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="divide"></div>
+
+      <table class="tbl earn">
+        <thead><tr><th colspan="2">EARNINGS</th></tr></thead>
+        <tbody>
+        {% for label, amt in earning_lines %}{% if amt %}
+          <tr><td>{{ label }}</td><td class="amt">{{ amt|floatformat:0|intcomma }}</td></tr>{% endif %}
+        {% endfor %}
+        </tbody>
+        <tfoot><tr class="total-row"><td>Gross Salary</td><td class="amt">{{ object.gross_salary|floatformat:0|intcomma }}</td></tr></tfoot>
+      </table>
+
+      <table class="tbl ded">
+        <thead><tr><th colspan="2">DEDUCTIONS</th></tr></thead>
+        <tbody>
+        {% for label, amt in statutory_lines %}{% if amt %}
+          <tr><td>{{ label }}</td><td class="amt">‑{{ amt|floatformat:0|intcomma }}</td></tr>{% endif %}
+        {% endfor %}
+        {% for d in deductions_list %}
+          <tr><td>{{ d.reason }}</td><td class="amt">‑{{ d.amount|floatformat:0|intcomma }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="divide"></div>
+
+      <table class="tbl"><tbody>
+        <tr class="total-row"><td>NET PAY</td><td class="amt" style="color:var(--mint)">{{ object.net_salary|floatformat:0|intcomma }}</td></tr>
+      </tbody></table>
+
+      {% if object.remarks %}
+        <div class="divide"></div>
+        <p style="font-weight:700;margin:.2rem 0 .4rem">Remarks</p>
+        <p style="white-space:pre-line;margin:0">{{ object.remarks }}</p>
+      {% endif %}
+
+      <div class="sign">
+        <div>Prepared by<br><strong>Dorcas Sentozi</strong></div>
+        <div>Staff signature</div>
+      </div>
+
+      {% if not allow_print %}
+        <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not allow_print %}
+<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.3/dist/vanilla-tilt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+VanillaTilt.init(document.querySelector("#slip-card"),{max:9,speed:400,glare:true,"max-glare":0.25,perspective:1100});
+(()=>{
+  if(localStorage.getItem("slipConfettiDone")) return;
+  confetti({particleCount:120,spread:70,origin:{y:.55}});
+  localStorage.setItem("slipConfettiDone","1");
+})();
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Actions</title>
+    <style>
+        /* Style for green buttons */
+        .green-button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        /* Hover effect */
+        .green-button:hover {
+            background-color: #45a049; /* Darker green */
+        }
+        
+        /* Center align content */
+        .center-align {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-align">
+        <h1><u>Welcome to Library Management</u></h1>
+        <h2><u>Library Actions</u></h2>
+
+        <!-- Add New Book button -->
+        <p><a href="{% url 'add_book' %}" class="green-button">Add New Book</a></p>
+        
+        <!-- View Available Books button -->
+        <p><a href="{% url 'view_available_books' %}" class="green-button">View Available Books</a></p>
+        
+        <!-- Issue New Book button -->
+        <p><a href="{% url 'issue_new_book' %}" class="green-button">Issue Book to Student</a></p>
+        
+        <!-- View Issued Books button -->
+        <p><a href="{% url 'issued_students' %}" class="green-button">View Issued Books</a></p>
+
+        <p><a href="{% url 'issue_new_staff' %}" class="green-button">Issue Book to Staff</a></p>
+        
+        <!-- View Issued Books button -->
+        <p><a href="{% url 'issued_staffs' %}" class="green-button">View Issued Books</a></p>
+    </div>
+</body>
+</html>
+
+{% endblock content %}

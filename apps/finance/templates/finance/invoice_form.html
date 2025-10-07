@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load widget_tweaks humanize %}
+{% block content %}
+
+<!-- ═══════════════════  COLOURS & BASE  ═══════════════════ -->
+<style>
+:root{
+  --bg:#f9fafb;--card:#fff;--primary:#6366f1;--secondary:#f59e0b;
+  --danger:#ef4444;--success:#10b981;--info:#0ea5e9;--muted:#64748b;
+  --radius:18px;--shadow:0 4px 20px rgba(0,0,0,.08);
+}
+body{background:var(--bg);}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);}
+.card-header{background:linear-gradient(145deg,var(--primary),var(--secondary));
+             color:#fff;border-radius:var(--radius) var(--radius) 0 0;
+             padding:.9rem 1.2rem;display:flex;gap:.6rem;align-items:center;}
+.form-control,.form-select{border-radius:30px;border:1px solid #e2e8f0;padding:.48rem 1rem;}
+.form-control:focus,.form-select:focus{border-color:var(--primary);
+        box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+.btn-primary{background:var(--primary);color:#fff;border:none}
+.btn-primary:hover{background:#4f46e5}
+.btn-secondary{background:var(--muted);color:#fff;border:none}
+.btn-secondary:hover{background:#475569}
+.alert-danger{background:#fee2e2;color:var(--danger);border:none}
+
+/* ---------- responsive grid for inputs ---------- */
+.grid-two{display:grid;gap:1.3rem;
+          grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+
+/* ---------- summary table ---------- */
+.preview-table{width:100%;font-size:.9rem;border-collapse:collapse;
+               border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+.preview-table th{background:var(--info);color:#fff;font-weight:500;padding:.45rem .7rem;text-align:left}
+.preview-table td{padding:.45rem .7rem;}
+.preview-table tr:nth-child(even){background:#f1f5f9}
+
+/* pill badge for labels */
+.preview-table td:first-child{font-weight:600;white-space:nowrap}
+.badge{padding:.15rem .55rem;border-radius:999px;font-size:.75rem;font-weight:600;
+       color:#fff;background:var(--primary);}
+#sum_total{font-weight:700;color:var(--success)}
+
+/* flash animation when value updates */
+@keyframes flash{0%{background:#fef9c3;}100%{background:transparent}}
+.flash{animation:flash .8s ease;}
+</style>
+
+<!-- ═══════════════════  JS: preview, flash & ajax helpers  ═══════════════════ -->
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const f=document.forms[0],
+        student=f.student, session=f.session,
+        clsBox=document.getElementById('cls-box'),
+        feeSel=f.school_fees, instSel=f.installment,
+        amount=f.invoice_amount, prevBal=f.balance_from_previous_install,
+        due=f.due_date, termID="{{ academic_term_id|default:'0' }}";
+
+  /* ─── fetch current class ─────────────────────────────── */
+  async function fetchClass(){
+    clsBox.value='…';
+    if(!student.value||!session.value){clsBox.value='';return;}
+    try{
+      const r=await fetch(`{% url 'get-student-class' %}?student_id=${student.value}&session_id=${session.value}&term_id=${termID}`);
+      const d=await r.json();
+      clsBox.value=d.class_name||'–';
+      update();
+    }catch{
+      clsBox.value='⛔';
+      update();
+    }
+  }
+
+  /* ─── fetch previous balance (cross-session/term) ─────── */
+  async function fetchPrevBalance(){
+    if(!student.value||!session.value||!instSel.value){return;}
+    try{
+      const r=await fetch(
+        `{% url 'get-student-balance' %}?student_id=${student.value}`+
+        `&session_id=${session.value}&installment_id=${instSel.value}`
+      );
+      const d=await r.json();
+      if(d.balance!==undefined){
+        prevBal.value=d.balance;
+        update();
+      }
+    }catch{/* silent */}
+  }
+
+  /* ─── helpers ─────────────────────────────────────────── */
+  function flash(id){
+    const el=document.getElementById(id);
+    el.classList.remove('flash'); void el.offsetWidth;
+    el.classList.add('flash');
+  }
+  function num(v){return v?Number(v).toLocaleString():'—';}
+  function txt(sel){return sel.options[sel.selectedIndex]?.text||'—';}
+
+  function update(){
+    const mapping={
+      sum_student:txt(student),
+      sum_class:clsBox.value||'—',
+      sum_session:txt(session),
+      sum_inst:txt(instSel),
+      sum_fee:txt(feeSel),
+      sum_amount:num(amount.value),
+      sum_prevbal:num(prevBal.value),
+      sum_total:num(+amount.value+(+prevBal.value||0)),
+      sum_duedate:due.value||'—'
+    };
+    for(const [id,val] of Object.entries(mapping)){
+      const el=document.getElementById(id);
+      if(el.textContent!==val){el.textContent=val;flash(id);}
+    }
+  }
+
+  /* ─── event wiring ────────────────────────────────────── */
+  ['change','input'].forEach(ev=>
+    [student,session,feeSel,instSel,amount,prevBal,due]
+      .forEach(el=>el.addEventListener(ev,update))
+  );
+  [student,session].forEach(el=>el.addEventListener('change',fetchClass));
+  [student,session,instSel].forEach(el=>el.addEventListener('change',fetchPrevBalance));
+
+  /* ─── first run ───────────────────────────────────────── */
+  fetchClass();
+  fetchPrevBalance();
+  update();
+});
+</script>
+
+<!-- ═══════════════════  MARK-UP  ══════════════════════════ -->
+<div class="card mx-auto" style="max-width:1000px">
+  <div class="card-header"><span style="font-size:1.6rem">🧾</span>
+    <h2 class="m-0 fs-4 fw-semibold">{{ object|yesno:'Update Invoice,Add Invoice' }}</h2></div>
+
+  <div class="card-body">
+    {% include "_form_errors.html" with form=form %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- DETAILS -->
+      <fieldset class="mb-4"><legend class="fw-semibold mb-2">🚀 Invoice Details</legend>
+        <div class="grid-two">
+          <div><label class="form-label">👩‍🎓 Student *</label>
+            {{ form.student|add_class:"form-select" }}
+            <small class="d-block mt-1 text-muted">Class:
+              <input id="cls-box" readonly
+                     class="form-control form-control-sm opacity-75 d-inline-block"
+                     style="max-width:130px">
+            </small></div>
+
+          <div><label class="form-label">📅 Session *</label>
+              {{ form.session|add_class:"form-select" }}</div>
+
+          <div><label class="form-label">🗓️ Installment *</label>
+              {{ form.installment|add_class:"form-select" }}</div>
+
+          <div><label class="form-label">💰 Fee Category *</label>
+              {{ form.school_fees|add_class:"form-select" }}</div>
+
+          <div><label class="form-label">💵 Amount (TZS)*</label>
+              {{ form.invoice_amount|add_class:"form-control" }}</div>
+
+          <div><label class="form-label">📉 Prev Balance</label>
+              {{ form.balance_from_previous_install|add_class:"form-control opacity-75" }}</div>
+
+          <div><label class="form-label">⏰ Due Date *</label>
+              {{ form.due_date|add_class:"form-control" }}</div>
+
+          <div><label class="form-label">📝 Notes</label>
+              {{ form.notes|add_class:"form-control" }}</div>
+
+          <div><label class="form-label">✅ Status *</label>
+              {{ form.status|add_class:"form-select" }}</div>
+        </div>
+      </fieldset>
+
+      <!-- PREVIEW -->
+      <fieldset><legend class="fw-semibold mb-2">🔍 Quick Preview</legend>
+        <table class="preview-table">
+          <tr><td>Student</td><td id="sum_student">—</td></tr>
+          <tr><td>Class</td><td id="sum_class">—</td></tr>
+          <tr><td>Session</td><td id="sum_session">—</td></tr>
+          <tr><td>Installment</td><td id="sum_inst">—</td></tr>
+          <tr><td>Fee Category</td><td id="sum_fee">—</td></tr>
+          <tr><td>Invoice TZS</td><td id="sum_amount">—</td></tr>
+          <tr><td>Prev&nbsp;Balance</td><td id="sum_prevbal">—</td></tr>
+          <tr><td>Total&nbsp;Payable</td><td id="sum_total">—</td></tr>
+          <tr><td>Due&nbsp;Date</td><td id="sum_duedate">—</td></tr>
+        </table>
+      </fieldset>
+
+      <!-- ACTIONS -->
+      <div class="mt-4 d-flex gap-2 justify-content-end">
+        <button class="btn btn-primary px-4">{{ object|yesno:'💾 Save,➕ Add Invoice' }}</button>
+        <a class="btn btn-secondary" href="{% url 'invoice-list' %}">✖️ Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

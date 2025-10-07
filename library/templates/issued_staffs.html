@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issued Books</title>
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        .green-tick {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Issued Books to {{ staff_name }}</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th rowspan="2">Serial Number</th>
+                    <th rowspan="2">Staff Name</th>
+                    <th rowspan="2">Issued Book</th>
+                    <th rowspan="2">Book Number</th>
+                    <th rowspan="2">Book Author</th>
+                    <th rowspan="2">Book Category</th>
+                    <th rowspan="2">Date Issued</th>
+                    <th rowspan="2">Date to return</th>
+                    <th colspan="2" class="text-center">Actions</th>
+                </tr>
+                <tr>
+                    <th>Delete</th>
+                    <th>Returned?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issued_book in issued_books %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ issued_book.staff }}</td>
+                    <td>{{ issued_book.book.book_name }}</td>
+                    <td>{{ issued_book.book_number }}/{{ issued_book.book.quantity }}</td>
+                    <td>{{ issued_book.book.author }}</td>
+                    <td>{{ issued_book.book.category }}</td>
+                    <td>{{ issued_book.date_issued }}</td>
+                    <td>{{ issued_book.expiry_date }}</td>
+                    <td>
+                        <a href="{% url 'delete_issued_staff' issued_book.id %}" class="btn btn-success">Delete</a>
+                    </td>
+                    <td>
+                        {% if issued_book.returned %}
+                            <span class="green-tick">&#10004;</span>
+                        {% else %}
+                            <a href="{% url 'mark_staff_returned' issued_book.id %}" class="btn btn-warning">Returned</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
+
+{% endblock content %}

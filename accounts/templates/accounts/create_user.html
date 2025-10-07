@@ -1,0 +1,121 @@
+{# templates/accounts/create_user.html  – 10 Jul 2025 #}
+{% extends "base.html" %}
+{% load static %}
+{% block title %}New {{ user_type|default:"User" }}{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{--primary:#1e3a8a;--secondary:#d97706;--bg:#f8fafc;--danger:#dc2626;--radius:25px}
+body{background:var(--bg);font-family:'Inter',sans-serif}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);
+      overflow:hidden;opacity:0;transform:translateY(20px);transition:.5s}
+.card-header{padding:.6rem 1rem;border-bottom:1px solid #e5e7eb}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--primary)}
+.card-body{padding:1rem;display:flex;flex-direction:column;gap:1rem}
+.form-label{font-weight:600;margin-bottom:.25rem;font-size:.9rem;color:#374151}
+.form-control{border:1px solid #d1d5db;border-radius:var(--radius);padding:.55rem 1rem;font-size:.9rem;width:100%;background:#f9fafb}
+.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,58,138,.15);outline:none}
+.text-danger{color:var(--danger);font-size:.8rem;margin-top:.25rem}
+.password-wrap{position:relative}
+.pass-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;font-size:1rem;color:#64748b;cursor:pointer}
+.progress{height:6px;border-radius:var(--radius);overflow:hidden;background:#e5e7eb}
+.btn{border:none;border-radius:var(--radius);padding:.45rem 1rem;font-weight:600;font-size:.85rem;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--secondary);transform:translateY(-2px)}
+.btn-secondary{background:#6b7280;color:#fff}
+@media(max-width:640px){.card{border-radius:10px}}
+</style>
+
+<div class="card mx-auto" style="max-width:550px">
+  <div class="card-header">
+    <h2>➕ New {{ user_type|default:"User" }} Account</h2>
+  </div>
+
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="text-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" style="display:grid;gap:1.1rem">
+      {% csrf_token %}
+
+      {# ───────── loop through every field ───────── #}
+      {% for field in form %}
+        {% if field.name == "password1" or field.name == "password2" %}
+          <div>
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="password-wrap">
+              {{ field }}
+              <button type="button" class="pass-toggle" data-target="{{ field.id_for_label }}">
+                 <i class="fa fa-eye-slash"></i>
+              </button>
+            </div>
+            {% if field.name == "password1" %}
+              <div class="progress mt-2" id="pwMeter">
+                <div class="progress-bar bg-danger" style="width:0%"></div>
+              </div>
+            {% endif %}
+            {% if field.errors %}
+              <div class="text-danger">{{ field.errors.0 }}</div>
+            {% endif %}
+          </div>
+        {% else %}
+          <div>
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="text-danger">{{ field.errors.0 }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-primary" type="submit">💾 Save</button>
+        <a href="{% url 'select_user_type' %}" class="btn btn-secondary">❌ Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',() => {
+
+  /* fade-in card */
+  const c=document.querySelector('.card'); setTimeout(()=>{c.style.opacity='1';c.style.transform='none'},80);
+
+  /* eye-toggle */
+  document.querySelectorAll('.pass-toggle').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      const inp=document.getElementById(btn.dataset.target);
+      const icon=btn.firstElementChild;
+      const show=inp.type==='password';
+      inp.type = show ? 'text' : 'password';
+      icon.className = show ? 'fa fa-eye' : 'fa fa-eye-slash';
+    });
+  });
+
+  /* strength meter for password1 */
+  const pw = document.getElementById('{{ form.password1.id_for_label }}');
+  const bar= document.querySelector('#pwMeter .progress-bar');
+  if(pw){
+    pw.addEventListener('input', e=>{
+      const val=e.target.value;
+      let score=0;
+      if(val.length>=6) score++;
+      if(/[A-Za-z]/.test(val)&&/\d/.test(val)) score++;
+      if(val.length>=8 && /[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+
+      const pct=[0,40,70,100][score];
+      const clr=['bg-danger','bg-warning','bg-success'][score>2?2:score-1]||'bg-danger';
+
+      bar.style.width=pct+'%';
+      bar.className='progress-bar '+clr;
+    });
+  }
+});
+</script>
+{% endblock %}

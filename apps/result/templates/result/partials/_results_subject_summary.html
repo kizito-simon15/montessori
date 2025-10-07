@@ -1,0 +1,65 @@
+<div class="table-container" style="width: 100%; overflow-x: auto;">
+    <table class="styled-table" id="subjectSummaryTable" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+        <thead style="background-color: #007bff; color: white;">
+            <tr>
+                <th>SUBJECT POSITION</th>
+                <th>SUBJECT</th>
+                <th>SUBJECT AVERAGE</th>
+                <th>SUBJECT GRADE</th>
+                <th>SUBJECT GPA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subject_data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ subject.subject }}</td>
+                <td>{{ subject.average }}</td>
+                <td>{{ subject.grade }}</td>
+                <td>{{ subject.gpa }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .styled-table thead tr {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .styled-table th:last-child, .styled-table td:last-child {
+        border-right: none;
+    }
+
+    .styled-table tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    @media (max-width: 768px) {
+        .styled-table {
+            font-size: 14px;
+        }
+
+        .styled-table th, .styled-table td {
+            padding: 8px;
+        }
+    }
+</style>

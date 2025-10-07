@@ -1,0 +1,241 @@
+{% extends "parents/parent_base.html" %}
+{% load static custom_tags %}
+
+{% block content-header %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-sm-12 text-center">
+                <h1 class="h4 text-primary"><u>Welcome, Parent of {{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</u></h1>
+                <p class="h6 text-secondary"><u>ELEMENTS LAKEZONE PRE & PRIMARY SCHOOL</u></p>
+                <p class="h6 text-info"><u>Parent Dashboard</u></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Notification Boxes -->
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="border border-primary p-3 rounded bg-white shadow-sm">
+                <div class="row">
+                    {% if academic_answers_count > 0 or secretary_answers_count > 0 or bursor_answers_count > 0 %}
+                    <div class="col-12 mb-3">
+                        <div class="row">
+                            {% if academic_answers_count > 0 %}
+                            <div class="col-md-4 col-12 mb-3">
+                                <div class="small-box bg-danger">
+                                    <div class="inner">
+                                        <h6 class="font-weight-bold">Notice</h6>
+                                        <p>{{ academic_answers_count }} comments on academic results</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if secretary_answers_count > 0 %}
+                            <div class="col-md-4 col-12 mb-3">
+                                <div class="small-box bg-warning">
+                                    <div class="inner">
+                                        <h6 class="font-weight-bold">Notice</h6>
+                                        <p>{{ secretary_answers_count }} comments on student reports</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if bursor_answers_count > 0 %}
+                            <div class="col-md-4 col-12 mb-3">
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h6 class="font-weight-bold">Notice</h6>
+                                        <p>{{ bursor_answers_count }} comments on payment information</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Info Boxes -->
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="small-box bg-info shadow">
+                            <div class="inner">
+                                <h6>Student Info</h6>
+                                <p>View details</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% if student %}
+                            <a href="{% url 'parent_student_details' student.id %}" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                            {% else %}
+                            <a href="#" class="small-box-footer disabled">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="small-box bg-success shadow">
+                            <div class="inner">
+                                <h6>Payments</h6>
+                                <p>View payment info</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <a href="{% url 'parent_student_invoices' %}" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="small-box bg-primary shadow">
+                            <div class="inner">
+                                <h6>Contributions</h6>
+                                <p>View contributions</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <a href="{% url 'parent_uniform_list' %}" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="small-box bg-warning shadow">
+                            <div class="inner">
+                                <h6>Results</h6>
+                                <p>View student results</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <a href="{% url 'parent_student_details_all' %}" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="small-box bg-danger shadow">
+                            <div class="inner">
+                                <h6>Comments</h6>
+                                <p>View comments and responses</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            {% if student %}
+                            <a href="{% url 'all_comments_view' student.id %}" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                            {% else %}
+                            <a href="#" class="small-box-footer disabled">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Help Box -->
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="small-box bg-secondary shadow">
+                            <div class="inner">
+                                <h6>Help</h6>
+                                <p>System Usage Guide</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <a href="{% url 'help_view' %}" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Performance Graphs -->
+    <div class="row mt-4">
+        {% if performance_graph %}
+        <div class="col-md-6 mb-4">
+            <h6 class="text-center text-primary">Overall Performance Trend (Stem and Line Graphs)</h6>
+            <img src="data:image/png;base64,{{ performance_graph }}" alt="Student Performance Graphs" class="img-fluid border border-primary rounded">
+            <p class="text-center mt-2 font-italic"><strong>Analysis:</strong> {{ overall_analysis }}</p>
+            <p class="text-center mt-2 font-italic"><strong>Stem Graph Insights:</strong> {{ stem_analysis }}</p>
+        </div>
+        {% endif %}
+
+        {% if hist_graph %}
+        <div class="col-md-6 mb-4">
+            <h6 class="text-center text-primary">Subject Performance Analysis</h6>
+            <img src="data:image/png;base64,{{ hist_graph }}" alt="Subject Performance Histogram" class="img-fluid border border-primary rounded">
+            <p class="text-center mt-2 font-italic"><strong>Analysis:</strong> {{ subject_hist_analysis }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Individual Subject Graphs -->
+    <div class="row mt-4">
+        {% for subject_name, subject_graph, subject_analysis in subject_graphs_and_analyses %}
+        <div class="col-md-6 mb-4">
+            <h6 class="text-center text-success">Performance Variation in {{ subject_name }}</h6>
+            <img src="data:image/png;base64,{{ subject_graph }}" alt="{{ subject_name }} Performance Histogram" class="img-fluid border border-success rounded">
+            <p class="text-center mt-2 font-italic"><strong>Analysis:</strong> {{ subject_analysis }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Additional CSS for styling -->
+<style>
+    .small-box {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-align: center;
+        padding: 15px;
+    }
+    .small-box:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .small-box .icon {
+        top: 10px;
+        right: 10px;
+        font-size: 45px;
+        opacity: 0.6;
+    }
+    .small-box .inner h6 {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .small-box .inner p {
+        font-size: 0.9rem;
+    }
+    .small-box-footer {
+        color: white !important;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        transition: color 0.2s;
+    }
+    .small-box-footer:hover {
+        color: #f8f9fa !important;
+    }
+    .border-primary {
+        border-color: #007bff !important;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock content %}

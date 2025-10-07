@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block content %}
+<script>
+function printPage(){document.body.classList.add('printing');window.print();document.body.classList.remove('printing');}
+function goBack(){history.back();}
+</script>
+
+<style>
+:root{
+  --c-primary:#0ea5e9;
+  --c-bg:#f8fafc; --c-strip:#f1f5f9; --c-line:#e2e8f0;
+  --c-label:#64748b; --c-text:#0f172a;
+  --c-green:#10b981; --c-red:#ef4444;
+  --radius:14px;
+}
+body{background:var(--c-bg);margin:0;font-family:"Inter",sans-serif}
+.main-wrap{margin:calc(var(--h-topbar,0px) + 1rem) 0 2rem;animation:fade .35s}
+.card{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.card-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+           background:var(--c-strip);padding:1rem 1.5rem;gap:.8rem}
+.card-title{font-weight:700;font-size:1.3rem;color:var(--c-primary);display:flex;gap:.5rem;align-items:center}
+.btn-set{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn{border:none;border-radius:22px;padding:.5rem 1.15rem;font-size:.8rem;font-weight:600;
+     display:inline-flex;align-items:center;gap:.4rem;cursor:pointer;transition:.16s}
+.btn:hover{transform:translateY(-2px)}
+.btn-gray{background:#64748b;color:#fff}.btn-blue{background:#2563eb;color:#fff}
+.btn-amber{background:#f59e0b;color:#fff}.btn-red{background:var(--c-red);color:#fff}
+.profile-box{display:flex;align-items:center;gap:1.5rem;padding:1.5rem 1.8rem;border-bottom:1px solid var(--c-line)}
+.profile-img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid var(--c-primary)}
+.profile-info h2{margin:0;font-size:1.25rem;font-weight:700;color:var(--c-text)}
+.profile-info .occ{color:var(--c-label);font-weight:600;margin:.15rem 0 .35rem}
+.profile-info .stat{font-weight:700;color:var(--c-green)}.profile-info .inactive{color:var(--c-red)}
+.section{border-top:1px solid var(--c-line)}
+.section-head{background:var(--c-strip);padding:.75rem 1.5rem;color:var(--c-primary);
+              font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:.55rem}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.85rem;padding:1rem 1.5rem}
+.detail-grid.one{grid-template-columns:1fr}
+.dl{background:#fff;border:1px solid var(--c-line);border-radius:var(--radius);
+    padding:.7rem .9rem;display:flex;align-items:center;gap:.75rem}
+.dl i{color:var(--c-label);flex-shrink:0}.lbl{font-weight:600;color:var(--c-label);font-size:.78rem}.val{color:var(--c-text);font-size:.83rem}
+@media print{.btn-set{display:none}body{background:#fff}.card{box-shadow:none}}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:660px){.detail-grid{grid-template-columns:1fr}.profile-img{width:95px;height:95px}}
+</style>
+
+<div class="main-wrap">
+  <div class="card">
+
+    <!-- header buttons -->
+    <div class="card-head">
+      <h1 class="card-title"><i class="fas fa-address-card"></i> Staff Profile</h1>
+      <div class="btn-set">
+        <button class="btn btn-gray"  onclick="printPage()"><i class="fas fa-print"></i>Print</button>
+        <a href="{% url 'staff-update' staff.pk %}" class="btn btn-blue"><i class="fas fa-edit"></i>Edit</a>
+        <a href="{% url 'staff-delete' staff.pk %}" class="btn btn-red"><i class="fas fa-trash-alt"></i>Delete</a>
+        <a href="{% url 'staff-list' %}"           class="btn btn-amber"><i class="fas fa-list"></i>All Staff</a>
+        <button class="btn btn-gray" onclick="goBack()"><i class="fas fa-arrow-left"></i>Back</button>
+      </div>
+    </div>
+
+    <!-- profile ribbon -->
+    <div class="profile-box">
+      {% if staff.passport_photo %}
+        <img src="{{ staff.passport_photo.url }}" alt="photo" class="profile-img">
+      {% else %}
+        <img src="{% static 'dist/img/avatar.png' %}" alt="avatar" class="profile-img">
+      {% endif %}
+      <div class="profile-info">
+        <h2>{{ staff.firstname }} {{ staff.middle_name|default_if_none:'' }} {{ staff.surname }}</h2>
+        <p class="occ">{{ staff.job_title|default:"—" }}</p>
+        <p class="stat {% if staff.current_status == 'inactive' %}inactive{% endif %}">{{ staff.current_status|capfirst }}</p>
+      </div>
+    </div>
+
+    <!-- BASIC -->
+    <section class="section">
+      <div class="section-head"><i class="fas fa-info-circle"></i>Basic Info</div>
+      <div class="detail-grid">
+        <div class="dl"><i class="fas fa-id-card"></i><span class="lbl">Staff&nbsp;ID</span><span class="val">{{ staff.staff_id }}</span></div>
+        <div class="dl"><i class="fas fa-birthday-cake"></i><span class="lbl">DOB</span><span class="val">{{ staff.date_of_birth|date:"d M Y" }}</span></div>
+        <div class="dl"><i class="fas fa-venus-mars"></i><span class="lbl">Gender</span><span class="val">{{ staff.get_gender_display }}</span></div>
+      </div>
+    </section>
+
+    <!-- EMPLOYMENT -->
+    <section class="section">
+      <div class="section-head"><i class="fas fa-briefcase"></i>Employment</div>
+      <div class="detail-grid">
+        <div class="dl"><i class="fas fa-tags"></i><span class="lbl">Category</span><span class="val">{{ staff.get_staff_category_display }}</span></div>
+        <div class="dl"><i class="fas fa-briefcase"></i><span class="lbl">Job&nbsp;Title</span><span class="val">{{ staff.job_title|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-building"></i><span class="lbl">Department</span><span class="val">{{ staff.get_department_display|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-calendar-plus"></i><span class="lbl">Joined</span><span class="val">{{ staff.date_of_admission|date:"d M Y" }}</span></div>
+
+        <div class="dl"><i class="fas fa-money-bill-wave"></i><span class="lbl">Basic&nbsp;Salary</span>
+          <span class="val">{{ staff.salary|floatformat:0|intcomma }} TZS</span></div>
+
+        <div class="dl"><i class="fas fa-gift"></i><span class="lbl">Special&nbsp;Allowance</span>
+          <span class="val">{{ staff.special_allowance|floatformat:0|intcomma|default:"0" }} TZS</span></div>
+
+        <div class="dl"><i class="fas fa-calculator"></i><span class="lbl">Gross&nbsp;(for deductions)</span>
+          <span class="val">{{ staff.gross_for_deductions|floatformat:0|intcomma }} TZS</span></div>
+
+        <div class="dl"><i class="fas fa-hourglass-half"></i><span class="lbl">Contract</span><span class="val">{{ staff.contract_duration|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-calendar-alt"></i><span class="lbl">Start → End</span>
+          <span class="val">{{ staff.contract_start_date|date:"M Y"|default:"—" }} → {{ staff.contract_end_date|date:"M Y"|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-id-card-alt"></i><span class="lbl">Reg&nbsp;No.</span><span class="val">{{ staff.registration_number|default:"—" }}</span></div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section">
+      <div class="section-head"><i class="fas fa-phone"></i>Contact & Emergency</div>
+      <div class="detail-grid">
+        <div class="dl"><i class="fas fa-phone-alt"></i><span class="lbl">Mobile</span><span class="val">{{ staff.mobile_number|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-envelope"></i><span class="lbl">Email</span><span class="val">{{ staff.email|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-map-marker-alt"></i><span class="lbl">Address</span><span class="val">{{ staff.address|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-user-shield"></i><span class="lbl">Guarantor</span><span class="val">{{ staff.guarantor|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-user"></i><span class="lbl">Emerg. Name</span><span class="val">{{ staff.emergency_contact_name|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-mobile-alt"></i><span class="lbl">Emerg. No.</span><span class="val">{{ staff.emergency_contact_number|default:"—" }}</span></div>
+      </div>
+    </section>
+
+    <!-- FINANCIAL -->
+    <section class="section">
+      <div class="section-head"><i class="fas fa-university"></i>Financial & IDs</div>
+      <div class="detail-grid">
+        <div class="dl"><i class="fas fa-university"></i><span class="lbl">Bank</span><span class="val">{{ staff.bank_name|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-credit-card"></i><span class="lbl">Account No.</span><span class="val">{{ staff.bank_account_number|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-building"></i><span class="lbl">Branch</span><span class="val">{{ staff.bank_branch|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-id-badge"></i><span class="lbl">NIDA ID</span><span class="val">{{ staff.nida_id|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-file-invoice-dollar"></i><span class="lbl">TIN</span><span class="val">{{ staff.tin_number|default:"—" }}</span></div>
+        <div class="dl"><i class="fas fa-graduation-cap"></i><span class="lbl">HELSB</span><span class="val">{{ helsb_display }}</span></div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="section">
+      <div class="section-head"><i class="fas fa-info-circle"></i>Other Notes</div>
+      <div class="detail-grid one">
+        <div class="dl" style="align-items:flex-start">
+          <i class="fas fa-sticky-note"></i>
+          <div class="val">{{ staff.others|default:"No additional notes."|linebreaks }}</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+{% endblock %}

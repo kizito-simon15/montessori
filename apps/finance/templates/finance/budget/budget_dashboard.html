@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load humanize finance_tags %}
+
+{# ───────────────────────────────────────────────────────────────╮
+   Budget Dashboard – modern term-free • 05 Jul 2025             │
+╰─────────────────────────────────────────────────────────────── #}
+{% block title %}Budget Dashboard • Analytics{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+ :root{--indigo:#4f46e5;--rose:#ef4444;--emerald:#10b981;--amber:#f59e0b;--purple:#7c3aed;--paper:#f9fafb}
+ body{font-family:Inter,system-ui,sans-serif;background:var(--paper);}
+ .kpi{border-top-width:4px;transition:.2s}.kpi:hover{transform:translateY(-2px) scale(1.02)}
+ .chart-box{background:#fff;border-radius:1rem;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+ .chart-box canvas{width:100%!important;height:auto!important}
+ /* keep pies/doughnuts neat & centred */
+ .square-wrapper{max-width:420px;margin-inline:auto}
+ .square-wrapper canvas{aspect-ratio:1/1}
+ .table-head{background:#f1f5f9}.tbl tr:hover{background:#f9fafb}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+      🧮 Budget Dashboard <span class="text-sm font-normal text-gray-500">(per session)</span>
+    </h1>
+    <p class="text-sm text-gray-500">Track allocation, utilisation &amp; run-rate of every envelope.</p>
+  </div>
+  <a href="{% url 'budget-create' %}"
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white shadow">
+    ➕ New Budget
+  </a>
+</div>
+
+{# ───────────── KPI tiles ───────────── #}
+{% widthratio total_used total_alloc 100 as used_pct %}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+  <div class="kpi rounded-xl bg-white shadow p-4" style="border-color:var(--indigo);">
+    <h4 class="text-xs uppercase font-semibold text-slate-500">Allocated</h4>
+    <p class="text-xl font-bold text-[color:var(--indigo)]">{{ total_alloc|floatformat:2|intcomma }}</p>
+  </div>
+  <div class="kpi rounded-xl bg-white shadow p-4" style="border-color:var(--rose);">
+    <h4 class="text-xs uppercase font-semibold text-slate-500">Used</h4>
+    <p class="text-xl font-bold text-[color:var(--rose)]">{{ total_used|floatformat:2|intcomma }}</p>
+  </div>
+  <div class="kpi rounded-xl bg-white shadow p-4" style="border-color:var(--emerald);">
+    <h4 class="text-xs uppercase font-semibold text-slate-500">Remaining</h4>
+    <p class="text-xl font-bold {{ total_remain|gt:0|yesno:'text-[color:var(--emerald)],text-[color:var(--rose)]' }}">
+      {{ total_remain|floatformat:2|intcomma }}
+    </p>
+  </div>
+  <div class="kpi rounded-xl bg-white shadow p-4" style="border-color:var(--amber);">
+    <h4 class="text-xs uppercase font-semibold text-slate-500">Utilisation %</h4>
+    <p class="text-xl font-bold text-[color:var(--amber)]">{{ used_pct|floatformat:0 }}%</p>
+  </div>
+  <div class="kpi rounded-xl bg-white shadow p-4 lg:block hidden" style="border-color:var(--purple);">
+    <h4 class="text-xs uppercase font-semibold text-slate-500">Envelopes</h4>
+    <p class="text-xl font-bold text-[color:var(--purple)]">{{ budgets|length }}</p>
+  </div>
+</div>
+
+{# ───────────── Charts ───────────── #}
+<div class="grid gap-6 mb-10 lg:grid-cols-2">
+  <div class="chart-box p-4"><canvas id="bar"></canvas></div>
+  <div class="chart-box p-4 square-wrapper"><canvas id="donut"></canvas></div>
+  <div class="chart-box p-4 lg:col-span-2"><canvas id="line"></canvas></div>
+  <div class="chart-box p-4 square-wrapper lg:col-span-2"><canvas id="pie"></canvas></div>
+</div>
+
+{# ───────────── Table ─────────────── #}
+<div class="relative overflow-x-auto shadow rounded-lg">
+  <table class="min-w-full text-sm text-gray-700 divide-y divide-gray-200 tbl">
+    <thead class="table-head text-xs text-gray-500 uppercase font-semibold">
+      <tr>
+        <th class="px-4 py-3">Envelope</th>
+        <th class="px-4 py-3">Session</th>
+        <th class="px-4 py-3 text-right">Allocated</th>
+        <th class="px-4 py-3 text-right">Used</th>
+        <th class="px-4 py-3 text-right">Remaining</th>
+        <th class="px-4 py-3 w-24 text-center">%</th>
+        <th class="px-4 py-3 text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-100">
+      {% for b in budgets %}
+        {% widthratio b.used b.alloc 100 as pct %}
+        <tr>
+          <td class="px-4 py-3 font-medium text-gray-800">{{ b.obj.name }}</td>
+          <td class="px-4 py-3">{{ b.obj.session }}</td>
+          <td class="px-4 py-3 text-right">{{ b.alloc|floatformat:2|intcomma }}</td>
+          <td class="px-4 py-3 text-right text-[color:var(--rose)]">{{ b.used|floatformat:2|intcomma }}</td>
+          <td class="px-4 py-3 text-right {{ b.remain|lt:0|yesno:'text-[color:var(--rose)],text-[color:var(--emerald)]' }}">
+            {{ b.remain|floatformat:2|intcomma }}
+          </td>
+          <td class="px-4 py-3 text-center">
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div class="h-2.5 rounded-full {{ pct|floatformat:0|gt:80|yesno:'bg-[color:var(--rose)],bg-[color:var(--emerald)]' }}"
+                   style="width:{{ pct }}%"></div>
+            </div>
+            <span class="text-xs text-gray-500">{{ pct|floatformat:0 }}%</span>
+          </td>
+          <td class="px-4 py-3 text-center whitespace-nowrap">
+            <a href="{% url 'budget-update' b.obj.id %}" class="inline-block text-indigo-600 hover:text-indigo-800 mr-2" title="Edit">✏</a>
+            <a href="{% url 'budget-delete' b.obj.id %}" class="inline-block text-[color:var(--rose)] hover:text-red-700" title="Delete">🗑</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No budget envelopes found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+(() => {
+  const labels      = {{ labels       | safe }};
+  const allocSeries = {{ alloc_series | safe }};
+  const usedSeries  = {{ used_series  | safe }};
+  const remSeries   = {{ rem_series   | safe }};
+  const lineLabels  = {{ line_labels  | safe }};
+  const lineSeries  = {{ line_series  | safe }};
+  const pieLabels   = {{ pie_labels   | safe }};
+  const pieSeries   = {{ pie_series   | safe }};
+  const totalAlloc  = {{ total_alloc }};
+  const totalRemain = {{ total_remain }};
+  const fmt = v => Number(v).toLocaleString();
+
+  /* stacked bar */
+  new Chart(document.getElementById('bar'),{
+    type:'bar',
+    data:{labels,
+      datasets:[
+        {label:'Allocated', data:allocSeries, backgroundColor:'rgba(79,70,229,.85)'},
+        {label:'Used',      data:usedSeries,  backgroundColor:'rgba(239,68,68,.85)'},
+        {label:'Remaining', data:remSeries,   backgroundColor:'rgba(16,185,129,.85)'}
+      ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true}},
+               tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`}}},
+      scales:{x:{stacked:true,grid:{display:false}},
+              y:{stacked:true,beginAtZero:true,title:{display:true,text:'TZS'},
+                 ticks:{callback:v=>fmt(v)}}}
+    }
+  });
+
+  /* overall doughnut */
+  new Chart(document.getElementById('donut'),{
+    type:'doughnut',
+    data:{labels:['Used','Remaining'],
+          datasets:[{data:[totalAlloc-totalRemain,totalRemain],
+                     backgroundColor:['rgba(239,68,68,.85)','rgba(16,185,129,.5)'],
+                     hoverOffset:4}]},
+    options:{responsive:true,cutout:'65%',
+             plugins:{legend:{display:false},
+                      title:{display:true,text:'Overall Utilisation'},
+                      tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmt(ctx.parsed)}`}}}}
+  });
+
+  /* cumulative line */
+  new Chart(document.getElementById('line'),{
+    type:'line',
+    data:{labels:lineLabels,
+          datasets:[{label:'Cumulative Utilisation %',
+                     data:lineSeries,tension:.25,borderWidth:2,fill:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+             plugins:{legend:{display:false},
+                      title:{display:true,text:'Cumulative Utilisation (%)'}}}
+  });
+
+  /* allocation share pie / doughnut */
+  (() => {
+    const ctx   = document.getElementById('pie');
+    const nCats = pieSeries.length;
+
+    new Chart(ctx, {
+      type: nCats === 1 ? 'doughnut' : 'pie',
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieSeries,
+          backgroundColor: [
+            '#4f46e5','#ef4444','#10b981',
+            '#f59e0b','#7c3aed','#14b8a6','#e879f9'
+          ],
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 1,
+        cutout: nCats === 1 ? '70%' : '0',
+        layout: { padding: 10 },
+        plugins: {
+          legend: {
+            display: nCats > 1,
+            position: 'bottom',
+            labels: { usePointStyle:true }
+          },
+          title: {
+            display: true,
+            text: 'Allocation Share by Category'
+          },
+          tooltip: {
+            callbacks: { label: ctx => `${ctx.label}: ${fmt(ctx.parsed)}` }
+          }
+        }
+      }
+    });
+  })();
+})();
+</script>
+{% endblock %}

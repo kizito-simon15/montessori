@@ -1,0 +1,30 @@
+{# finance-focused quick-access nav #}
+<style>
+  .vs-nav{display:flex;flex-direction:column;gap:.75rem;padding:1.2rem}
+  .vs-link{
+    display:flex;align-items:center;gap:.55rem;padding:.6rem .9rem;
+    border-radius:14px;font-size:.9rem;font-weight:600;color:#fff;
+    background:linear-gradient(135deg,var(--clr-accent),var(--clr-primary));
+    text-decoration:none;box-shadow:0 3px 8px #0003;transition:.15s;
+  }
+  .vs-link:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 12px #0004}
+  .vs-section{margin:1.2rem 0 .2rem;font-size:.7rem;font-weight:700;
+              text-transform:uppercase;color:#a5f3fc;letter-spacing:.05em;padding-left:.9rem;}
+</style>
+
+<div class="vs-nav">
+  <a href="{% url 'bursor_dashboard' %}" class="vs-link"><i class="fa fa-chart-pie"></i>Dashboard</a>
+
+  <span class="vs-section">Finance</span>
+  <a href="{% url 'bursor-invoice-list' %}"        class="vs-link"><i class="fa fa-file-invoice"></i>Payment&nbsp;Invoices</a>
+  <a href="{% url 'expenditure_dashboard' %}"    class="vs-link"><i class="fa fa-money-bill-wave"></i>Expenditures</a>
+  <a href="{% url 'bursor-expenditure-list' %}" class="vs-link"><i class="fa fa-file-signature"></i>Expenditure&nbsp;Envelopes</a>
+  <a href="{ url 'bursor_salary_invoices' }"    class="vs-link"><i class="fa fa-sack-dollar"></i>Salaries</a>
+
+  <span class="vs-section">Assets</span>
+  <a href="{ url 'bursor_property_list' }"       class="vs-link"><i class="fa fa-building"></i>School&nbsp;Properties</a>
+
+  <span class="vs-section">Messaging</span>
+  <a href="{ url 'bursor_send_sms_form' }"       class="vs-link"><i class="fa fa-paper-plane"></i>Send&nbsp;SMS</a>
+  <a href="{ url 'bursor_sms_history' }"         class="vs-link"><i class="fa fa-history"></i>SMS&nbsp;History</a>
+</div>

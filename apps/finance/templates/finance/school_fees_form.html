@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const annualAmountInput = document.getElementById('id_annual_amount');
+    const categoryInput = document.getElementById('id_category');
+    const sessionInput = document.getElementById('id_session');
+    const cancelBtn = document.querySelector('.btn-secondary');
+
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Client-side validation for annual amount
+    function validateAnnualAmount() {
+        const value = parseInt(annualAmountInput.value);
+        const errorDiv = annualAmountInput.closest('.form-group').querySelector('.text-danger');
+        if (isNaN(value) || value <= 0) {
+            errorDiv.textContent = 'Please enter a positive whole number (e.g., 1000000)';
+            annualAmountInput.classList.add('is-invalid');
+        } else if (annualAmountInput.value.includes('.')) {
+            errorDiv.textContent = 'Decimal values are not allowed';
+            annualAmountInput.classList.add('is-invalid');
+        } else {
+            errorDiv.textContent = '';
+            annualAmountInput.classList.remove('is-invalid');
+        }
+    }
+
+    // Client-side validation for category
+    function validateCategory() {
+        const value = categoryInput.value.trim();
+        const errorDiv = categoryInput.closest('.form-group').querySelector('.text-danger');
+        if (!value) {
+            errorDiv.textContent = 'Please enter a category';
+            categoryInput.classList.add('is-invalid');
+        } else if (value.length > 50) {
+            errorDiv.textContent = 'Category cannot exceed 50 characters';
+            categoryInput.classList.add('is-invalid');
+        } else {
+            errorDiv.textContent = '';
+            categoryInput.classList.remove('is-invalid');
+        }
+    }
+
+    // Client-side validation for session
+    function validateSession() {
+        const value = sessionInput.value;
+        const errorDiv = sessionInput.closest('.form-group').querySelector('.text-danger');
+        if (!value) {
+            errorDiv.textContent = 'Please select an academic session';
+            sessionInput.classList.add('is-invalid');
+        } else {
+            errorDiv.textContent = '';
+            sessionInput.classList.remove('is-invalid');
+        }
+    }
+
+    annualAmountInput.addEventListener('input', debounce(validateAnnualAmount, 300));
+    categoryInput.addEventListener('input', debounce(validateCategory, 300));
+    sessionInput.addEventListener('change', debounce(validateSession, 300));
+
+    // Toggle fieldset visibility
+    const fieldsets = document.querySelectorAll('.card-body fieldset');
+    fieldsets.forEach((fieldset, index) => {
+        const legend = fieldset.querySelector('legend');
+        const content = fieldset.querySelector('.fieldset-content');
+        const isCollapsed = localStorage.getItem(`school-fees-form-fieldset-${index}`) === 'collapsed';
+        
+        if (isCollapsed) {
+            content.style.display = 'none';
+            legend.classList.add('collapsed');
+        }
+
+        legend.addEventListener('click', () => {
+            const isNowCollapsed = content.style.display === 'none';
+            content.style.display = isNowCollapsed ? 'grid' : 'none';
+            legend.classList.toggle('collapsed', !isNowCollapsed);
+            localStorage.setItem(`school-fees-form-fieldset-${index}`, isNowCollapsed ? 'expanded' : 'collapsed');
+        });
+    });
+
+    // Cancel confirmation
+    cancelBtn.addEventListener('click', (e) => {
+        if (form.checkValidity() && Array.from(form.elements).some(el => el.value)) {
+            if (!confirm('Are you sure you want to cancel? Unsaved changes will be lost.')) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    // Sticky header on scroll
+    const header = document.querySelector('.card-header');
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = debounce(() => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            header.classList.add('sticky');
+        } else {
+            header.classList.remove('sticky');
+        }
+        lastScrollY = currentScrollY;
+    }, 100);
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Fade-in animation for card
+    const card = document.querySelector('.card');
+    card.style.opacity = '0';
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+});
+</script>
+
+<style>
+:root {
+    --primary: #1e3a8a; /* Deep blue */
+    --secondary: #d97706; /* Amber */
+    --sidebar-bg: #2e1065; /* Deep purple */
+    --sidebar-hover: #a78bfa; /* Light purple */
+    --sidebar-active: #6d28d9; /* Active purple */
+    --success: #16a34a;
+    --danger: #dc2626;
+    --info: #0284c7;
+    --background: #f1f5f9;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --input-bg: #f9fafb;
+    --input-border: #d1d5db;
+}
+
+body {
+    background: var(--background);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 0 0 15px 15px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(20px);
+    animation: slideInDown 0.5s ease forwards;
+}
+
+.card-header {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+    position: relative;
+    z-index: 10;
+    padding: 1rem;
+}
+
+.card-header.sticky {
+    position: sticky;
+    top: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-header h2 {
+    font-size: clamp(1.4rem, 5vw, 1.6rem);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body {
+    display: grid;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.alert-danger {
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin-bottom: 1rem;
+    background: #fee2e2;
+    color: var(--danger);
+}
+
+fieldset {
+    border: none;
+    border-radius: 12px;
+    background: var(--input-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+fieldset:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+legend {
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+    font-weight: 600;
+    color: #fff;
+    background: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+legend:hover {
+    background: var(--secondary);
+}
+
+legend.collapsed::after {
+    content: '▶';
+    margin-left: 0.5rem;
+}
+
+legend:not(.collapsed)::after {
+    content: '▼';
+    margin-left: 0.5rem;
+}
+
+.fieldset-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.form-control, .form-select {
+    border-radius: 25px;
+    border: 1px solid var(--input-border);
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    background: var(--input-bg);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: #6b7280;
+    opacity: 0.7;
+}
+
+.form-control.is-invalid {
+    border-color: var(--danger);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-text {
+    border-radius: 25px 0 0 25px;
+    background: #e5e7eb;
+    border: none;
+    color: var(--secondary);
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    padding: 0.5rem 0.75rem;
+}
+
+.text-danger {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: var(--danger);
+    margin-top: 0.25rem;
+}
+
+.text-muted {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.btn {
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    padding: 0.75rem 1.5rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: #fff;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+    .fieldset-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-header h2 {
+        font-size: clamp(1.2rem, 4vw, 1.4rem);
+    }
+    .form-control, .form-select {
+        font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    }
+    .btn {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        padding: 0.6rem 1.2rem;
+    }
+    .fieldset-content {
+        display: none;
+    }
+    legend:not(.collapsed) + .fieldset-content {
+        display: grid;
+    }
+}
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h2>
+            {% if object %}
+                <i class="fas fa-edit"></i> Update School Fees
+            {% else %}
+                <i class="fas fa-plus-circle"></i> Add School Fees
+            {% endif %}
+        </h2>
+    </div>
+    <div class="card-body">
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>Form Errors:</strong>
+                <ul class="mb-0">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset>
+                <legend><i class="fas fa-money-bill-wave"></i> Fee Details</legend>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <label for="id_session" class="form-label">Academic Session <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">📅</span>
+                            {{ form.session|add_class:"form-select" }}
+                        </div>
+                        {% if form.session.errors %}
+                            <div class="text-danger">
+                                {% for error in form.session.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-danger"></div>
+                            <small class="text-muted">Select the academic session (e.g., 2024/2025)</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_category" class="form-label">Category <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">🏫</span>
+                            {{ form.category|add_class:"form-control" }}
+                        </div>
+                        {% if form.category.errors %}
+                            <div class="text-danger">
+                                {% for error in form.category.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-danger"></div>
+                            <small class="text-muted">Enter category (e.g., Boarding, Day Scholar)</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_annual_amount" class="form-label">Annual Amount (TZS) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">💰</span>
+                            {{ form.annual_amount|add_class:"form-control" }}
+                        </div>
+                        {% if form.annual_amount.errors %}
+                            <div class="text-danger">
+                                {% for error in form.annual_amount.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-danger"></div>
+                            <small class="text-muted">Enter amount in TZS (e.g., 1000000)</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}
+                        <i class="fas fa-save"></i> Save
+                    {% else %}
+                        <i class="fas fa-plus-circle"></i> Add Fees
+                    {% endif %}
+                </button>
+                <a class="btn btn-secondary" href="{% url 'school-fees-list' %}"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

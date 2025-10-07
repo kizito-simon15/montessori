@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Historical Term Assignments: {{ student }}
+{% endblock title %}
+
+{% block content %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Print page function
+    function printPage() {
+        document.body.classList.add('printing');
+        window.print();
+        document.body.classList.remove('printing');
+    }
+
+    // Go back function
+    function goBack() {
+        window.history.back();
+    }
+
+    // Expose functions to global scope
+    window.printPage = printPage;
+    window.goBack = goBack;
+
+    // Session filter
+    const sessionFilter = document.getElementById('sessionFilter');
+    sessionFilter.addEventListener('change', function() {
+        if (this.value) {
+            window.location.href = `{% url 'historical-term-assignments' student.id %}?session_id=${this.value}`;
+        } else {
+            window.location.href = `{% url 'historical-term-assignments' student.id %}`;
+        }
+    });
+
+    // Fade-in animation for card
+    const card = document.querySelector('.main-card');
+    card.style.opacity = '0';
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+});
+</script>
+
+<style>
+:root {
+    --primary: #1e3a8a;
+    --secondary: #d97706;
+    --sidebar-bg: #2e1065;
+    --sidebar-hover: #a78bfa;
+    --sidebar-active: #6d28d9;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --info: #0284c7;
+}
+
+body {
+    background: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.main-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(20px);
+    animation: slideInDown 0.5s ease forwards;
+}
+
+.title-section {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    color: #fff;
+    border-radius: 12px 12px 0 0;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+}
+
+.title-section h2 {
+    font-size: clamp(1.5rem, 5vw, 1.8rem);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title-section .btn-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.controls-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    background: #fff;
+    padding: 0.5rem;
+}
+
+.filter-btn {
+    border-radius: 25px;
+    background: #facc15;
+    color: #333;
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: clamp(150px, 40vw, 200px);
+}
+
+.filter-btn:hover {
+    background: #eab308;
+}
+
+.detail-content {
+    padding: 0.5rem;
+}
+
+.detail-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-line:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detail-icon {
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    color: var(--secondary);
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #333;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+}
+
+.detail-value {
+    color: #555;
+    flex: 1;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+}
+
+.term-assigned {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.term-not-assigned {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.btn {
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    padding: 0.5rem 1rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-sm {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    padding: 0.4rem 0.8rem;
+}
+
+.btn-info {
+    background: var(--info);
+    color: #fff;
+    border: none;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: #fff;
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-info:hover {
+    background: #0369a1;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.no-data {
+    text-align: center;
+    color: #6b7280;
+    padding: 1rem;
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+}
+
+.printing .title-section .btn-group {
+    display: none;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .title-section {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    .title-section .btn-group {
+        justify-content: center;
+    }
+    .controls-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .title-section h2 {
+        font-size: clamp(1.2rem, 4vw, 1.4rem);
+    }
+}
+</style>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="main-card">
+    <div class="title-section">
+        <h2><i class="fas fa-history"></i> Historical Term Assignments</h2>
+        <div class="btn-group">
+            <button class="btn btn-secondary btn-sm" onclick="printPage()" title="Print this page">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="goBack()" title="Go Back">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <a href="{% url 'student-detail' student.id %}" class="btn btn-info btn-sm">
+                <i class="fas fa-user-graduate"></i> Student Details
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <h3>{{ student.firstname }} {{ student.middle_name|default_if_none:'' }} {{ student.surname|default_if_none:'' }}</h3>
+        <div class="controls-container">
+            <select id="sessionFilter" class="filter-btn form-select">
+                <option value="">All Sessions</option>
+                {% for session in academic_sessions %}
+                    <option value="{{ session.id }}" {% if session == selected_session %}selected{% endif %}>
+                        {{ session.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="detail-content">
+            {% if term_assignments %}
+                {% for assignment in term_assignments %}
+                    <div class="detail-line">
+                        <i class="fas fa-calendar-alt detail-icon"></i>
+                        <span class="detail-label">Term:</span>
+                        <span class="detail-value {% if assignment.academic_term.current and assignment.academic_session.current %}term-assigned{% else %}term-not-assigned{% endif %}">
+                            {{ assignment.academic_term }} ({{ assignment.academic_session }}) - Assigned on {{ assignment.assigned_date }}
+                        </span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-data">
+                    No term assignments found for {% if selected_session %}{{ selected_session }}{% else %}any session{% endif %}.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

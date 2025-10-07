@@ -1,0 +1,37 @@
+<tr class="result-row" 
+    data-name="{{ student_data.student|lower }}"
+    data-average="{{ student_data.overall_average }}"
+    style="border-bottom: 1px solid #ddd;">
+    <td class="sticky-col">{{ counter }}</td>
+    <td class="sticky-col">
+        <a href="{% url 'single-student' student_id=student_data.student.id %}" style="color: #007bff; text-decoration: none;">
+            {{ student_data.student }}
+        </a>
+    </td>
+    <td class="sticky-col">
+        {% if student_data.student.gender == "male" %}M{% else %}F{% endif %}
+    </td>
+    <td class="sticky-col">{{ student_data.student_class }}</td>
+    {% for subject, subject_data in student_data.subjects.items %}
+    <td>{{ subject_data.test_score|default:"None" }}</td>
+    <td>{{ subject_data.exam_score|default:"None" }}</td>
+    <td>{{ subject_data.average|default:"None" }}</td>
+    {% endfor %}
+    <td>{{ student_data.total }}</td>
+    <td>{{ student_data.overall_average|floatformat:"2" }}</td>
+    <td>{{ student_data.overall_status }}</td>
+    <td>{{ student_data.position }}</td>
+</tr>
+
+<style>
+    .result-row a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .result-row td {
+            font-size: 14px;
+            padding: 6px;
+        }
+    }
+</style>

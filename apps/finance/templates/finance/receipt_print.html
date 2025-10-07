@@ -1,0 +1,173 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<title>Risiti {{ receipt.receipt_number }}</title>
+<style>
+/* ── WEB-FONTS ─────────────────────────────────────────────────────── */
+@font-face{font-family:'Inter';font-weight:400;
+  src:url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter-Regular.woff2") format("woff2")}
+@font-face{font-family:'Inter';font-weight:600;
+  src:url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter-SemiBold.woff2") format("woff2")}
+@font-face{font-family:'Inter';font-weight:700;
+  src:url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter-Bold.woff2") format("woff2")}
+
+/* ── ROOT & PAGE SETUP ────────────────────────────────────────────── */
+@page{size:A4;margin:18mm 16mm 20mm}
+:root{
+  --blue:#29a5ff;
+  --green:#16a34a;
+  --carrot:#fb923c;
+  --border:#d1d5db;
+  --shadow:0 10px 22px rgba(0,0,0,.08);
+  --text:#111827;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#ecf7ff;font:400 13px/1.55 'Inter',sans-serif;color:var(--text)}
+
+/* ── WRAPPER ───────────────────────────────────────────────────────── */
+.wrapper{
+  max-width:780px;margin:0 auto;background:#fff;border:1px solid var(--border);
+  border-radius:22px;padding:32px 36px;box-shadow:var(--shadow)
+}
+
+/* ── HEADER ────────────────────────────────────────────────────────── */
+.header{display:flex;gap:18px;align-items:center;margin-bottom:28px}
+.logo{width:92px;height:92px;border-radius:50%;object-fit:cover;
+      box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.ttl{margin:0;color:var(--blue);font-weight:700;font-size:1.75rem}
+.tag{margin:2px 0 10px;font-size:12px;opacity:.82}
+.addr{margin:1px 0;font-size:11.3px;opacity:.88}
+.divider{height:4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--blue)0%,var(--green)55%,var(--carrot)95%);
+  margin-bottom:28px}
+
+/* ── TABLES ────────────────────────────────────────────────────────── */
+.table{width:100%;border-collapse:collapse;font-size:12.8px}
+.table th{width:150px;text-align:left;font-weight:600;padding:6px 10px 6px 0}
+.table td{padding:6px 0}
+.table tr:nth-child(even) td{background:#f9fafb}
+.pay-method{color:var(--carrot);font-weight:600}
+
+/* ── AMOUNT BOX ───────────────────────────────────────────────────── */
+.box-amt{
+  margin:30px 0;padding:18px 20px;background:#ecfdf5;border-left:6px solid var(--green);
+  border-radius:13px;display:flex;justify-content:space-between;align-items:center}
+.box-amt .big{font-size:1.95rem;font-weight:700;color:var(--green)}
+
+/* ── BADGES ───────────────────────────────────────────────────────── */
+.badge{display:inline-block;font-size:10px;padding:3px 8px;border-radius:8px;font-weight:600;color:#fff}
+.badge.paid{background:var(--green)}.badge.bal{background:var(--carrot)}
+
+/* ── SIGNATURE ─────────────────────────────────────────────────────── */
+.sig{margin-top:78px;text-align:center}
+.sig .line{width:66%;height:1px;background:#000;margin:0 auto 6px}
+
+/* ── FOOTER & PRINT BUTTON ────────────────────────────────────────── */
+footer{
+  margin-top:42px;text-align:center;font-size:11.2px;opacity:.78;
+  border-top:1px dashed var(--border);padding-top:14px}
+.tools{position:fixed;top:22px;right:22px;z-index:999}
+.tools button{
+  background:linear-gradient(135deg,var(--green),var(--blue));border:none;border-radius:999px;
+  color:#fff;font-size:12px;padding:8px 24px;font-weight:600;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.16)
+}
+
+/* ── PRINT OVERRIDES ──────────────────────────────────────────────── */
+@media print{
+  body{background:#fff;-webkit-print-color-adjust:exact}
+  .wrapper{max-width:100%;border:none;box-shadow:none;padding:0}
+  .divider{margin-bottom:24px}
+  .tools{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<!-- Quick-print floating button (hidden kwa print) -->
+<div class="tools"><button onclick="window.print()">🖨️ Chapisha</button></div>
+
+<section class="wrapper">
+
+  <!-- ============ HEADER ============ -->
+  <div class="header">
+    <img src="{% static 'images/logo.jpg' %}" alt="Logo" class="logo">
+    <div>
+      <h1 class="ttl">Victory Pre&nbsp;&amp;&nbsp;Primary School</h1>
+      <p class="tag">“Together we make a difference”</p>
+      <p class="addr">📞 +255 768 100 035  •  S.L.P 52, Biharamulo — Kagera</p>
+      <p class="addr">🌐 www.victory.ac.tz</p>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- ============ RECEIPT META ============ -->
+  <table class="table">
+    <tr><th>Namba ya Risiti:</th><td>{{ receipt.receipt_number }}</td></tr>
+    <tr><th>Tarehe ya Malipo:</th><td>{{ receipt.date_paid|date:"d F Y" }}</td></tr>
+    <tr><th>Njia ya Malipo:</th><td class="pay-method">{{ receipt.get_payment_method_display }}</td></tr>
+    {% if receipt.transaction_reference %}
+      <tr><th>Kumbukumbu:</th><td>{{ receipt.transaction_reference }}</td></tr>
+    {% endif %}
+  </table>
+
+  <!-- ============ STUDENT / INVOICE INFO ============ -->
+  <table class="table" style="margin-top:24px">
+    <tr><th>Mwanafunzi:</th><td>{{ receipt.invoice.student }}</td></tr>
+    <tr><th>Darsa:</th><td>{{ receipt.invoice.class_for }}</td></tr>
+    <tr><th>Kipindi:</th><td>{{ receipt.invoice.session }}</td></tr>
+
+    <tr>
+      <th>Muhula:</th>
+      <td>
+        {% with inst=receipt.invoice.installment.name|lower %}
+          {% if inst == "first" or inst == "1" %}muhula wa kwanza
+          {% elif inst == "second" or inst == "2" %}muhula wa pili
+          {% elif inst == "third" or inst == "3" %}muhula wa tatu
+          {% elif inst == "fourth" or inst == "4" %}muhula wa nne
+          {% else %}{{ receipt.invoice.installment.name }}{% endif %}
+        {% endwith %}
+      </td>
+    </tr>
+
+    <tr><th>Namba ya Ankara:</th><td>{{ receipt.invoice.invoice_number }}</td></tr>
+  </table>
+
+  <!-- ============ AMOUNT RECEIVED ============ -->
+  <div class="box-amt">
+    <span>Tumepokea</span>
+    <span class="big">{{ receipt.amount_paid|floatformat:2|intcomma }} TZS</span>
+  </div>
+
+  <!-- ============ REMAINING BALANCE ============ -->
+  {% with deni=receipt.invoice.overall_balance %}
+    {% if deni <= 0 %}
+      <p>Jumla ya deni liliobaki muhula huu:
+         <span class="badge paid">IMELIPWA KAMILI</span></p>
+    {% else %}
+      <p>Jumla ya deni liliobaki muhula huu:
+         <span class="badge bal">{{ deni|floatformat:2|intcomma }} TZS</span></p>
+    {% endif %}
+  {% endwith %}
+
+  {% if receipt.comment %}
+    <p style="margin-top:14px"><strong>Maelezo:</strong> {{ receipt.comment }}</p>
+  {% endif %}
+
+  <!-- ============ SIGNATURE ============ -->
+  <div class="sig">
+    <div class="line"></div>
+    Sahihi ya Mhasibu
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    Risiti imetolewa — Mfumo wa Shule ya Victory • {{ now|date:"d F Y  •  H:i" }}
+  </footer>
+
+</section>
+</body>
+</html>

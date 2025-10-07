@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load humanize static %}
+
+{% block title %}Invoice {{ object.invoice_number }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#2563eb;--pri2:#3b82f6;--sec:#f97316;--bg:#f1f5f9;--bdr:rgba(0,0,0,.07);
+  --grn:#16a34a;--red:#dc2626;--sky:#0ea5e9;
+}
+html,body{margin:0;background:var(--bg);font:.94rem/1.55 "Inter",sans-serif}
+
+/* banner */
+.banner{display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(135deg,var(--pri),var(--sec));color:#fff;
+  padding:1rem 1.4rem;border-radius:0 0 24px 24px}
+.banner h2{margin:0;font:600 1.35rem/1 "Inter",sans-serif;display:flex;gap:.45rem;align-items:center}
+.banner small{opacity:.85;font-size:.82rem}
+.action-bar a{display:inline-flex;align-items:center;gap:.3rem;font-weight:600;
+  font-size:.8rem;padding:.46rem 1rem;border-radius:24px;text-decoration:none;cursor:pointer}
+.back      {background:#fff;color:var(--pri)}
+.print     {background:var(--pri2);color:#fff}
+.pdf       {background:var(--sky);color:#fff}
+.delete    {background:var(--red);color:#fff}
+.action-bar a:hover{filter:brightness(1.1)}
+
+/* cards / KPI */
+.card{background:#fff;border:1px solid var(--bdr);border-radius:22px;padding:1.2rem;margin:1.2rem 1.2rem 0}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem}
+.kpi-item strong{font-size:.78rem;opacity:.75}
+.kpi-item .val{font-size:1.25rem;font-weight:700}
+.kpi-due{color:var(--sky)} .kpi-paid{color:var(--grn)} .kpi-bal{color:var(--red)}
+.kpi-status{color:var(--sec);text-transform:uppercase;font-weight:700}
+
+/* progress */
+.prog-wrap{height:.7rem;border-radius:999px;background:#e5e7eb;overflow:hidden}
+.prog{height:100%;background:linear-gradient(135deg,var(--grn),#22c55e)}
+
+/* info grid */
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{padding:.55rem .9rem;white-space:nowrap}
+thead{background:var(--pri2);color:#fff;font-size:.78rem}
+tbody tr:nth-child(even){background:#f9fafb}
+tbody tr:hover{background:#e0f2fe}
+
+/* buttons */
+.btn-sm{font-size:.73rem;padding:.32rem .7rem;border-radius:14px;border:1px solid var(--pri2);
+        background:#fff;color:var(--pri2);text-decoration:none}
+.btn-sm:hover{background:var(--pri2);color:#fff}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ░░ Banner ░░ -->
+<div class="banner">
+  <div>
+    <h2>📑 Invoice&nbsp;Details</h2>
+    <small>#{{ object.invoice_number }}</small>
+  </div>
+
+  <div class="action-bar" style="display:flex;gap:.55rem">
+    <a class="back"   href="{% url 'invoice-list' %}">← Back</a>
+    <a class="print"  href="{% url 'invoice-print' pk=object.id %}" target="_blank">🖨 Print</a>
+    <a class="pdf"    href="{% url 'invoice-generate' pk=object.id %}">📄 PDF</a>
+    <a class="delete" href="{% url 'invoice-delete' pk=object.id %}"
+       onclick="return confirm('Delete this invoice? All its receipts will be lost.');">🗑 Delete</a>
+  </div>
+</div>
+
+<!-- ░░ KPI ░░ -->
+<div class="card">
+  <div class="kpi">
+    <div class="kpi-item kpi-due"><strong>💳 Total&nbsp;Due</strong><span class="val">{{ object.invoice_amount|intcomma }}</span></div>
+    <div class="kpi-item kpi-paid"><strong>✅ Paid</strong><span class="val">{{ total_paid|intcomma }}</span></div>
+    <div class="kpi-item kpi-bal"><strong>⚖️ Balance</strong><span class="val">{{ balance|intcomma }}</span></div>
+    <div class="kpi-item kpi-status"><strong>📌 Status</strong><span class="val">{{ object.status }}</span></div>
+  </div>
+
+  <!-- progress bar -->
+  <div style="margin-top:1.1rem">
+    <div class="prog-wrap">
+      <div class="prog" style="width:{{ pct }}%"></div>
+    </div>
+    <small style="opacity:.6">{{ pct }} %</small>
+  </div>
+</div>
+
+<!-- ░░ Info ░░ -->
+<div class="card">
+  <h3 style="margin:0 0 .7rem;font-size:.95rem">🗂️ Info</h3>
+  <div class="info">
+    <div><strong>🙎 Student</strong>{{ object.student }}</div>
+    <div><strong>🎓 Class</strong>{{ object.class_for }}</div>
+    <div><strong>📅 Session</strong>{{ object.session }}</div>
+    <div><strong>🗓️ Installment</strong>{{ object.installment }}</div>
+    <div><strong>⏰ Due</strong>{{ object.due_date|date:'Y-m-d' }}</div>
+  </div>
+  {% if object.notes %}
+    <p style="margin-top:.6rem;font-size:.8rem;opacity:.7">🖊 {{ object.notes }}</p>
+  {% endif %}
+</div>
+
+<!-- ░░ Receipts ░░ -->
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+    <h3 style="margin:0;font-size:.95rem">🧾 Receipts ({{ receipts|length }})</h3>
+    <a class="btn-sm" href="{% url 'receipt-create' %}?invoice={{ object.id }}">➕ Add</a>
+  </div>
+
+  {% if receipts %}
+  <div style="overflow:auto">
+    <table>
+      <thead><tr><th>#</th><th>Date</th><th>Amount</th><th>Method</th><th>Ref</th><th></th></tr></thead>
+      <tbody>
+      {% for r in receipts %}
+        <tr>
+          <td>{{ r.receipt_number }}</td>
+          <td>{{ r.date_paid|date:'Y-m-d' }}</td>
+          <td>{{ r.amount_paid|intcomma }}</td>
+          <td>{{ r.get_payment_method_display }}</td>
+          <td>{{ r.transaction_reference|default:'—' }}</td>
+          <td>
+            <a class="btn-sm" href="{% url 'receipt-view' receipt_id=r.id %}"   target="_blank">👁</a>
+            <a class="btn-sm" href="{% url 'generate-receipt' pk=r.id %}">📄</a>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p style="font-size:.83rem;opacity:.7">No receipts yet.</p>
+  {% endif %}
+</div>
+
+<!-- ░░ Items ░░ -->
+{% if items %}
+<div class="card">
+  <h3 style="margin:0 0 .6rem;font-size:.95rem">📋 Items</h3>
+  <div style="overflow:auto">
+    <table>
+      <thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead>
+      <tbody>
+      {% for it in items %}
+        <tr>
+          <td>{{ it.description }}</td>
+          <td>{{ it.quantity }}</td>
+          <td>{{ it.unit_price|intcomma }}</td>
+          <td>{{ it.amount|intcomma }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

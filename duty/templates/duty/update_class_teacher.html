@@ -1,0 +1,136 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e0e6ef;
+    }
+
+    h2 {
+        color: #333;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        background-color: #007aff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .form-control, .form-check-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus, .form-check-input:focus {
+        border-color: #007aff;
+        outline: none;
+    }
+
+    .form-check-label {
+        display: inline-block;
+        margin-left: 5px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+        color: #fff;
+        transition: background-color 0.3s;
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background-color: #34c759; /* iOS-like green */
+    }
+
+    .btn-primary:hover {
+        background-color: #28a745;
+    }
+
+    .btn-secondary {
+        background-color: #007aff; /* iOS-like blue */
+    }
+
+    .btn-secondary:hover {
+        background-color: #0063cc;
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2>Update Class Teacher</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="id_staff">Staff Name</label>
+            {{ form.staff }}
+            {% if form.staff.errors %}
+                <div class="text-danger">{{ form.staff.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group mb-3">
+            <label for="id_assigned_class">Is Class Teacher Of</label>
+            {{ form.assigned_class }}
+            {% if form.assigned_class.errors %}
+                <div class="text-danger">{{ form.assigned_class.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-check mb-3">
+            {{ form.is_class_teacher }}
+            <label class="form-check-label" for="id_is_class_teacher">Is Class Teacher</label>
+            {% if form.is_class_teacher.errors %}
+                <div class="text-danger">{{ form.is_class_teacher.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Update Class Teacher</button>
+    </form>
+
+    <a href="{% url 'staff-role-list' %}" class="btn btn-secondary mt-3">Back to Role List</a>
+</div>
+{% endblock %}

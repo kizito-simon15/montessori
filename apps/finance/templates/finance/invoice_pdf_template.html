@@ -1,0 +1,165 @@
+{# finance/invoice_pdf_template.html #}
+{% load humanize static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Invoice {{ invoice.invoice_number }}</title>
+
+<!-- PDF-friendly CSS (pure inline, no external files) -->
+<style>
+@page { size:A4 portrait; margin:18mm 15mm 20mm; }
+body  { font-family:"Inter","Helvetica Neue",Arial,sans-serif; font-size:12.2px; color:#111; }
+
+h1,h2,h3,h4{ margin:0 }
+table{ width:100%; border-collapse:collapse; }
+th,td{ padding:6px 8px; }
+
+.header { display:flex; align-items:center; border-bottom:2px solid #2563eb; padding-bottom:10px; margin-bottom:20px; }
+.logo   { height:65px; width:auto; margin-right:12px; }
+.school h2{ font-size:1.45rem; color:#2563eb }
+.school p { margin:1px 0; font-size:11px; }
+
+.meta   { margin-bottom:14px; }
+.meta th{ text-align:left; font-weight:600; white-space:nowrap; }
+.meta td{ border:none; }
+
+.section-title{ background:#2563eb; color:#fff; padding:4px 8px; font-weight:600; font-size:12px;
+                margin:22px 0 6px; }
+
+.items thead{ background:#f3f4f6; border-bottom:1px solid #ccc; }
+.items th{ text-transform:uppercase; font-size:11px; }
+.items td{ border-bottom:1px solid #e5e7eb; }
+.num { text-align:right; }
+
+.total-box{ margin-top:10px; width:60%; float:right; }
+.total-box td{ border:none; padding:3px 4px; }
+.total-box tr:last-child td{ border-top:2px solid #000; font-weight:600; }
+.total-label{ width:60%; }
+.total-val  { width:40%; text-align:right; }
+
+.due-green { color:#16a34a; }
+.due-amber { color:#d97706; }
+.due-red   { color:#b91c1c; }
+
+footer{ position:fixed; bottom:0; left:0; right:0; text-align:center; font-size:10px; }
+
+.signature{ width:45%; display:inline-block; margin-top:50px; text-align:center; }
+.signature .line{ border-bottom:1px solid #000; height:1px; margin:40px 0 4px; }
+</style>
+</head>
+
+<body>
+
+<!-- ═════════════ HEADER ═════════════ -->
+<div class="header">
+  <img src="{% static 'images/logo.jpg' %}" class="logo" alt="School logo">
+  <div class="school">
+    <h2>Victory Pre &amp; Primary School</h2>
+    <p>P.O. Box 1234 • Arusha, Tanzania  •  Tel: 0712 345 678  •  info@victory.ac.tz</p>
+  </div>
+</div>
+
+<!-- ═════════════ INVOICE & STUDENT META ═════════════ -->
+<table class="meta">
+  <tr>
+    <th>Invoice&nbsp;No.:</th><td>{{ invoice.invoice_number }}</td>
+    <th>Issue&nbsp;Date:</th><td>{{ invoice.created_at|date:"d M Y" }}</td>
+  </tr>
+  <tr>
+    <th>Due&nbsp;Date:</th><td>{{ invoice.due_date|date:"d M Y" }}</td>
+    <th>Status:</th>
+    <td>
+      {% if invoice.status == 'closed' %}
+        <span class="due-green">CLOSED ✅</span>
+      {% elif invoice.status == 'active' %}
+        <span class="due-amber">ACTIVE</span>
+      {% else %}
+        {{ invoice.status|upper }}
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <th>Session:</th><td>{{ invoice.session }}</td>
+    <th>Installment:</th><td>{{ invoice.installment }}</td>
+  </tr>
+  <tr>
+    <th>Student:</th><td>{{ invoice.student }}</td>
+    <th>Class:</th><td>{{ invoice.class_for }}</td>
+  </tr>
+  <tr>
+    <th>Reg.&nbsp;#:</th><td>{{ invoice.student.registration_number }}</td>
+    <td colspan="2"></td>
+  </tr>
+</table>
+
+<!-- ═════════════ ITEMISED CHARGES ═════════════ -->
+<div class="section-title">Invoice Items</div>
+<table class="items">
+  <thead>
+    <tr><th>Description</th><th>Qty</th><th>Unit&nbsp;(TZS)</th><th>Total&nbsp;(TZS)</th></tr>
+  </thead>
+  <tbody>
+  {% if invoice.items.exists %}
+    {% for it in invoice.items.all %}
+    <tr>
+      <td>{{ it.description }}</td>
+      <td class="num">{{ it.quantity }}</td>
+      <td class="num">{{ it.unit_price|floatformat:2|intcomma }}</td>
+      <td class="num">{{ it.amount|floatformat:2|intcomma }}</td>
+    </tr>
+    {% endfor %}
+  {% else %}
+    <tr><td colspan="4">Tuition fees for {{ invoice.installment }}.</td></tr>
+  {% endif %}
+  </tbody>
+</table>
+
+<!-- ═════════════ TOTALS SUMMARY ═════════════ -->
+<table class="total-box">
+  <tr><td class="total-label">Sub-total</td>
+      <td class="total-val">{{ invoice.invoice_amount|floatformat:2|intcomma }}</td></tr>
+  <tr><td class="total-label">Previous&nbsp;Balance</td>
+      <td class="total-val">{{ invoice.previous_balance|floatformat:2|intcomma }}</td></tr>
+  <tr><td class="total-label">Amount&nbsp;Paid</td>
+      <td class="total-val">{{ invoice.amount_paid|floatformat:2|intcomma }}</td></tr>
+  <tr>
+    <td class="total-label"><strong>Balance&nbsp;Due</strong></td>
+    {% with bal=invoice.overall_balance %}
+    <td class="total-val">
+      <span class="{% if bal <= 0 %}due-green{% elif bal < 10000 %}due-amber{% else %}due-red{% endif %}">
+        {{ bal|floatformat:2|intcomma }}
+      </span>
+    </td>
+    {% endwith %}
+  </tr>
+</table>
+
+<!-- ═════════════ PAYMENT FOOTER ═════════════ -->
+<div style="margin-top:75px; font-size:11px">
+  <p><strong>Payment options:</strong></p>
+  <ul style="margin:4px 0 0 16px; padding:0">
+    <li>NMB Bank – Victory Pre & Primary School – Acc No: 01-23456789</li>
+    <li>M-Pesa Paybill #: 123456  (Ref: <em>Student Reg #</em>)</li>
+  </ul>
+  <p style="margin-top:6px">Please quote the invoice number on all payments. Thank you!</p>
+</div>
+
+<!-- ═════════════ SIGNATURES ═════════════ -->
+<div style="margin-top:60px">
+  <div class="signature">
+    <div class="line"></div>
+    Parent / Guardian
+  </div>
+  <div class="signature" style="float:right">
+    <div class="line"></div>
+    Bursar
+  </div>
+</div>
+
+<footer>
+  Generated {{ now|date:"d M Y H:i" }} — Victory School MIS
+</footer>
+</body>
+</html>

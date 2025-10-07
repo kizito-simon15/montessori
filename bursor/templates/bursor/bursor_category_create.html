@@ -1,0 +1,43 @@
+{% extends 'bursor/bursor_base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1 class="my-5">Create Category</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="id_name" class="form-label">Category Name</label>
+      {{ form.name }}
+    </div>
+    <button type="submit" class="btn btn-primary">Create Category</button>
+  </form>
+</div>
+<style>
+  /* Inline CSS styles */
+  body {
+    background-color: #f8f9fa; /* Set background color for the entire page */
+  }
+
+  .container {
+    background-color: #ffffff; /* Set background color for the container */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+    margin-top: 20px; /* Add margin to the top */
+  }
+
+  .form-label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #007bff; /* Set primary button color */
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3; /* Change button color on hover */
+    border-color: #0056b3;
+  }
+</style>
+{% endblock %}

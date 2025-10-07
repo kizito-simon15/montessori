@@ -1,0 +1,136 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="container-fluid py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; border-radius: 12px;">
+  <div>
+    <h1 class="fw-bold mb-0" data-aos="fade-down" data-aos-duration="1000">
+      <i class="fas fa-user-circle"></i> Bursor Details
+    </h1>
+    <p class="mb-0">Comprehensive Personal, Contract, and Additional Information</p>
+  </div>
+  <!-- Three-Dots Dropdown -->
+  <div class="dropdown">
+    <button class="btn btn-light btn-sm rounded-circle dropdown-toggle shadow-sm" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background: white; color: #2575fc; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-ellipsis-v"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="menuDropdown" style="animation: fadeIn 0.3s ease-in-out;">
+      <li data-aos="fade-in" data-aos-duration="500">
+        <a class="dropdown-item" href="{% url 'bursor_details' %}">
+          <i class="fas fa-info-circle me-2"></i>Staff Details
+        </a>
+      </li>
+      <li data-aos="fade-in" data-aos-duration="500" data-aos-delay="200">
+        <a class="dropdown-item" href="{% url 'bursor-staff-list' %}">
+          <i class="fas fa-list me-2"></i>Staff List
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<div class="container mt-4 p-4 rounded shadow" style="background: linear-gradient(to right, #ffffff, #f7faff);">
+  <div class="row g-4">
+    <!-- Left Profile Section -->
+    <div class="col-12 col-lg-4">
+      <div class="card text-center shadow-lg border-0" data-aos="fade-right" style="border-radius: 16px; background: linear-gradient(135deg, #e3ffe7 0%, #d9e7ff 100%);">
+        <div class="card-body">
+          {% if object.passport_photo %}
+          <img src="{{ object.passport_photo.url }}" alt="User Photo" class="rounded-circle border mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+          {% else %}
+          <img src="{% static 'dist/img/avatar.png' %}" alt="Default Avatar" class="rounded-circle border mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+          {% endif %}
+          <h4 class="fw-bold text-primary">{{ object.firstname }} {{ object.middle_name }} {{ object.surname }}</h4>
+          <p class="text-muted"><i class="fas fa-briefcase"></i> {{ object.occupation }}</p>
+          <p class="badge bg-secondary"><i class="fas fa-venus-mars"></i> {{ object.get_gender_display }}</p>
+          <p class="badge bg-info"><i class="fas fa-info-circle"></i> {{ object.get_current_status_display }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Details Section -->
+    <div class="col-12 col-lg-8">
+      <!-- Personal Details -->
+      <div class="card mb-4 border-0 shadow-lg" data-aos="fade-up" style="border-radius: 16px; background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-user"></i> Personal Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-calendar-alt me-2 text-primary"></i><strong>Date of Birth:</strong></span>
+            <span>{{ object.date_of_birth }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-phone me-2 text-primary"></i><strong>Mobile Number:</strong></span>
+            <span>{{ object.mobile_number }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-map-marker-alt me-2 text-primary"></i><strong>Address:</strong></span>
+            <span>{{ object.address }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-comment-alt me-2 text-primary"></i><strong>Comments:</strong></span>
+            <span>{{ object.others }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contract Details -->
+      <div class="card mb-4 border-0 shadow-lg" data-aos="fade-up" style="border-radius: 16px; background: linear-gradient(to right, #e0c3fc 0%, #8ec5fc 100%);">
+        <div class="card-header bg-gradient-success text-white">
+          <h5 class="mb-0"><i class="fas fa-file-contract"></i> Contract Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-calendar me-2 text-success"></i><strong>Contract Duration:</strong></span>
+            <span>{{ object.contract_duration }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-calendar-check me-2 text-success"></i><strong>Start Date:</strong></span>
+            <span>{{ object.contract_start_date }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-calendar-times me-2 text-success"></i><strong>End Date:</strong></span>
+            <span>{{ object.contract_end_date }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-dollar-sign me-2 text-success"></i><strong>Salary:</strong></span>
+            <span>{{ object.salary }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="card mb-4 border-0 shadow-lg" data-aos="fade-up" style="border-radius: 16px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
+        <div class="card-header bg-gradient-warning text-dark">
+          <h5 class="mb-0"><i class="fas fa-id-card"></i> Additional Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-id-badge me-2 text-warning"></i><strong>NIDA ID:</strong></span>
+            <span>{{ object.nida_id }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-file-invoice me-2 text-warning"></i><strong>TIN Number:</strong></span>
+            <span>{{ object.tin_number }}</span>
+          </div>
+          <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
+            <span><i class="fas fa-user-friends me-2 text-warning"></i><strong>Guarantor:</strong></span>
+            <span>{{ object.guarantor }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // Initialize AOS
+  AOS.init();
+</script>
+{% endblock morejs %}

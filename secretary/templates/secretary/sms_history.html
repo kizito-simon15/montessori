@@ -1,0 +1,101 @@
+{% extends 'secretary/base_secretary.html' %}
+{% load static %}
+
+{% block title %}SMS History{% endblock title %}
+
+{% block content %}
+<style>
+.text-blue { color: blue; }
+.carrot-color { color: #ED9121; } /* Carrot color for dates */
+.aqua-header { background-color: #00FFFF; color: white; }
+.light-blue-lines {
+    border: 1px solid #ADD8E6; /* Light blue lines for table cells */
+}
+.table td, .table th {
+    vertical-align: middle;
+    border-top: 1px solid #ADD8E6;
+}
+</style>
+
+<div class="container">
+  <div class="filters mb-3">
+    <div class="row">
+      <div class="col-md-3 mb-2">
+        <input type="date" id="date-search" class="form-control text-blue">
+      </div>
+      <div class="col-md-3 mb-2">
+        <input type="text" id="name-search" placeholder="Search by names" class="form-control text-blue">
+      </div>
+      <div class="col-md-3 mb-2">
+        <input type="number" id="year-search" placeholder="Search by year (YYYY)" min="1900" max="2099" class="form-control text-blue">
+      </div>
+      <div class="col-md-3 mb-2">
+        <a href="{% url 'secretary_check_balance' %}" class="btn btn-info">Check Balance</a>
+      </div>
+    </div>
+  </div>
+  <form method="POST" action="{% url 'delete_sms' %}">
+    {% csrf_token %}
+    <div class="table-responsive">
+      <table id="sms-history-table" class="table table-bordered table-hover">
+        <thead class="aqua-header">
+          <tr>
+            <th class="text-blue"><input type="checkbox" id="select-all"></th>
+            <th class="text-blue">Status</th>
+            <th class="text-blue">Sent <span class="carrot-color">(Date)</span></th>
+            <th class="text-blue">First Name</th>
+            <th class="text-blue">Last Name</th>
+            <th class="text-blue">Contact Number <span class="text-blue">(Father's/Mother's)</span></th>
+            <th class="text-blue">Message</th>
+          </tr>
+        </thead>
+        <tbody class="light-blue-lines">
+          {% for message in messages %}
+          <tr>
+            <td><input type="checkbox" name="sms_ids" value="{{ message.id }}" class="delete-checkbox"></td>
+            <td>{{ message.status }}</td>
+            <td class="carrot-color">{{ message.sent_date|date:"Y-m-d H:i" }}</td>
+            <td>{{ message.first_name }}</td>
+            <td>{{ message.last_name }}</td>
+            <td class="text-blue">{{ message.dest_addr }}</td>
+            <td>{{ message.message }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="mb-3">
+      <button type="submit" class="btn btn-danger">Delete Selected</button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const selectAllCheckbox = document.getElementById('select-all');
+  selectAllCheckbox.addEventListener('change', function() {
+    document.querySelectorAll('.delete-checkbox').forEach(cb => {
+      cb.checked = this.checked;
+    });
+  });
+
+  const inputs = [document.getElementById('date-search'), document.getElementById('name-search'), document.getElementById('year-search')];
+  inputs.forEach(input => input.addEventListener('input', function() {
+    const query = {
+      date: document.getElementById('date-search').value,
+      name: document.getElementById('name-search').value.toLowerCase(),
+      year: document.getElementById('year-search').value
+    };
+    document.querySelectorAll('#sms-history-table tbody tr').forEach(row => {
+      const date = row.cells[2].textContent.toLowerCase();
+      const firstName = row.cells[3].textContent.toLowerCase();
+      const lastName = row.cells[4].textContent.toLowerCase();
+      const year = new Date(row.cells[2].textContent).getFullYear().toString();
+      row.style.display = (!query.date || date.includes(query.date)) &&
+                          (!query.name || (firstName.includes(query.name) || lastName.includes(query.name))) &&
+                          (!query.year || year.includes(query.year)) ? '' : 'none';
+    });
+  }));
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,121 @@
+{# ────────────────────────────────────────────────────────────────
+   processedproduct_list.html · rebuilt 08 Jul 2025
+   ──────────────────────────────────────────────────────────────── #}
+{% extends "base.html" %}{% load humanize %}
+
+{% block title %}Inventory · Processed Products{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* palette & fonts */
+:root{
+  --indigo:#1e40af;--amber:#f59e0b;--rose:#e11d48;--bg:#f1f5f9;
+  --card:#ffffff;--radius:22px;
+}
+html,body{margin:0;background:var(--bg);font-family:Inter,sans-serif}
+/* card */
+.card{background:var(--card);border-radius:0 0 18px 18px;
+      box-shadow:0 4px 14px rgba(0,0,0,.08);
+      opacity:0;transform:translateY(32px);
+      transition:.5s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.head{padding:.75rem 1.3rem;border-bottom:1px solid #e2e8f0;
+      display:flex;align-items:center;justify-content:space-between}
+.head h2{margin:0;font-size:1.35rem;font-weight:700;color:var(--indigo)}
+.body{padding:1rem 1.3rem}
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:.875rem}
+.tbl thead{background:var(--indigo);color:#fff}
+.tbl th,.tbl td{padding:.5rem .7rem;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+.tbl tbody tr:nth-child(even){background:#f8fafc}
+.tbl tbody tr:hover{background:#eef2ff}
+.text-end{text-align:right}
+/* buttons */
+.btn{display:inline-block;line-height:1;border:none;border-radius:var(--radius);
+     padding:.45rem .95rem;font-size:.8rem;font-weight:600;cursor:pointer;
+     transition:transform .15s}
+.btn-indigo{background:var(--indigo);color:#fff}
+.btn-rose{background:var(--rose);color:#fff}
+.btn:hover{transform:translateY(-2px)}
+/* summary */
+.kpi{font-size:.9rem;font-weight:600;margin-bottom:.6rem}
+.kpi span{color:var(--indigo)}
+/* low-stock pill  (optional – show when balance == 0) */
+.pill{display:inline-block;padding:.15rem .5rem;border-radius:9999px;
+      background:var(--rose);color:#fff;font-size:.68rem;font-weight:700}
+@media(max-width:680px){
+  .tbl th,.tbl td{padding:.4rem;font-size:.78rem}
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded",()=> {
+  const c=document.querySelector(".card");
+  if(c) setTimeout(()=>c.classList.add("show"),90);
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="head">
+    <h2>🏷️ Processed Products</h2>
+    <a href="{% url 'processedproduct_create' %}" class="btn btn-indigo">➕ New</a>
+  </div>
+
+  <div class="body">
+    <!-- KPI line -->
+    <p class="kpi">
+      Produced <span>{{ total_produced|floatformat:2|intcomma }}</span> |
+      Consumed <span>{{ total_consumed|floatformat:2|intcomma }}</span> |
+      On-hand <span>{{ total_balance|floatformat:2|intcomma }}</span>
+    </p>
+
+    <!-- table -->
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th><th>Name</th><th>Source</th><th>Unit</th>
+            <th class="text-end">Produced</th>
+            <th class="text-end">Consumed</th>
+            <th class="text-end">Stock</th>
+            <th class="text-end">Raw&nbsp;left</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for p in rows %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.source_product.name }}</td>
+            <td>{{ p.unit }}</td>
+            <td class="text-end">{{ p.produced|floatformat:2 }}</td>
+            <td class="text-end">{{ p.consumed|floatformat:2 }}</td>
+            <td class="text-end">
+              {{ p.balance|floatformat:2 }}
+              {% if p.balance == 0 %}<span class="pill">out</span>{% endif %}
+            </td>
+            <td class="text-end">
+              {{ p.remaining_raw|floatformat:2 }} {{ p.source_product.unit }}
+            </td>
+            <td>
+              <a href="{% url 'processedproduct_update' p.pk %}" class="btn btn-indigo">✏</a>
+              <a href="{% url 'processedproduct_delete' p.pk %}" class="btn btn-rose"
+                 onclick="return confirm('Delete this processed product?')">🗑</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9">No processed products recorded.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

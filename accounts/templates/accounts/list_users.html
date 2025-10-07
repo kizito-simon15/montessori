@@ -1,0 +1,159 @@
+{# accounts/templates/accounts/list_users.html #}
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}User Accounts{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─── palette & sizes ─────────────────────────────────────────────── */
+:root{
+  --card-r:22px;          /* card radius */
+  --clr-head:#1e3a8a;     /* page heading */
+  --zebra-even:#f9fafc;
+  --zebra-odd:#eef2f7;
+}
+body{font-family:Inter,sans-serif;background:#f1f5f9;}
+
+h1{font-size:clamp(1.5rem,4vw,2rem);margin-bottom:1.4rem;font-weight:700;color:var(--clr-head);}
+
+/* box wrapper */
+.box{
+  background:#fff;border-radius:var(--card-r);
+  box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:1.4rem;
+  overflow:hidden;
+}
+/* coloured header strip */
+.box-hd{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:1rem;padding:.85rem 1rem;color:#fff;
+}
+.box-hd h2{margin:0;font-size:1rem;font-weight:700;letter-spacing:.25px;}
+
+/* body */
+.box-bd{padding:1rem;}
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.65rem;}
+
+.table{width:100%;border-collapse:collapse;font-size:.875rem;}
+.table th,.table td{padding:.55rem .6rem;border-bottom:1px solid #e5e7eb;}
+.table tbody tr:nth-child(odd){background:var(--zebra-odd);}
+.table tbody tr:nth-child(even){background:var(--zebra-even);}
+.table tbody tr:hover{background:#dbeafe;}
+
+.count{font-weight:600;color:var(--clr-head);margin-top:.55rem;}
+.pass{width:90px;font-size:.8rem;}
+.btn-sm{font-size:.74rem;padding:.25rem .55rem;}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="mb-0">👥 User&nbsp;Accounts</h1>
+
+  <div class="text-end">
+    <p class="fw-semibold text-danger mb-1">
+      Overall: {{ overall_total|intcomma }}
+    </p>
+    <a href="{% url 'select_user_type' %}" class="btn btn-success fw-semibold">
+      ➕ Create Account
+    </a>
+  </div>
+</div>
+
+{% for s in sections %}
+  {% if s.users %}
+  <section class="box">
+    <header class="box-hd"
+            style="background:linear-gradient(135deg,{{ s.gradA }},{{ s.gradB }})">
+      <h2>{{ s.label }} ({{ s.users|length|intcomma }})</h2>
+
+      {# bulk activate / deactivate #}
+      {% if s.toggle_all %}
+        <a href="{% url s.toggle_all %}"
+           class="btn btn-light btn-sm fw-semibold text-dark">
+          {% if s.users.0.is_active %}🔕 Deactivate All{% else %}🔔 Activate All{% endif %}
+        </a>
+      {% endif %}
+    </header>
+
+    <div class="box-bd">
+
+      {# ── quick filters ── #}
+      <div class="filters">
+        <input id="{{ s.label|slugify }}_f1" class="form-control form-control-sm"
+               placeholder="Filter by {{ s.filter1.0 }}"
+               onkeyup="filterTable('{{ s.label|slugify }}_f1','tbl_{{ s.label|slugify }}',{{ s.filter1.1 }})">
+        {% if s.filter2 %}
+          <input id="{{ s.label|slugify }}_f2" class="form-control form-control-sm"
+                 placeholder="Filter by {{ s.filter2.0 }}"
+                 onkeyup="filterTable('{{ s.label|slugify }}_f2','tbl_{{ s.label|slugify }}',{{ s.filter2.1 }})">
+        {% endif %}
+      </div>
+
+      {# ── table ── #}
+      <div class="table-responsive">
+        <table id="tbl_{{ s.label|slugify }}" class="table">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Username</th><th>Password</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for u in s.users %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+
+                <td>
+                  {% if s.label == "Parents" %}
+                    {{ u.parent_first_name }} {{ u.parent_middle_name }} {{ u.parent_last_name }}
+                  {% else %}
+                    {{ u.staff.firstname }} {{ u.staff.middle_name }} {{ u.staff.surname }}
+                  {% endif %}
+                </td>
+
+                <td>{{ u.username }}</td>
+                <td>
+                  <input type="password" class="form-control form-control-sm pass" disabled value="••••••">
+                </td>
+
+                <td class="d-flex gap-1">
+                  <a href="{% url s.update u.pk %}" class="btn btn-primary btn-sm">✏️</a>
+                  <a href="{% url s.delete u.pk %}" class="btn btn-danger  btn-sm">🗑️</a>
+                  <a href="{% url s.toggle u.pk %}"
+                     class="btn btn-sm {% if u.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                     {% if u.is_active %}🚫{% else %}✅{% endif %}
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <p id="tbl_{{ s.label|slugify }}_count" class="count">
+        Visible: {{ s.users|length }}
+      </p>
+    </div>
+  </section>
+  {% endif %}
+{% endfor %}
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* lightweight client-side table filtering */
+function filterTable(inputId, tableId, colIdx){
+  const term = document.getElementById(inputId).value.toLowerCase().trim();
+  const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+  let visible = 0;
+  rows.forEach(r=>{
+      const txt = r.children[colIdx].textContent.toLowerCase();
+      const show = !term || txt.includes(term);
+      r.style.display = show ? "" : "none";
+      if(show) visible++;
+  });
+  document.getElementById(`${tableId}_count`).textContent = `Visible: ${visible}`;
+}
+</script>
+{% endblock %}

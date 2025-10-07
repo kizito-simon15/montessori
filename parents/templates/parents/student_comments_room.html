@@ -1,0 +1,125 @@
+{% extends "parents/parent_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container" data-aos="fade-up" data-aos-duration="2000">
+    <h2>Student Comments Room</h2>
+
+    <div class="chat-container">
+        {% for comment in comments %}
+        <div class="chat-row" data-aos="fade-up" data-aos-duration="2000">
+            <!-- Parent Comments -->
+            <div class="chat-box parent-box">
+                <div class="status">
+                    {% if comment.date_commented == comment.date_updated_comments %}
+                        <span class="new-status">New</span>
+                    {% else %}
+                        Old
+                    {% endif %}
+                </div>
+                <div class="message">
+                    {{ comment.comment }}
+                </div>
+                <div class="actions">
+                    <a href="{% url 'edit_student_comment' comment.id %}" class="btn btn-sm btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                    <a href="{% url 'delete_student_comment' comment.id %}" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i> Delete</a>
+                    {% if comment.mark_student_comment %}
+                        <span class="satisfied-status"><i class="fas fa-thumbs-up"></i></span>
+                    {% else %}
+                        <a href="{% url 'mark_student_comment' comment.id %}" class="btn btn-sm btn-satisfied">Satisfied?</a>
+                    {% endif %}
+                </div>
+                <div class="timestamp">
+                    <small>{{ comment.date_commented }}</small>
+                    <small>{{ comment.date_updated_comments }}</small>
+                </div>
+            </div>
+
+            <!-- Teacher Answers -->
+            <div class="chat-box teacher-box">
+                <div class="status">
+                    <!-- Placeholder for teacher's status -->
+                    Teacher Response
+                </div>
+                <div class="message">
+                    <!-- Placeholder for teacher's response -->
+                    Teacher's response will appear here.
+                </div>
+                <div class="actions">
+                    <!-- Placeholder for teacher's actions -->
+                </div>
+                <div class="timestamp">
+                    <!-- Placeholder for teacher's timestamp -->
+                    <small>Date</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .chat-row {
+        display: flex;
+        justify-content: space-between;
+    }
+    .chat-box {
+        width: 45%;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    .parent-box {
+        background-color: #e0f7fa;
+        align-self: flex-start;
+    }
+    .teacher-box {
+        background-color: #ffebee;
+        align-self: flex-end;
+    }
+    .status {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+    .message {
+        margin-bottom: 10px;
+        font-size: 1.1em;
+    }
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .timestamp {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8em;
+        color: #777;
+    }
+    .new-status {
+        color: green;
+    }
+    .satisfied-status {
+        color: blue;
+        font-size: 1.2em;
+    }
+    .btn-edit {
+        color: orange;
+    }
+    .btn-delete {
+        color: red;
+    }
+    .btn-satisfied {
+        color: green;
+    }
+</style>
+{% endblock %}

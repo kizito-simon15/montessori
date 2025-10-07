@@ -1,0 +1,980 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Maria Montessori Nursery, Pre and Primary School in Iringa, Tanzania, offers high-quality holistic education with modern facilities, fostering creativity and independence.">
+<meta name="keywords" content="Maria Montessori, Nursery School, Pre-School, Primary School, Iringa, Tanzania, Holistic Education, Montessori Method, NECTA Results">
+<meta name="author" content="Maria Montessori School">
+<meta name="robots" content="index, follow">
+<title>Maria Montessori Nursery, Pre and Primary School | Iringa, Tanzania</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Vendor CSS Files -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<style>
+:root {
+  --primary:#4FC3F7; --secondary:#FF6F61; --accent:#26A69A;
+  --success:#FFCA28; --success-light:#FFE082;
+  --text-dark:#1E293B; --text-light:#FFFFFF;
+  --bg-light:#F9FAFB; --shadow:0 4px 12px rgba(0,0,0,.1);
+  --header-h:72px; /* updated by JS */
+}
+/* Hide Django Debug Toolbar */
+#djDebug{display:none!important;}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;color:var(--text-dark);line-height:1.6;overflow-x:hidden}
+
+/* ============== Modern Full-Width Title Bar (long) ============== */
+.header{
+  position:fixed; top:0; left:0; right:0; z-index:1030;
+  padding:0; transition:box-shadow .22s ease, background .22s ease;
+  background:
+    radial-gradient(1200px 300px at 0% 0%, rgba(79,195,247,.22), transparent 60%),
+    linear-gradient(90deg, rgba(79,195,247,.94), rgba(38,166,154,.94));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:0 10px 30px rgba(2,6,23,.12);
+}
+.header.scrolled{ box-shadow:0 6px 20px rgba(2,6,23,.16); }
+
+/* Use your navbar container as the full-width bar */
+.header .navbar{
+  width:100%!important; max-width:100%!important; margin:0;
+  padding:10px 16px;
+  display:grid; grid-template-columns:auto 1fr auto; gap:.6rem; align-items:center;
+}
+
+/* Brand (center) */
+.navbar-brand{
+  grid-column:2; display:flex; align-items:center; gap:10px; min-width:0; justify-self:center;
+}
+.navbar-brand img{
+  width:34px; height:34px; border-radius:50%;
+  border:2px solid rgba(255,255,255,.85); object-fit:cover;
+}
+.navbar-brand .sitename{
+  font-family:'Raleway',sans-serif; font-weight:900; letter-spacing:.2px; color:#fff;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+}
+
+/* Links */
+.header .nav-link{
+  color:#fff!important; font-weight:700; border-radius:999px;
+  padding:.35rem .75rem; margin-left:15px;
+  transition:background .2s ease, transform .15s ease;
+}
+.header .nav-link:hover,.header .nav-link.active{
+  color:#1E293B!important; background:rgba(255,255,255,.9); transform:translateY(-1px);
+}
+
+/* Hamburger */
+.navbar-toggler{
+  grid-column:1; border:0; color:#fff; font-size:1.35rem;
+  width:42px; height:42px; display:inline-grid; place-items:center;
+  border-radius:999px; background:rgba(255,255,255,.16);
+}
+.navbar-toggler:hover{ background:rgba(255,255,255,.22) }
+.navbar-toggler:focus{ box-shadow:none }
+
+/* Offcanvas */
+.offcanvas{ background:var(--bg-light) }
+.offcanvas .nav-link{ color:var(--text-dark)!important; padding:10px 20px; font-size:18px }
+.offcanvas .nav-link:hover{ background:rgba(79,195,247,.1); color:var(--primary)!important }
+
+/* Mobile brand: wrap & center long name, avoid hamburger overlap */
+@media (max-width:991.98px){
+  .navbar-brand{ flex:1 1 100%; justify-content:center }
+  .navbar-brand img{ width:30px; height:30px }
+  .navbar-brand .sitename{
+    white-space:normal; text-align:center; line-height:1.15;
+    font-size:clamp(.98rem,3.8vw,1.15rem);
+    padding-right:56px; max-width:100%;
+  }
+  .navbar-toggler{ z-index:5; margin-left:8px }
+}
+
+/* -------- HERO (header-aware, robust) -------- */
+.hero{ position:relative; overflow:hidden; height:calc(100svh - var(--header-h)) }
+[id]{ scroll-margin-top:calc(var(--header-h) + 8px) }
+.hero .swiper,.hero .swiper .swiper-wrapper,.hero .swiper .swiper-slide,.hero .hero-slide{ height:100% }
+.hero .swiper-slide{ position:relative; background:center/cover no-repeat }
+.hero .swiper-slide img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 45%; display:block }
+.hero .swiper-slide::before{ content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg,rgba(0,0,0,.38) 0%,rgba(0,0,0,.55) 60%,rgba(0,0,0,.35) 100%) }
+.hero .swiper-content{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2; text-align:center; color:#fff; padding:0 1rem; width:100%; max-width:900px }
+.hero h2{ font-family:'Raleway',sans-serif; font-weight:700; font-size:clamp(1.8rem,3.2vw + 1rem,3.4rem); line-height:1.1; margin:0 0 .75rem; color:#fff; text-shadow:0 2px 18px rgba(0,0,0,.35) }
+.hero p{ font-size:clamp(.95rem,.7vw + .8rem,1.2rem); margin:0; color:#e9eef7; text-shadow:0 2px 12px rgba(0,0,0,.35) }
+.hero .swiper-pagination{ position:absolute; left:0; right:0; bottom:12px; z-index:3 }
+.hero .swiper-slide:nth-child(1) img{ object-position:50% 35% }
+.hero .swiper-slide:nth-child(2) img{ object-position:50% 42% }
+.hero .swiper-slide:nth-child(3) img{ object-position:50% 45% }
+@media (max-width:768px){
+  .hero{ height:calc(70svh - var(--header-h)) }
+  .hero .swiper-content{ top:calc(50% + 12px); transform:translate(-50%,-44%) }
+  .hero h2{ font-size:clamp(1.6rem,4.5vw + .6rem,2.4rem) }
+  .hero p{ font-size:.95rem }
+}
+
+/* Ensure content shows on pages without hero too */
+.main{ padding-top: calc(var(--header-h) + 8px) }
+
+/* ===== Sections (your styles kept as-is) ===== */
+.section{ padding:60px 0 }
+.section-title h2{
+  font-family:'Raleway',sans-serif; font-size:2.5rem; font-weight:700; text-align:center; margin-bottom:1rem;
+  background:linear-gradient(90deg,var(--primary),var(--secondary)); -webkit-background-clip:text; color:transparent
+}
+.section-title p{ font-size:1.1rem; color:var(--primary); text-align:center; margin-bottom:2rem }
+
+/* Login Portal */
+.login-portal{ padding:40px 0; background:var(--bg-light); text-align:center }
+.login-portal h2{ font-family:'Raleway',sans-serif; font-size:2.5rem; font-weight:700; margin-bottom:1rem; color:var(--primary) }
+.login-portal .login-form{ max-width:400px; margin:0 auto; padding:20px; background:#fff; border-radius:10px; box-shadow:var(--shadow) }
+.login-portal .form-control{ border-radius:5px; margin-bottom:1rem }
+.login-portal .btn-primary{ background:var(--secondary); border:none; width:100% }
+.login-portal .btn-primary:hover{ background:var(--primary) }
+
+/* About */
+.about .row>div{ display:flex; flex-direction:column; justify-content:center }
+.about img{ width:100%; height:auto; border-radius:10px; margin-bottom:1.5rem }
+.about h3{ color:var(--secondary); font-family:'Raleway',sans-serif; font-weight:600; margin-bottom:1rem }
+.about .core-values-heading{ color:var(--accent); font-family:'Raleway',sans-serif; font-weight:600; margin-bottom:1rem }
+.about ul li{ margin-bottom:.5rem }
+
+/* Programs */
+.services .card{ border:none; transition:transform .3s ease }
+.services .card:hover{ transform:translateY(-10px) }
+.services .card-img-top{ height:200px; object-fit:cover; border-top-left-radius:10px; border-top-right-radius:10px }
+.services .card-body h4{ color:var(--secondary); font-weight:600 }
+
+/* Team */
+.team .card{ border:none; text-align:center; transition:transform .3s ease }
+.team .card:hover{ transform:translateY(-10px) }
+.team .card-img-top{ width:150px; height:200px; object-fit:cover; object-position:top; margin:0 auto 1rem; border-radius:50% }
+.team .card-body h4{ color:var(--secondary); font-weight:600 }
+.team .social a{ color:var(--text-dark); margin:0 5px; font-size:1.2rem }
+.team .social a:hover{ color:var(--secondary) }
+
+/* Curriculum */
+.curriculum .card-img-top{ height:120px; object-fit:cover }
+.curriculum .card-body h4{ color:var(--secondary); font-weight:600 }
+
+/* Gallery */
+.gallery .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:15px; padding:0 15px }
+.gallery .gallery-item{ overflow:hidden; border-radius:10px; cursor:pointer; transition:transform .3s ease }
+.gallery .gallery-item:hover{ transform:scale(1.05) }
+.gallery .gallery-item img{ width:100%; height:200px; object-fit:cover; border-radius:10px }
+
+/* ===== NEW: Future Plans ===== */
+.plans .icon{
+  width:44px;height:44px;border-radius:12px;display:inline-grid;place-items:center;
+  background:rgba(79,195,247,.18);color:#0b72b6;font-size:1.2rem
+}
+.plans .card{border:0;box-shadow:var(--shadow);border-radius:14px}
+.plans .card:hover{transform:translateY(-6px);transition:transform .25s ease}
+
+/* ===== NEW: Project Uploads (Front-end only) ===== */
+.project .upload-box{
+  background:#fff;border:1px dashed rgba(2,6,23,.2);border-radius:14px;padding:18px;
+  display:flex;flex-direction:column;gap:12px;align-items:flex-start;box-shadow:var(--shadow)
+}
+.project .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
+.project .preview-item{position:relative;border-radius:10px;overflow:hidden;background:#f2f4f7}
+.project .preview-item img{width:100%;height:140px;object-fit:cover;display:block}
+.project .preview-item span{
+  position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:.75rem;
+  padding:2px 6px;border-radius:999px
+}
+
+/* Contact */
+.contact .card{ border:none; text-align:center; transition:transform .3s ease }
+.contact .card:hover{ transform:translateY(-10px) }
+.contact .card-img-top{ height:150px; object-fit:cover }
+.contact .card-body h4{ color:var(--secondary); font-weight:600 }
+.contact form{ border-radius:10px; box-shadow:var(--shadow) }
+.contact .form-control{ border-radius:5px; margin-bottom:1rem }
+.contact .btn-primary{ background:var(--secondary); border:none }
+.contact .btn-primary:hover{ background:var(--primary) }
+
+/* Footer */
+.footer{ background:var(--text-dark); color:var(--text-light); padding:40px 0 20px }
+.footer .footer-top{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:30px; margin-bottom:20px }
+.footer .footer-about .logo img{ width:30px; height:30px; margin-right:10px }
+.footer .footer-about .sitename{ font-size:1.5rem; font-weight:600 }
+.footer .footer-contact p{ font-size:.9rem; margin-bottom:.5rem }
+.footer .footer-contact strong{ color:var(--secondary) }
+.footer .social-links a{ color:var(--text-light); font-size:1.2rem; margin-right:15px; transition:color .3s ease }
+.footer .social-links a:hover{ color:var(--secondary) }
+.footer .footer-links h4,.footer .footer-newsletter h4{ font-family:'Raleway',sans-serif; font-size:1.2rem; margin-bottom:1rem; color:var(--secondary) }
+.footer .footer-links ul{ list-style:none; padding:0 }
+.footer .footer-links a{ color:var(--text-light); font-size:.9rem; display:block; margin-bottom:.5rem; transition:color .3s ease }
+.footer .footer-links a:hover{ color:var(--secondary) }
+.footer .newsletter-form input[type="email"]{ padding:8px; border:1px solid var(--secondary); border-radius:5px; width:70%; font-size:.9rem }
+.footer .newsletter-form .btn{ padding:8px 15px; font-size:.9rem; border-radius:5px; background:var(--secondary); border:none }
+.footer .newsletter-form .btn:hover{ background:var(--primary) }
+.footer .copyright{ text-align:center; font-size:.8rem; padding-top:10px; border-top:1px solid rgba(255,255,255,.1) }
+.footer .copyright a{ color:var(--success); text-decoration:none; font-weight:600 }
+
+/* Scroll Top */
+.scroll-top{ position:fixed; bottom:20px; right:20px; background:var(--primary); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); transition:background .3s ease; z-index:1030 }
+.scroll-top:hover{ background:var(--secondary) }
+.scroll-top i{ color:var(--text-light); font-size:1.2rem }
+
+/* Responsive tweaks */
+@media (max-width:991px){
+  .hero h2{ font-size:2.3rem } .hero p{ font-size:1rem }
+  .gallery .gallery-item img{ height:150px }
+  .footer .footer-top{ grid-template-columns:1fr; text-align:center }
+  .footer .social-links{ justify-content:center }
+  .navbar-brand .sitename{ font-size:20px }
+  .nav-link{ font-size:14px; margin-left:10px }
+  .about .row{ flex-direction:column }
+}
+@media (max-width:576px){
+  .hero h2{ font size:1.9rem } .hero p{ font-size:.9rem }
+  .hero .btn{ font-size:.8rem; padding:8px 15px }
+  .section-title h2{ font-size:2rem } .section-title p{ font-size:1rem }
+  .services .card-img-top,.team .card-img-top{ height:120px }
+  .curriculum .card-img-top{ height:100px }
+  .gallery .gallery-item img{ height:100px }
+  .contact .card-img-top{ height:120px }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <nav class="navbar navbar-expand-lg container" aria-label="Main navigation">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}" aria-label="Maria Montessori Home">
+      <img src="{% static 'img/logo.png' %}" alt="Maria Montessori Logo" class="img-fluid rounded-circle" loading="lazy">
+      <span class="sitename">Maria Montessori Nursery,Pre and Primary School</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-end flex-grow-1">
+          <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Programs</a></li>
+          <li class="nav-item"><a class="nav-link" href="#curriculum">Curriculum</a></li>
+          <li class="nav-item"><a class="nav-link" href="#plans">Future Plans</a></li>
+          <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'custom_login' %}">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="main">
+  <!-- HERO -->
+  <section id="hero" class="hero">
+    <div class="swiper hero-slider">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="hero-slide">
+            <img src="{% static 'img/hero-slide-1-jpg-medium.JPG' %}"
+                 srcset="{% static 'img/hero-slide-1-jpg-tiny.JPG' %} 320w, {% static 'img/hero-slide-1-jpg-medium.JPG' %} 800w"
+                 sizes="(max-width: 768px) 320px, 800px"
+                 alt="Maria Montessori Students Learning" class="hero-img" loading="lazy">
+            <div class="container d-flex flex-column align-items-center swiper-content">
+              <h2 data-aos="fade-up" data-aos-delay="100">Aim for the Best, Persist, and Reach Higher!</h2>
+              <p data-aos="fade-up" data-aos-delay="200">Empowering children to transform dreams into reality.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="hero-slide">
+            <img src="{% static 'img/hero-slide-2-jpg-medium.JPG' %}"
+                 srcset="{% static 'img/hero-slide-2-jpg-tiny.JPG' %} 320w, {% static 'img/hero-slide-2-jpg-medium.JPG' %} 800w"
+                 sizes="(max-width: 768px) 320px, 800px"
+                 alt="Maria Montessori Classroom Activities" class="hero-img" loading="lazy">
+            <div class="container d-flex flex-column align-items-center swiper-content">
+              <h2 data-aos="fade-up" data-aos-delay="100">Help Me to Do It by Myself</h2>
+              <p data-aos="fade-up" data-aos-delay="200">Fostering independence and creativity in every child.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="hero-slide">
+            <img src="{% static 'img/hero-slide-3-jpg-medium.JPG' %}"
+                 srcset="{% static 'img/hero-slide-3-jpg-tiny.JPG' %} 320w, {% static 'img/hero-slide-3-jpg-medium.JPG' %} 800w"
+                 sizes="(max-width: 768px) 320px, 800px"
+                 alt="Maria Montessori School Community" class="hero-img" loading="lazy">
+            <div class="container d-flex flex-column align-items-center swiper-content">
+              <h2 data-aos="fade-up" data-aos-delay="100">Together We Grow, Together We Shine</h2>
+              <p data-aos="fade-up" data-aos-delay="200">Building a supportive community for lifelong learning.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+  <!-- LOGIN PORTAL -->
+  <section id="login-portal" class="login-portal section">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Login Portal</h2>
+        <p>Access Your Account</p>
+      </div>
+      <div class="login-form" data-aos="fade-up" data-aos-delay="100">
+        <form method="POST" action="" novalidate>
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="username" class="form-label visually-hidden">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label visually-hidden">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about section bg-light">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>About Us</h2>
+        <p>Our Commitment to Excellence</p>
+      </div>
+      <div class="row gy-4 align-items-center">
+        <div class="col-lg-6" data-aos="fade-right">
+          <img src="{% static 'img/about-jpg.JPG' %}" alt="Maria Montessori Campus" class="img-fluid rounded-4 mb-4" loading="lazy">
+          <h3>About Maria Montessori</h3>
+          <p>Maria Montessori Nursery, Pre and Primary School in Iringa, Tanzania, is a distinguished institution committed to nurturing and educating children with excellence. We empower children to transform their innate dreams, skills, and talents into meaningful realities.</p>
+          <p><strong>Vision:</strong> Through quality education, we envision creating a thriving environment where children grow into respectable, high-achieving individuals and responsible citizens.</p>
+          <p><strong>Mission:</strong> To transform lives by providing quality education, generating knowledge, and applying it effectively to serve the community.</p>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <div class="content">
+            <img src="{% static 'img/about-2-jpg.JPG' %}" alt="Maria Montessori Students" class="img-fluid rounded-4 mb-4" loading="lazy">
+            <h3 class="core-values-heading">Our Core Values</h3>
+            <ul class="list-unstyled">
+              <li data-aos="fade-up" data-aos-delay="100"><i class="bi bi-check-circle-fill text-primary"></i> Excellence: Striving for high-quality standards.</li>
+              <li data-aos="fade-up" data-aos-delay="200"><i class="bi bi-check-circle-fill text-primary"></i> Initiative: Encouraging proactive learning.</li>
+              <li data-aos="fade-up" data-aos-delay="300"><i class="bi bi-check-circle-fill text-primary"></i> Accountability: Promoting responsible stewardship.</li>
+              <li data-aos="fade-up" data-aos-delay="400"><i class="bi bi-check-circle-fill text-primary"></i> Inclusivity: Fostering mutual respect and community.</li>
+              <li data-aos="fade-up" data-aos-delay="500"><i class="bi bi-check-circle-fill text-primary"></i> Innovation: Nurturing creativity and independence.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAMS -->
+  <section id="services" class="services section">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Our Programs</h2>
+        <p>Educational Offerings for Holistic Development</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/services-1-jpg.JPG' %}" alt="Nursery Program" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Nursery Program</h4>
+              <p>Fostering early learning through play, creativity, and social skills.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/services-2-jpg.JPG' %}" alt="Pre-School Program" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Pre-School Program</h4>
+              <p>Preparing children for primary education with foundational skills.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/services-3-jpg.JPG' %}" alt="Primary Program" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Primary Program</h4>
+              <p>Comprehensive curriculum for academic excellence and critical thinking.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/extracurricular.jpg' %}" alt="Extracurricular Activities" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Extracurricular Activities</h4>
+              <p>Arts, sports, and clubs to foster creativity and teamwork.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRICULUM -->
+  <section id="curriculum" class="curriculum section">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Curriculum</h2>
+        <p>Core Subjects for Holistic Development</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/courses/english.jpg' %}" alt="English Language" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>English Language</h4>
+              <p>Building strong communication skills through interactive learning.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/courses/math.jpg' %}" alt="Mathematics" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Mathematics</h4>
+              <p>Developing logical thinking with practical applications.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/courses/science.jpg' %}" alt="Science" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Science</h4>
+              <p>Hands-on experiments to spark curiosity and innovation.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/courses/montessori.jpg' %}" alt="Montessori Method" class="card-img-top" loading="lazy">
+            <div class="card-body text-center">
+              <h4>Montessori Method</h4>
+              <p>Child-centered learning fostering independence and creativity.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUTURE PLANS -->
+  <section id="plans" class="plans section bg-light">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Future Plans</h2>
+        <p>Growing to Serve More Families</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 p-4">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon"><i class="bi bi-geo-alt-fill"></i></div>
+              <h5 class="m-0">New Campus Location</h5>
+            </div>
+            <p class="mb-2">
+              We are preparing a second campus to expand access to quality Montessori education.
+              The site will provide calm learning spaces, safe access and modern facilities.
+            </p>
+            <ul class="mb-0">
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Early years & primary classrooms</li>
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Library, ICT lab & STEM studio</li>
+              <li><i class="bi bi-check2-circle text-success me-1"></i> Outdoor play areas & sports courts</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 p-4">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon"><i class="bi bi-calendar2-check"></i></div>
+              <h5 class="m-0">Timeline & Next Steps</h5>
+            </div>
+            <p class="mb-2">
+              Construction is phased to minimize disruption and involve families throughout the journey.
+            </p>
+            <ul class="mb-3">
+              <li><i class="bi bi-dot"></i> Phase 1 — Foundations & structural works</li>
+              <li><i class="bi bi-dot"></i> Phase 2 — Classrooms, library & ICT fit-out</li>
+              <li><i class="bi bi-dot"></i> Phase 3 — Landscaping, play areas & handover</li>
+            </ul>
+            <a href="#contact" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-envelope-paper-heart me-1"></i> Register your interest
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT UPDATES (Front-end only) -->
+  <section id="project" class="project section">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Project Updates</h2>
+        <p>Photos from the Ongoing Campus Construction</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+          <form class="upload-box" method="POST" action="" enctype="multipart/form-data" id="projectUploadForm">
+            {% csrf_token %}
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-images fs-4 text-primary"></i>
+              <strong>Upload new photos</strong>
+            </div>
+            <p class="mb-2 text-muted">Select one or more images (JPG, PNG). Thumbnails will appear below.</p>
+            <input class="form-control" type="file" id="projectPhotos" name="photos" accept="image/*" multiple>
+            <button class="btn btn-primary btn-sm mt-2" type="submit">
+              <i class="bi bi-cloud-arrow-up me-1"></i>Submit Images
+            </button>
+            <div id="previewGrid" class="preview-grid"></div>
+            <small id="projectNote" class="text-muted d-block mt-2">
+              (Front-end preview only — connect a backend later to store images.)
+            </small>
+          </form>
+        </div>
+
+        <div class="col-lg-7" data-aos="fade-up" data-aos-delay="150">
+          <div class="row g-3">
+            <!-- 5 sample placeholders -->
+            <div class="col-6 col-md-4">
+              <div class="preview-item"><img src="{% static 'img/project/sample1.jpg' %}" alt="Site works"><span>Site works</span></div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="preview-item"><img src="{% static 'img/project/sample2.jpg' %}" alt="Foundations"><span>Foundations</span></div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="preview-item"><img src="{% static 'img/project/sample3.jpg' %}" alt="Materials"><span>Materials</span></div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="preview-item"><img src="{% static 'img/project/sample4.jpg' %}" alt="Structure"><span>Structure</span></div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="preview-item"><img src="{% static 'img/project/sample5.jpg' %}" alt="Landscaping"><span>Landscaping</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section id="team" class="team section bg-light">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Our Team</h2>
+        <p>Dedicated Leadership and Staff</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-12 text-center mb-4" data-aos="fade-up">
+          <h4 style="color: var(--primary);">Our Dedicated Staff Team</h4>
+        </div>
+
+        <!-- Existing 3 -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-1-jpg.JPG' %}" alt="Mr. Ferdinand Mlandali" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Mr. Ferdinand Mlandali</h4>
+              <p class="text-muted">Director</p>
+              <div class="social d-flex justify-content-center">
+                <a href="https://x.com/mariamontessori" target="_blank" aria-label="Follow Mr. Ferdinand Mlandali on X"><i class="bi bi-twitter-x"></i></a>
+                <a href="https://facebook.com/mariamontessori" target="_blank" aria-label="Follow Mr. Ferdinand Mlandali on Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://instagram.com/mariamontessori" target="_blank" aria-label="Follow Mr. Ferdinand Mlandali on Instagram"><i class="bi bi-instagram" style="color:#8a3ab9;"></i></a>
+                <a href="https://linkedin.com/company/mariamontessori" target="_blank" aria-label="Follow Mr. Ferdinand Mlandali on LinkedIn"><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="150">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-2-jpg.JPG' %}" alt="Miss. Magdalena Andrea" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Miss. Magdalena Andrea</h4>
+              <p class="text-muted">Teacher</p>
+              <div class="social d-flex justify-content-center">
+                <a href="https://x.com/mariamontessori" target="_blank" aria-label="Follow Miss. Magdalena Andrea on X"><i class="bi bi-twitter-x"></i></a>
+                <a href="https://facebook.com/mariamontessori" target="_blank" aria-label="Follow Miss. Magdalena Andrea on Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://instagram.com/mariamontessori" target="_blank" aria-label="Follow Miss. Magdalena Andrea on Instagram"><i class="bi bi-instagram" style="color:#8a3ab9;"></i></a>
+                <a href="https://linkedin.com/company/mariamontessori" target="_blank" aria-label="Follow Miss. Magdalena Andrea on LinkedIn"><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-3-jpg.JPG' %}" alt="Miss. Rhoda Lyombile" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Miss. Rhoda Lyombile</h4>
+              <p class="text-muted">Teacher</p>
+              <div class="social d-flex justify-content-center">
+                <a href="https://x.com/mariamontessori" target="_blank" aria-label="Follow Miss. Rhoda Lyombile on X"><i class="bi bi-twitter-x"></i></a>
+                <a href="https://facebook.com/mariamontessori" target="_blank" aria-label="Follow Miss. Rhoda Lyombile on Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://instagram.com/mariamontessori" target="_blank" aria-label="Follow Miss. Rhoda Lyombile on Instagram"><i class="bi bi-instagram" style="color:#8a3ab9;"></i></a>
+                <a href="https://linkedin.com/company/mariamontessori" target="_blank" aria-label="Follow Miss. Rhoda Lyombile on LinkedIn"><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW 3 -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="250">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-4-jpg.JPG' %}" alt="Mr. John Bosco" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Miss. Ester Sanga</h4>
+              <p class="text-muted">Teacher</p>
+              <div class="social d-flex justify-content-center">
+                <a href="#" aria-label="X"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-5-jpg.JPG' %}" alt="Mrs. Amina Ndege" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Miss. Naida Mlandali</h4>
+              <p class="text-muted">Matron</p>
+              <div class="social d-flex justify-content-center">
+                <a href="#" aria-label="Instagram"><i class="bi bi-instagram" style="color:#8a3ab9;"></i></a>
+                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cooker -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="350">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-6-jpg.JPG' %}" alt="Mr. Peter Mwakalinga" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Miss. Jema Msekwa</h4>
+              <p class="text-muted">Cook and Nutritionist</p>
+              <div class="social d-flex justify-content-center">
+                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Driver -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/team/team-7-jpg.JPG' %}" alt="Mr. Elias Msuya" class="card-img-top" loading="lazy">
+            <div class="card-body">
+              <h4>Mr. Ally Mbelele</h4>
+              <p class="text-muted">Driver</p>
+              <div class="social d-flex justify-content-center">
+                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i class="bi bi-instagram" style="color:#8a3ab9;"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="gallery section bg-light">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Gallery</h2>
+        <p>Showcasing Our School's Moments</p>
+      </div>
+      <div class="gallery-grid">
+        <a href="{% static 'img/portfolio/app-1-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Academic Activities" data-aos="fade-up" data-aos-delay="100"><img src="{% static 'img/portfolio/app-1-jpg.JPG' %}" alt="Academic Activities" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/product-1-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Art Workshops" data-aos="fade-up" data-aos-delay="150"><img src="{% static 'img/portfolio/product-1-jpg.JPG' %}" alt="Art Workshops" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/branding-1-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Sports Day Fun" data-aos="fade-up" data-aos-delay="200"><img src="{% static 'img/portfolio/branding-1-jpg.JPG' %}" alt="Sports Day Fun" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/books-1-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Community Service Days" data-aos="fade-up" data-aos-delay="250"><img src="{% static 'img/portfolio/books-1-jpg.JPG' %}" alt="Community Service Days" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/app-2-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Science Experiments" data-aos="fade-up" data-aos-delay="300"><img src="{% static 'img/portfolio/app-2-jpg.JPG' %}" alt="Science Experiments" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/product-2-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Music Classes" data-aos="fade-up" data-aos-delay="350"><img src="{% static 'img/portfolio/product-2-jpg.JPG' %}" alt="Music Classes" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/branding-2-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Cultural Celebrations" data-aos="fade-up" data-aos-delay="400"><img src="{% static 'img/portfolio/branding-2-jpg.JPG' %}" alt="Cultural Celebrations" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/books-2-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Charity Events" data-aos="fade-up" data-aos-delay="450"><img src="{% static 'img/portfolio/books-2-jpg.JPG' %}" alt="School Charity Events" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/app-3-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Math Challenges" data-aos="fade-up" data-aos-delay="500"><img src="{% static 'img/portfolio/app-3-jpg.JPG' %}" alt="Math Challenges" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/product-3-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Drama Club" data-aos="fade-up" data-aos-delay="550"><img src="{% static 'img/portfolio/product-3-jpg.JPG' %}" alt="Drama Club" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/branding-3-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Soccer Matches" data-aos="fade-up" data-aos-delay="600"><img src="{% static 'img/portfolio/branding-3-jpg.JPG' %}" alt="Soccer Matches" loading="lazy"></a>
+        <a href="{% static 'img/portfolio/books-3-jpg.JPG' %}" class="gallery-item glightbox" data-glightbox="title: Environmental Activities" data-aos="fade-up" data-aos-delay="650"><img src="{% static 'img/portfolio/books-3-jpg.JPG' %}" alt="Environmental Activities" loading="lazy"></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact section bg-light">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Contact</h2>
+        <p>Get in Touch</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="row g-3">
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+              <div class="card h-100 shadow-sm text-center p-3">
+                <img src="{% static 'img/contact/address.jpg' %}" alt="Address" class="card-img-top" loading="lazy">
+                <h4>Address <span style="color:#FF6F61;">📍</span></h4>
+                <p>P.O. Box 1323, Iringa, Tanzania</p>
+              </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+              <div class="card h-100 shadow-sm text-center p-3">
+                <img src="{% static 'img/contact/call.jpg' %}" alt="Call Us" class="card-img-top" loading="lazy">
+                <h4>Call Us <span style="color:#FFCA28;">📞</span></h4>
+                <p><a href="tel:+255752544403" class="text-decoration-none">+255 752 544403</a><br>
+                <a href="tel:+255622560333" class="text-decoration-none">+255 622 560333</a><br>
+                <a href="tel:+255655544403" class="text-decoration-none">+255 655 544403</a></p>
+              </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+              <div class="card h-100 shadow-sm text-center p-3">
+                <img src="{% static 'img/contact/whatsapp.jpg' %}" alt="WhatsApp" class="card-img-top" loading="lazy">
+                <h4>WhatsApp <span style="color:#26A69A;">💬</span></h4>
+                <p><a href="https://wa.me/255752544403" class="text-decoration-none">+255 752 544403</a></p>
+              </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+              <div class="card h-100 shadow-sm text-center p-3">
+                <img src="{% static 'img/contact/email.jpg' %}" alt="Email Us" class="card-img-top" loading="lazy">
+                <h4>Email Us <span style="color:#4FC3F7;">✉️</span></h4>
+                <p><a href="mailto:mariamontessori1970@gmail.com" class="text-decoration-none">mariamontessori1970@gmail.com</a></p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4" data-aos="fade-up" data-aos-delay="500">
+            <h4>Location Map <span style="color:#FF6F61;">🗺️</span></h4>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.123456!2d35.6917!3d-7.7742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zTWFyaWEgTW9udGVzc29yaSBTY2hvb2w!5e0!3m2!1sen!2stz!4v1623456789" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+          </div>
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
+          <form method="POST" class="p-4 shadow-sm bg-white rounded-3">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="name" class="form-label visually-hidden">Your Name</label>
+              <input type="text" id="name" name="name" class="form-control" placeholder="Your Name" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label visually-hidden">Your Email</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="Your Email" required>
+            </div>
+            <div class="mb-3">
+              <label for="subject" class="form-label visually-hidden">Subject</label>
+              <input type="text" id="subject" name="subject" class="form-control" placeholder="Subject" required>
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label visually-hidden">Message</label>
+              <textarea id="message" name="message" class="form-control" placeholder="Message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="footer" class="footer">
+  <div class="container footer-top" data-aos="fade-up">
+    <div class="footer-about">
+      <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+        <img src="{% static 'img/logo.png' %}" alt="Maria Montessori Logo" class="img-fluid rounded-circle" loading="lazy">
+        <span class="sitename">Maria Montessori</span>
+      </a>
+      <div class="footer-contact mt-3">
+        <p>P.O. Box 1323, Iringa, Tanzania</p>
+        <p><strong>Phone:</strong> <span><a href="tel:+255752544403" class="text-decoration-none">+255 752 544403</a>, <a href="tel:+255622560333" class="text-decoration-none">+255 622 560333</a>, <a href="tel:+255655544403" class="text-decoration-none">+255 655 544403</a></span></p>
+        <p><strong>WhatsApp:</strong> <span><a href="https://wa.me/255752544403" class="text-decoration-none">+255 752 544403</a></span></p>
+        <p><strong>Email:</strong> <span><a href="mailto:mariamontessori1970@gmail.com" class="text-decoration-none">mariamontessori1970@gmail.com</a></span></p>
+      </div>
+      <div class="social-links d-flex mt-3">
+        <a href="https://x.com/mariamontessori" target="_blank" aria-label="Follow Maria Montessori on X"><i class="bi bi-twitter-x"></i></a>
+        <a href="https://facebook.com/mariamontessori" target="_blank" aria-label="Follow Maria Montessori on Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="https://instagram.com/mariamontessori" target="_blank" aria-label="Follow Maria Montessori on Instagram"><i class="bi bi-instagram" style="color:#8a3ab9;"></i></a>
+        <a href="https://linkedin.com/company/mariamontessori" target="_blank" aria-label="Follow Maria Montessori on LinkedIn"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h4>Useful Links</h4>
+      <ul>
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Programs</a></li>
+        <li><a href="#curriculum">Curriculum</a></li>
+        <li><a href="#plans">Future Plans</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="{% url 'custom_login' %}">Login</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Our Programs</h4>
+      <ul>
+        <li><a href="#services">Nursery Program</a></li>
+        <li><a href="#services">Pre-School Program</a></li>
+        <li><a href="#services">Primary Program</a></li>
+        <li><a href="#services">Extracurricular Activities</a></li>
+      </ul>
+    </div>
+    <div class="footer-newsletter">
+      <h4>Our Newsletter</h4>
+      <p>Subscribe for updates on school events!</p>
+      <form method="POST" class="d-flex">
+        {% csrf_token %}
+        <input type="email" name="email" placeholder="Your Email" class="form-control me-2" required>
+        <button type="submit" class="btn btn-secondary">Subscribe</button>
+      </form>
+    </div>
+  </div>
+  <div class="copyright" data-aos="fade-up" data-aos-delay="200">
+    <p>© 2025 <span class="sitename">Maria Montessori Nursery, Pre and Primary School</span> All Rights Reserved | Developed by <a href="https://www.kizitasoft.co.tz" target="_blank">Kizita Soft Ltd</a></p>
+  </div>
+</footer>
+
+<a href="#" id="scroll-top" class="scroll-top"><i class="bi bi-arrow-up"></i></a>
+
+<!-- JavaScript Files -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/js/glightbox.min.js"></script>
+<script>
+AOS.init({ duration: 1000, once: true });
+
+const lightbox = GLightbox({ touchNavigation: true, loop: true, zoomable: true });
+
+// Swiper
+const swiper = new Swiper('.swiper', {
+  loop: true,
+  autoplay: { delay: 3000, disableOnInteraction: false },
+  pagination: { el: '.swiper-pagination', clickable: true },
+  speed: 1000
+});
+
+// Scroll Top
+const scrollTop = document.querySelector('#scroll-top');
+window.addEventListener('scroll', () => {
+  scrollTop.style.display = (window.scrollY > 300) ? 'flex' : 'none';
+});
+scrollTop.addEventListener('click', (e) => {
+  e.preventDefault();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Offcanvas overflow lock
+document.querySelector('.navbar-toggler').addEventListener('click', () => {
+  const offcanvas = document.getElementById('offcanvasNavbar');
+  offcanvas.addEventListener('show.bs.offcanvas', () => { document.body.style.overflow = 'hidden'; });
+  offcanvas.addEventListener('hidden.bs.offcanvas', () => { document.body.style.overflow = 'auto'; });
+});
+
+// Smooth in-page nav + close drawer
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const href = link.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+        const oc = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasNavbar'));
+        if (oc) oc.hide();
+      }
+    }
+  });
+});
+
+// Header height → CSS var so hero/anchors offset correctly
+(function(){
+  function setHeaderVar(){
+    const header = document.querySelector('.header');
+    const h = header ? header.offsetHeight : 72;
+    document.documentElement.style.setProperty('--header-h', h + 'px');
+  }
+  window.addEventListener('load', setHeaderVar);
+  window.addEventListener('resize', setHeaderVar);
+  setHeaderVar();
+})();
+
+// Shrink header shadow on scroll (polish)
+(function(){
+  const hdr = document.querySelector('.header');
+  function onScroll(){ hdr?.classList.toggle('scrolled', (window.scrollY||0) > 8); }
+  window.addEventListener('scroll', onScroll, { passive:true }); onScroll();
+})();
+
+/* Live previews for Project upload (front-end only) + prevent submit */
+(function(){
+  const input = document.getElementById('projectPhotos');
+  const grid  = document.getElementById('previewGrid');
+  const form  = document.getElementById('projectUploadForm');
+  const note  = document.getElementById('projectNote');
+
+  if(input && grid){
+    input.addEventListener('change', function(){
+      grid.innerHTML = '';
+      const files = Array.from(this.files || []);
+      files.forEach(file => {
+        if(!file.type.startsWith('image/')) return;
+        const url = URL.createObjectURL(file);
+        const wrap = document.createElement('div');
+        wrap.className = 'preview-item';
+        wrap.innerHTML = `<img src="${url}" alt="${file.name}"><span>${file.name.slice(0,22)}</span>`;
+        grid.appendChild(wrap);
+      });
+    });
+  }
+
+  if(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault(); // prevent posting anywhere (front-end only)
+      if(note){
+        note.textContent = 'Preview saved locally. Connect a backend later to store these images.';
+        note.classList.remove('text-muted');
+        note.classList.add('text-success');
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>

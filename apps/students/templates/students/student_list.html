@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+{% load static student_tags %}
+
+{% block content %}
+<!-- Bootstrap 5 CSS (assumed to be included in base.html) -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const classFilter = document.getElementById('classFilter');
+    const studentTable = document.getElementById('studentTable');
+    const rows = studentTable.querySelectorAll('tbody tr');
+    const cardContainer = document.getElementById('cardContainer');
+
+    const totalMaleSpan = document.getElementById('total-male');
+    const totalFemaleSpan = document.getElementById('total-female');
+    const overallTotalSpan = document.getElementById('overall-total');
+
+    const sortNameBtn = document.getElementById('sortNameBtn');
+    const sortClassBtn = document.getElementById('sortClassBtn');
+    const sortSexBtn = document.getElementById('sortSexBtn');
+    const sortCategoryBtn = document.getElementById('sortCategoryBtn');
+    const sortTermRegisteredBtn = document.getElementById('sortTermRegisteredBtn');
+    const viewToggleBtn = document.getElementById('viewToggleBtn');
+
+    let nameAscending = localStorage.getItem('nameSort') !== 'false';
+    let classAscending = localStorage.getItem('classSort') !== 'false';
+    let sexAscending = localStorage.getItem('sexSort') !== 'false';
+    let categoryAscending = localStorage.getItem('categorySort') !== 'false';
+    let termRegisteredAscending = localStorage.getItem('termRegisteredSort') !== 'false';
+    let isTableView = localStorage.getItem('viewMode') !== 'card';
+
+    // Update button text based on initial sort state
+    updateSortButton(sortNameBtn, 'Name', nameAscending);
+    updateSortButton(sortClassBtn, 'Class', classAscending);
+    updateSortButton(sortSexBtn, 'Sex', sexAscending);
+    updateSortButton(sortCategoryBtn, 'Category', categoryAscending);
+    updateSortButton(sortTermRegisteredBtn, 'Term Registered', termRegisteredAscending);
+
+    // Debounce function for search
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Filter Rows by Name and Class
+    const debouncedFilterRows = debounce(filterRows, 300);
+    searchInput.addEventListener('input', debouncedFilterRows);
+    classFilter.addEventListener('change', filterRows);
+
+    sortNameBtn.addEventListener('click', () => {
+        sortRows('data-name', nameAscending);
+        nameAscending = !nameAscending;
+        localStorage.setItem('nameSort', nameAscending);
+        updateSortButton(sortNameBtn, 'Name', nameAscending);
+        updateKPIs();
+    });
+
+    sortClassBtn.addEventListener('click', () => {
+        sortRows('data-class', classAscending);
+        classAscending = !classAscending;
+        localStorage.setItem('classSort', classAscending);
+        updateSortButton(sortClassBtn, 'Class', classAscending);
+        updateKPIs();
+    });
+
+    sortSexBtn.addEventListener('click', () => {
+        sortRows('data-sex', sexAscending);
+        sexAscending = !sexAscending;
+        localStorage.setItem('sexSort', sexAscending);
+        updateSortButton(sortSexBtn, 'Sex', sexAscending);
+        updateKPIs();
+    });
+
+    sortCategoryBtn.addEventListener('click', () => {
+        sortRows('data-category', categoryAscending);
+        categoryAscending = !categoryAscending;
+        localStorage.setItem('categorySort', categoryAscending);
+        updateSortButton(sortCategoryBtn, 'Category', categoryAscending);
+        updateKPIs();
+    });
+
+    sortTermRegisteredBtn.addEventListener('click', () => {
+        sortRows('data-term-registered', termRegisteredAscending);
+        termRegisteredAscending = !termRegisteredAscending;
+        localStorage.setItem('termRegisteredSort', termRegisteredAscending);
+        updateSortButton(sortTermRegisteredBtn, 'Term Registered', termRegisteredAscending);
+        updateKPIs();
+    });
+
+    viewToggleBtn.addEventListener('click', () => {
+        isTableView = !isTableView;
+        localStorage.setItem('viewMode', isTableView ? 'table' : 'card');
+        toggleView();
+    });
+
+    function filterRows() {
+        const query = searchInput.value.toLowerCase();
+        const selectedClass = classFilter.value;
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name').toLowerCase();
+            const cls = row.getAttribute('data-class');
+            const matchesName = name.includes(query);
+            const matchesClass = (selectedClass === "All") || (cls === selectedClass);
+            if (matchesName && matchesClass) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        updateKPIs();
+        updateCardView();
+    }
+
+    function sortRows(attribute, ascending) {
+        const tbody = studentTable.querySelector('tbody');
+        const visibleRows = Array.from(rows).filter(r => r.style.display !== 'none');
+        visibleRows.sort((a, b) => {
+            const valA = a.getAttribute(attribute).toLowerCase();
+            const valB = b.getAttribute(attribute).toLowerCase();
+            return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+        visibleRows.forEach(r => tbody.appendChild(r));
+    }
+
+    function updateSortButton(button, text, ascending) {
+        button.innerHTML = `${text} ${ascending ? '▲' : '▼'}`;
+    }
+
+    function toggleView() {
+        const table = document.querySelector('.table-responsive');
+        const cardContainer = document.querySelector('.card-container');
+        if (isTableView) {
+            table.style.display = 'block';
+            cardContainer.style.display = 'none';
+            viewToggleBtn.textContent = 'Switch to Card View';
+        } else {
+            table.style.display = 'none';
+            cardContainer.style.display = 'grid';
+            viewToggleBtn.textContent = 'Switch to Table View';
+            updateCardView();
+        }
+    }
+
+    function updateKPIs() {
+        let maleCount = 0;
+        let femaleCount = 0;
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                visibleCount++;
+                const sex = row.getAttribute('data-sex');
+                if (sex === 'M') maleCount++;
+                else if (sex === 'F') femaleCount++;
+            }
+        });
+
+        totalMaleSpan.textContent = maleCount;
+        totalFemaleSpan.textContent = femaleCount;
+        overallTotalSpan.textContent = visibleCount;
+    }
+
+    function updateCardView() {
+        const cards = cardContainer.querySelectorAll('.card-item');
+        cards.forEach(card => {
+            const row = Array.from(rows).find(r => r.getAttribute('data-id') === card.getAttribute('data-id'));
+            if (row) {
+                card.style.display = row.style.display;
+            }
+        });
+    }
+
+    // Initial setup
+    toggleView();
+    updateKPIs();
+});
+</script>
+
+<style>
+:root {
+    --primary: #1e3a8a; /* Deep blue */
+    --secondary: #d97706; /* Amber */
+    --sidebar-bg: #2e1065; /* Deep purple */
+    --sidebar-hover: #a78bfa; /* Light purple */
+    --sidebar-active: #6d28d9; /* Active purple */
+    --success: #16a34a;
+    --danger: #dc2626;
+    --info: #0284c7;
+}
+
+body {
+    background: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.title-section {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    color: #fff;
+    border-radius: 0 0 15px 15px;
+    text-align: center;
+    animation: slideInDown 0.5s ease;
+    padding: 1rem;
+}
+
+.title-section h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: clamp(1.5rem, 5vw, 1.8rem);
+    font-weight: 700;
+    margin: 0;
+}
+
+.title-section p {
+    font-size: clamp(0.85rem, 4vw, 0.95rem);
+    opacity: 0.9;
+    margin: 0.5rem 0 0;
+}
+
+.kpi-section {
+    background: #fff;
+    padding: 1rem;
+}
+
+.kpi-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.kpi-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.kpi-item:hover {
+    transform: translateY(-3px);
+}
+
+.kpi-item h3 {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin-bottom: 0.5rem;
+    color: var(--secondary);
+}
+
+.kpi-item span {
+    font-size: clamp(1.1rem, 4vw, 1.3rem);
+    color: var(--primary);
+}
+
+.btn-primary-add, .btn-register-term {
+    border-radius: 25px;
+    font-weight: 600;
+    background: var(--primary);
+    border: none;
+    color: #fff;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    padding: 0.75rem 1.5rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.btn-primary-add:hover, .btn-register-term:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.controls-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+}
+
+.search-input {
+    border-radius: 25px;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    width: clamp(150px, 40vw, 200px);
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+.sort-btn, .filter-btn, .view-toggle-btn {
+    border-radius: 25px;
+    background: #facc15;
+    color: #333;
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sort-btn:hover, .filter-btn:hover, .view-toggle-btn:hover {
+    background: #eab308;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    min-width: 800px; /* Ensure table is scrollable on mobile */
+}
+
+thead {
+    background: var(--sidebar-bg);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+thead th {
+    padding: 0.75rem 1rem;
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: none;
+}
+
+tbody tr {
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+tbody tr:hover {
+    background: #e0f2fe;
+}
+
+td {
+    padding: 0.75rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    white-space: nowrap;
+    border: none;
+}
+
+.status-active {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.nhif-yes, .term-registered-yes {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.nhif-no, .term-registered-no {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.btn-sm {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-weight: 600;
+    border: none;
+    color: #fff;
+    margin-right: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.btn-sm:hover {
+    transform: translateY(-2px);
+}
+
+.btn-info-view {
+    background: var(--info);
+}
+
+.btn-success-edit {
+    background: var(--success);
+}
+
+.btn-danger-delete {
+    background: var(--danger);
+}
+
+.no-data {
+    text-align: center;
+    color: #6b7280;
+    padding: 1.5rem;
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+}
+
+.card-container {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.card-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.card-item:hover {
+    transform: translateY(-3px);
+}
+
+.card-item h3 {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    margin: 0 0 0.5rem;
+    color: var(--primary);
+}
+
+.card-item p {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin: 0.25rem 0;
+    color: #333;
+}
+
+.card-item .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-metrics {
+        grid-template-columns: 1fr;
+    }
+    .controls-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-input {
+        width: 100%;
+    }
+    .btn-primary-add, .btn-register-term {
+        width: 100%;
+        justify-content: center;
+    }
+    .sort-btn, .filter-btn, .view-toggle-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .title-section h2 {
+        font-size: 1.4rem;
+    }
+    .title-section p {
+        font-size: 0.8rem;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .card-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="title-section">
+    <h2>🧑‍🎓 Active Students</h2>
+    <p>Manage and view all active students at Victory School.</p>
+</div>
+
+<div class="kpi-section">
+    <div class="kpi-metrics">
+        <div class="kpi-item">
+            <h3>👨 Total Male</h3>
+            <span id="total-male">{{ total_male }}</span>
+        </div>
+        <div class="kpi-item">
+            <h3>👩 Total Female</h3>
+            <span id="total-female">{{ total_female }}</span>
+        </div>
+        <div class="kpi-item">
+            <h3>👥 Overall Total</h3>
+            <span id="overall-total">{{ overall_total }}</span>
+        </div>
+    </div>
+    <div class="text-center">
+        <a class="btn-primary-add" href="{% url 'student-create' %}">
+            <span>➕</span> Add New Student
+        </a>
+        <a class="btn-register-term" href="{% url 'assign-term' %}">
+            <span>📅</span> Register Students to Term
+        </a>
+    </div>
+</div>
+
+<div class="controls-container">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by name...">
+    <select id="classFilter" class="filter-btn form-select">
+        <option value="All">All Classes</option>
+        {% for cls in student_classes %}
+            <option value="{{ cls.name }}">{{ cls.name }}</option>
+        {% endfor %}
+    </select>
+    <button class="sort-btn" id="sortNameBtn">Name ▲</button>
+    <button class="sort-btn" id="sortSexBtn">Sex ▲</button>
+    <button class="sort-btn" id="sortClassBtn">Class ▲</button>
+    <button class="sort-btn" id="sortCategoryBtn">Category ▲</button>
+    <button class="sort-btn" id="sortTermRegisteredBtn">Term Registered ▲</button>
+    <button class="view-toggle-btn" id="viewToggleBtn">Switch to Card View</button>
+</div>
+
+<div class="table-responsive">
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>🔢 ID</th>
+                <th>🙎 Name</th>
+                <th>👫 Sex</th>
+                <th>🎓 Class</th>
+                <th>🏫 Category</th>
+                <th>👨 Guardian 1 #</th>
+                <th>👩 Guardian 2 #</th>
+                <th>🏥 NHIF</th>
+                <th>✅ Term Registered</th>
+                <th>🔅 Status</th>
+                <th>⚙️ Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr
+                data-id="{{ student.pk }}"
+                data-name="{{ student.firstname }} {{ student.middle_name }} {{ student.surname|default_if_none:'' }}"
+                data-sex="{% if student.gender == 'male' %}M{% else %}F{% endif %}"
+                {% if student.current_class %}
+                    data-class="{{ student.current_class.name }}"
+                {% else %}
+                    data-class="None"
+                {% endif %}
+                data-category="{{ student.get_category_display|default:'N/A' }}"
+                data-term-registered="{% if student_term_assignments|dict_get:student.id %}Yes{% else %}No{% endif %}"
+            >
+                <td>{{ student.registration_number }}</td>
+                <td>{{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</td>
+                <td>{{ student.gender|capfirst|slice:":1" }}</td>
+                <td>{{ student.current_class.name|default:"N/A" }}</td>
+                <td>{{ student.get_category_display|default:"N/A" }}</td>
+                <td>{{ student.guardian1_mobile_number|default:"N/A" }}</td>
+                <td>{{ student.guardian2_mobile_number|default:"N/A" }}</td>
+                <td>
+                    {% if student.has_nhif %}
+                        <span class="nhif-yes">✔</span>
+                    {% else %}
+                        <span class="nhif-no">✘</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if student_term_assignments|dict_get:student.id %}
+                        <span class="term-registered-yes">✔</span>
+                    {% else %}
+                        <span class="term-registered-no">✘</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="status-{% if student.current_status == 'active' %}active{% else %}inactive{% endif %}">
+                        {{ student.current_status|capfirst }}
+                    </span>
+                </td>
+                <td>
+                    <a class="btn-sm btn-info-view" href="{% url 'student-detail' student.pk %}" title="View Details">👁️</a>
+                    <a class="btn-sm btn-success-edit" href="{% url 'student-update' student.pk %}" title="Edit Student">✏️</a>
+                    <a class="btn-sm btn-danger-delete" href="{% url 'student-delete' student.pk %}" title="Delete Student">🗑️</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="11" class="no-data">No active students found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card-container" id="cardContainer">
+    {% for student in students %}
+    <div class="card-item" data-id="{{ student.pk }}">
+        <h3>{{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</h3>
+        <p><strong>ID:</strong> {{ student.registration_number }}</p>
+        <p><strong>Sex:</strong> {{ student.gender|capfirst|slice:":1" }}</p>
+        <p><strong>Class:</strong> {{ student.current_class.name|default:"N/A" }}</p>
+        <p><strong>Category:</strong> {{ student.get_category_display|default:"N/A" }}</p>
+        <p><strong>Guardian 1 #:</strong> {{ student.guardian1_mobile_number|default:"N/A" }}</p>
+        <p><strong>Guardian 2 #:</strong> {{ student.guardian2_mobile_number|default:"N/A" }}</p>
+        <p><strong>NHIF:</strong> 
+            {% if student.has_nhif %}
+                <span class="nhif-yes">✔</span>
+            {% else %}
+                <span class="nhif-no">✘</span>
+            {% endif %}
+        </p>
+        <p><strong>Term Registered:</strong> 
+            {% if student_term_assignments|dict_get:student.id %}
+                <span class="term-registered-yes">✔</span>
+            {% else %}
+                <span class="term-registered-no">✘</span>
+            {% endif %}
+        </p>
+        <p><strong>Status:</strong> 
+            <span class="status-{% if student.current_status == 'active' %}active{% else %}inactive{% endif %}">
+                {{ student.current_status|capfirst }}
+            </span>
+        </p>
+        <div class="card-actions">
+            <a class="btn-sm btn-info-view" href="{% url 'student-detail' student.pk %}" title="View Details">👁️</a>
+            <a class="btn-sm btn-success-edit" href="{% url 'student-update' student.pk %}" title="Edit Student">✏️</a>
+            <a class="btn-sm btn-danger-delete" href="{% url 'student-delete' student.pk %}" title="Delete Student">🗑️</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-data">No active students found.</div>
+    {% endfor %}
+</div>
+{% endblock content %}

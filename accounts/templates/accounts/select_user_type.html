@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--accent:#d97706;--radius:22px;}
+body{font-family:'Inter',sans-serif;background:#f8fafc;}
+/* ─── full-screen modal ──────────────────────────────── */
+#pickUserModal{position:fixed;inset:0;display:grid;place-items:center;
+  background:rgba(0,0,0,.45);z-index:50;animation:fade .4s both;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal-card{background:#fff;border-radius:var(--radius);width:90%;max-width:460px;
+  padding:1.7rem 1.4rem;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:slide .5s both;}
+@keyframes slide{from{transform:translateY(-40px);opacity:.3}to{transform:none;opacity:1}}
+.modal-card h2{margin:0 0 1rem;font-size:clamp(1.3rem,4vw,1.65rem);
+  color:var(--primary);text-align:center}
+/* buttons */
+.btn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:.75rem;}
+.btn-grid a{display:flex;align-items:center;justify-content:center;gap:.5rem;
+  padding:.6rem 1rem;border-radius:var(--radius);font-weight:600;font-size:.9rem;color:#fff;
+  transition:transform .15s;background:#64748b;}
+.btn-grid a:hover{transform:translateY(-3px);}
+.btn-parent   {background:#3b82f6;}
+.btn-teacher  {background:#16a34a;}
+.btn-headteach{background:#06b6d4;}   /* NEW */
+.btn-bursor   {background:#8b4513;}
+.btn-secretary{background:#d97706;}
+.btn-academic {background:#0ea5e9;}
+.btn-grid i{font-size:1rem;}
+</style>
+
+<div id="pickUserModal">
+  <div class="modal-card">
+    <h2>Select User Type</h2>
+    <div class="btn-grid">
+      <a href="{% url 'create_parent_user' %}"      class="btn-parent"><i class="fas fa-user"></i>Parent</a>
+      <a href="{% url 'create_teacher_user' %}"     class="btn-teacher"><i class="fas fa-chalkboard-teacher"></i>Teacher</a>
+      <a href="{% url 'create_headteacher_user' %}" class="btn-headteach"><i class="fas fa-user-tie"></i>Head&nbsp;Teacher</a>
+      <a href="{% url 'create_bursor_user' %}"      class="btn-bursor"><i class="fas fa-briefcase"></i>Bursor</a>
+      <a href="{% url 'create_secretary_user' %}"   class="btn-secretary"><i class="fas fa-user-secret"></i>Secretary</a>
+      <a href="{% url 'create_academic_user' %}"    class="btn-academic"><i class="fas fa-graduation-cap"></i>Academic</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

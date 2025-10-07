@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Student Uniform List</h2>
+  <a href="{% url 'student_uniform_create' %}" class="btn btn-success">Add Student Uniform</a>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Session</th>
+        <th>Term</th>
+        <th>Class</th>
+        <th>Amount</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student_uniform in student_uniforms %}
+      <tr>
+        <td>{{ student_uniform.student }}</td>
+        <td>{{ student_uniform.session }}</td>
+        <td>{{ student_uniform.term }}</td>
+        <td>{{ student_uniform.student_class }}</td>
+        <td>{{ student_uniform.amount }}</td>
+        <td>
+          <a href="{% url 'student_uniform_update' student_uniform.pk %}" class="btn btn-warning">Edit</a>
+          <a href="{% url 'student_uniform_delete' student_uniform.pk %}" class="btn btn-danger">Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

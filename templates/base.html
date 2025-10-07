@@ -1,0 +1,384 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}Maria Montessori Nursery, Pre and Primary School{% endblock %}</title>
+
+  <!-- libs -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+
+  <style>
+    :root{
+      --clr-primary:#1d4ed8;      /* blue */
+      --clr-accent:#93c5fd;       /* light-blue */
+      --clr-teal:#2dd4bf;         /* teal */
+      --clr-neutral:#1f2937;      /* dark gray text */
+      --danger-start:#ef4444;     /* logout gradient */
+      --danger-end:#b91c1c;
+      --w-sidebar:260px;
+      --w-sidebar-xs:80vw;
+      --h-topbar:64px;
+    }
+
+    /* Hide Django Debug Toolbar */
+    #djDebug{display:none!important;}
+
+    body{
+      margin:0; font-family:'Inter',sans-serif;
+      background:#F5F7FB; color:var(--clr-neutral);
+      overflow-x:hidden;
+    }
+    .hidden{display:none!important}
+    .pe-none{pointer-events:none!important}
+
+    /* Sidebar pushes content on desktop */
+    body.sb-open .vs-topbar, body.sb-open main{ margin-left:var(--w-sidebar); }
+    body.sb-open .vs-topbar{ width:calc(100% - var(--w-sidebar)); }
+    @media (max-width:992px){
+      body.sb-open .vs-topbar, body.sb-open main{ margin-left:0; width:100%; }
+    }
+
+    /* Sidebar */
+    .sidebar{
+      position:fixed; top:var(--h-topbar); left:0; z-index:1052;
+      width:var(--w-sidebar); height:calc(100vh - var(--h-topbar));
+      background-image:linear-gradient(180deg,#0ea5e9,#2563eb);
+      display:flex; flex-direction:column;
+      transform:translateX(-100%); transition:transform .3s;
+      overflow-y:auto; scrollbar-width:none;
+    }
+    .sidebar::-webkit-scrollbar{display:none}
+    body.sb-open .sidebar{transform:none}
+    @media (max-width:992px){ .sidebar{ width:var(--w-sidebar-xs); } }
+
+    /* Overlay */
+    #overlay{ position:fixed; inset:0; z-index:1051; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); transition:opacity .3s; }
+
+    /* Top bar as 3-area grid (burger | title | tools) */
+    .vs-topbar{
+      position:fixed; inset:0 0 auto 0; min-height:var(--h-topbar); z-index:1053;
+      display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:"left center right";
+      align-items:center; gap:.6rem; padding:.5rem .9rem;
+      color:#fff;
+      background:
+        radial-gradient(1200px 300px at 0% 0%, rgba(45,212,191,.25), transparent 60%),
+        linear-gradient(90deg, #0ea5e9, #2563eb 55%, #1e40af);
+      box-shadow:0 2px 4px rgba(0,0,0,.08);
+    }
+    .tb-left{ grid-area:left; display:flex; align-items:center; }
+    .tb-center{ grid-area:center; min-width:0; }
+    .tb-right{ grid-area:right; display:flex; align-items:center; gap:.45rem; }
+
+    .vs-icon{
+      width:36px;height:36px;border-radius:50%;
+      display:inline-grid; place-items:center;
+      background:rgba(255,255,255,.18); color:#fff; border:0; cursor:pointer;
+    }
+    .vs-icon:hover{ background:rgba(255,255,255,.28); }
+
+    .brand-wrap{ display:flex; align-items:center; gap:.55rem; min-width:0; justify-content:center; }
+    .brand-logo{
+      width:34px;height:34px;border-radius:50%; border:2px solid rgba(255,255,255,.9);
+      object-fit:cover; background:#fff; flex:0 0 34px;
+    }
+    .brand-title{
+      font-weight:800; letter-spacing:.2px; color:#fff; line-height:1.15;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;  /* desktop */
+      font-size:1rem;
+    }
+    /* On phones, let the title wrap fully and stay centered */
+    @media (max-width:576px){
+      .brand-title{ white-space:normal; overflow:visible; text-overflow:clip; text-align:center; }
+    }
+
+    /* Optional search (kept for md+) */
+    .vs-search{ flex:0 1 520px; display:none; }
+    @media (min-width:768px){ .vs-search{ display:block; } }
+    .vs-search input{
+      width:100%; border:0; border-radius:999px; padding:.55rem 1rem;
+      background:rgba(255,255,255,.22); color:#fff;
+    }
+    .vs-search input::placeholder{color:rgba(255,255,255,.8)}
+    .vs-search input:focus{ outline:none; background:rgba(255,255,255,.3); box-shadow:0 0 0 2px rgba(255,255,255,.25); }
+
+    /* Right pills */
+    .tb-pill{
+      display:inline-flex; align-items:center; gap:.45rem;
+      border-radius:999px; padding:.45rem .75rem; font-weight:700; border:0;
+      background:transparent; color:#fff; cursor:pointer;
+    }
+    .tb-pill:hover{ background:rgba(255,255,255,.2); }
+
+    /* Desktop auth pills */
+    .btn-pill{ border-radius:999px; padding:.45rem .9rem; font-weight:800; border:0; }
+    .btn-outline-light-ghost{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.55); }
+    .btn-outline-light-ghost:hover{ background:rgba(255,255,255,.1); }
+    .btn-logout{ color:#fff; background:linear-gradient(135deg, var(--danger-start), var(--danger-end)); }
+    .btn-logout:hover{ filter:brightness(1.05); }
+
+    /* MAIN spacing */
+    main{ min-height:100vh; padding:calc(var(--h-topbar) + 1rem) 0 1rem; transition:margin-left .3s; }
+    .content-wrapper{ width:100%; max-width:none; }
+
+    /* Container normalization */
+    .container{ max-width:100%!important; padding-left:0!important; padding-right:0!important; }
+
+    /* Sidebar footer (mobile auth) */
+    .sidebar-footer{
+      margin-top:auto; position:sticky; bottom:0; z-index:1;
+      padding:14px 14px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.12));
+      border-top:1px solid rgba(255,255,255,.18); backdrop-filter:blur(6px);
+    }
+    .auth-stack{ display:grid; gap:10px; }
+    .btn-pill-mobile{
+      display:inline-flex; align-items:center; justify-content:center; gap:.55rem; width:100%;
+      border:0; border-radius:999px; padding:.9rem 1.1rem; font-weight:800;
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
+    }
+    .btn-mobile-outline{ color:#fff; background:transparent; border:1px solid rgba(255,255,255,.5); }
+    .btn-mobile-outline:hover{ background:rgba(255,255,255,.1); }
+    .btn-mobile-login{ color:#0b1220; background:linear-gradient(135deg, var(--clr-accent), var(--clr-teal)); }
+    .btn-mobile-logout{ color:#fff; background:linear-gradient(135deg, var(--danger-start), var(--danger-end)); }
+    .btn-pill-mobile i{ font-size:1.05rem; }
+
+    /* ---------- Notification panel ---------- */
+    .notif-panel{
+      position:fixed; right:.75rem; top:calc(var(--h-topbar) + .5rem);
+      width:min(92vw, 360px); max-height:50vh; overflow:auto;
+      background:rgba(17,24,39,.95); color:#e5e7eb;
+      border:1px solid rgba(255,255,255,.12); border-radius:12px;
+      box-shadow:0 20px 40px rgba(0,0,0,.25); padding:.6rem; z-index:1054;
+    }
+    .notif-panel.hidden{ display:none; }
+    .notif-list{ list-style:none; margin:0; padding:0; }
+    .notif-list li{ padding:.5rem .4rem; border-radius:10px; }
+    .notif-list li:hover{ background:rgba(255,255,255,.06); }
+    .notif-list .title{ font-weight:700; }
+    .notif-list .meta{ font-size:.82rem; color:#9ca3af; }
+    .notif-empty{ text-align:center; padding:.9rem; color:#9ca3af; }
+
+    /* ===== Real dark mode styles ===== */
+    body.dark { background:#0b1020; color:#e5e7eb; }
+
+    /* Top bar (dark) */
+    body.dark .vs-topbar{
+      background:
+        radial-gradient(1200px 300px at 0% 0%, rgba(34,211,238,.18), transparent 60%),
+        linear-gradient(90deg, #0a3a63, #112266 60%, #0b183f);
+      box-shadow: 0 2px 6px rgba(0,0,0,.45);
+    }
+    body.dark .brand-title{ color:#e5e7eb; }
+    body.dark .tb-pill,
+    body.dark .vs-icon{ color:#e5e7eb; }
+    body.dark .vs-icon{ background:rgba(255,255,255,.12); }
+    body.dark .tb-pill:hover,
+    body.dark .vs-icon:hover{ background:rgba(255,255,255,.18); }
+
+    /* Sidebar (dark) */
+    body.dark .sidebar{
+      background-image: linear-gradient(180deg, #0a2a78, #0b5aa1);
+      box-shadow: 2px 0 10px rgba(0,0,0,.35);
+    }
+
+    /* Containers (dark) */
+    body.dark .container,
+    body.dark main { background:transparent; }
+
+    /* Desktop auth pills (dark) */
+    body.dark .btn-outline-light-ghost{ color:#e5e7eb; border-color:rgba(255,255,255,.35); }
+    body.dark .btn-outline-light-ghost:hover{ background:rgba(255,255,255,.08); }
+
+    /* Sidebar auth footer (dark) */
+    body.dark .sidebar-footer{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.08));
+      border-top-color:rgba(255,255,255,.12);
+    }
+    body.dark .btn-mobile-outline{ border-color:rgba(255,255,255,.35); }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="dark:bg-gray-900 dark:text-gray-300">
+
+<!-- overlay -->
+<div id="overlay" class="hidden opacity-0 pe-none"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  {% include "partials/sidebar.html" %}
+  <!-- Sticky auth footer for mobile -->
+  <div class="sidebar-footer d-lg-none">
+    {% if request.user.is_authenticated %}
+      <div class="auth-stack">
+        <a href="{% url 'profile' %}" class="btn-pill-mobile btn-mobile-outline" aria-label="Profile">
+          <i class="fas fa-user"></i><span>Profile</span>
+        </a>
+        <form method="post" action="{% url 'logout' %}" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn-pill-mobile btn-mobile-logout" aria-label="Logout">
+            <i class="fas fa-power-off"></i><span>Logout</span>
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <a href="{% url 'custom_login' %}" class="btn-pill-mobile btn-mobile-login" aria-label="Login">
+        <i class="fas fa-right-to-bracket"></i><span>Login</span>
+      </a>
+    {% endif %}
+  </div>
+</aside>
+
+<!-- TOP BAR -->
+<header class="vs-topbar">
+  <!-- Left: burger -->
+  <div class="tb-left">
+    <button id="vsToggle" class="vs-icon" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+  </div>
+
+  <!-- Center: logo + full title -->
+  <div class="tb-center">
+    <div class="brand-wrap">
+      <img class="brand-logo" src="{% static 'img/logo.png' %}" alt="Logo" loading="lazy">
+      <div class="brand-title">Maria Montessori Nursery, Pre and Primary School</div>
+    </div>
+  </div>
+
+  <!-- Right: tools (mobile + desktop) -->
+  <div class="tb-right">
+    <button id="notifBtn" class="tb-pill" aria-label="Notifications">
+      <i class="bi bi-bell"></i>
+      {% if notification_count %}<span class="badge bg-danger rounded-pill ms-1">{{ notification_count }}</span>{% endif %}
+    </button>
+    <button id="dmBtn" class="tb-pill" aria-label="Toggle dark mode"><i class="bi bi-moon-stars"></i></button>
+
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'profile' %}" class="btn btn-outline-light-ghost btn-pill d-none d-lg-inline">
+        <i class="fas fa-user"></i> Profile
+      </a>
+      <form method="post" action="{% url 'logout' %}" class="d-none d-lg-inline m-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-logout btn-pill">
+          <i class="fas fa-power-off"></i> Logout
+        </button>
+      </form>
+    {% else %}
+      <a href="{% url 'custom_login' %}" class="btn btn-outline-light-ghost btn-pill d-none d-lg-inline">
+        <i class="fas fa-right-to-bracket"></i> Login
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Notification panel -->
+  <div id="notifPanel" class="notif-panel hidden" role="region" aria-label="Notifications">
+    {% if notifications %}
+      <ul class="notif-list">
+        {% for n in notifications %}
+          <li>
+            <div class="title">{{ n.title }}</div>
+            <div class="meta">{{ n.created_at|date:"M j, H:i" }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="notif-empty">No new notifications</div>
+    {% endif %}
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <div class="content-wrapper">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<!-- scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js" crossorigin="anonymous" defer></script>
+
+<script>
+(() => {
+  /* sync CSS var with actual topbar height (title can wrap on phones) */
+  const syncH = () => {
+    const tb = document.querySelector('.vs-topbar');
+    if (tb) document.documentElement.style.setProperty('--h-topbar', tb.offsetHeight + 'px');
+  };
+  addEventListener('load', syncH);
+  addEventListener('resize', syncH);
+
+  /* sidebar open / close */
+  const body = document.body, btn = document.getElementById('vsToggle'), ovl = document.getElementById('overlay');
+  const setSB = open => {
+    body.classList.toggle('sb-open', open);
+    const phone = innerWidth < 992;
+    ['hidden','pe-none','opacity-0'].forEach(c => ovl.classList.toggle(c, !(open && phone)));
+    if (innerWidth >= 992) localStorage.setItem('sb', open ? '1' : '0');
+  };
+  setSB(innerWidth < 992 ? false : (localStorage.getItem('sb') ?? '1') === '1');
+  btn.onclick = () => setSB(!body.classList.contains('sb-open'));
+  ovl.onclick = () => setSB(false);
+  addEventListener('resize', () => { if (innerWidth < 992) setSB(false); });
+
+  /* dark mode (persist + system default fallback) */
+  const dm = document.getElementById('dmBtn');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  function syncDM(){
+    const saved = localStorage.getItem('dm');              // '1' | '0' | null
+    const on = saved === '1' || (saved === null && prefersDark);
+    document.body.classList.toggle('dark', on);
+    if (dm){
+      dm.innerHTML = on ? '<i class="bi bi-brightness-high"></i>' : '<i class="bi bi-moon-stars"></i>';
+      dm.setAttribute('aria-pressed', on ? 'true' : 'false');
+      dm.setAttribute('title', on ? 'Switch to light' : 'Switch to dark');
+    }
+  }
+  dm?.addEventListener('click', () => {
+    const nowOn = !document.body.classList.contains('dark');
+    localStorage.setItem('dm', nowOn ? '1' : '0');
+    syncDM();
+  });
+  if (window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (localStorage.getItem('dm') === null) syncDM();
+    });
+  }
+  syncDM();
+
+  /* notifications: toggle mini panel */
+  const notifBtn = document.getElementById('notifBtn');
+  const panel = document.getElementById('notifPanel');
+  const closePanel = () => panel?.classList.add('hidden');
+  const togglePanel = () => panel?.classList.toggle('hidden');
+
+  notifBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePanel();
+  });
+  document.addEventListener('click', (e) => {
+    if (!panel || panel.classList.contains('hidden')) return;
+    if (!panel.contains(e.target) && e.target !== notifBtn) closePanel();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
+
+  /* toastr flash messages */
+  {% if messages %}
+    toastr.options = { progressBar:true, closeButton:true, timeOut:5000 };
+    {% for m in messages %} toastr["{{ m.tags|default:'info' }}"]("{{ m|escapejs }}"); {% endfor %}
+  {% endif %}
+})();
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

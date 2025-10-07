@@ -1,0 +1,771 @@
+{% extends "base.html" %}
+{% load widget_tweaks humanize %}
+
+{% block title %}
+{% if form.instance.pk %}Update{% else %}Add{% endif %} Invoice
+{% endblock title %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    AOS.init({ duration: 800, once: true });
+
+    const studentSelect = document.getElementById('id_student');
+    const sessionSelect = document.getElementById('id_session');
+    const installmentSelect = document.getElementById('id_installment');
+    const invoiceAmountInput = document.getElementById('id_invoice_amount');
+    const invoiceAmountError = document.getElementById('invoice-amount-error');
+    const form = document.querySelector('form');
+    const saveBtn = document.querySelector('.btn-primary');
+    const cancelBtn = document.querySelector('.btn-secondary');
+
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Validate invoice amount
+    function validateInvoiceAmount() {
+        const value = invoiceAmountInput.value;
+        const errorDiv = invoiceAmountError;
+        if (value && (isNaN(value) || value <= 0)) {
+            errorDiv.textContent = 'Please enter a valid amount greater than zero.';
+            invoiceAmountInput.classList.add('is-invalid');
+            saveBtn.disabled = true;
+        } else {
+            errorDiv.textContent = '';
+            invoiceAmountInput.classList.remove('is-invalid');
+            saveBtn.disabled = false;
+        }
+    }
+
+    if (invoiceAmountInput) {
+        invoiceAmountInput.addEventListener('input', debounce(validateInvoiceAmount, 300));
+    }
+
+    // Update summary with AJAX
+    function updateSummary() {
+        const studentId = studentSelect.value;
+        const sessionId = sessionSelect.value;
+        const installmentId = installmentSelect.value;
+        const invoiceAmount = invoiceAmountInput.value;
+
+        if (studentId && sessionId && installmentId) {
+            // Fetch previous balance
+            $.ajax({
+                url: '/finance/ajax/get-student-balance/',
+                data: {
+                    'student_id': studentId,
+                    'session_id': sessionId,
+                    'installment_id': installmentId
+                },
+                success: function(data) {
+                    if (data.error) {
+                        console.error('Balance error:', data.error);
+                        $('#previous-balance-note').remove();
+                        return;
+                    }
+                    console.log('Previous balance:', data.balance);
+                    const balanceNote = $('#previous-balance-note');
+                    if (balanceNote.length) {
+                        balanceNote.html(`<strong>Previous Balance:</strong> ${data.balance.toLocaleString()} TZS`);
+                    } else {
+                        $('.instructions').append(`<p id="previous-balance-note"><strong>Previous Balance:</strong> ${data.balance.toLocaleString()} TZS</p>`);
+                    }
+                    const previousBalanceLi = $('ul li:contains("Previous Balance")');
+                    if (previousBalanceLi.length) {
+                        previousBalanceLi.html(`Previous Balance: ${data.balance.toLocaleString()} TZS`);
+                    } else {
+                        $('.summary-body ul').append(`<li>Previous Balance: ${data.balance.toLocaleString()} TZS</li>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching balance:', error);
+                }
+            });
+
+            // Fetch school fees
+            $.ajax({
+                url: '/finance/ajax/get-school-fees/',
+                data: { 'session_id': sessionId },
+                success: function(data) {
+                    if (data.error) {
+                        console.error('School fees error:', data.error);
+                        invoiceAmountInput.placeholder = 'No school fees data available';
+                        $('#school-fees-error').remove();
+                        $('.instructions').append('<p id="school-fees-error" class="text-danger">No school fees record for this session. Please create one via the School Fees section.</p>');
+                        saveBtn.disabled = true;
+                        return;
+                    }
+                    console.log('School fees:', data);
+                    invoiceAmountInput.placeholder = `Suggested: ${data.installment_amount.toLocaleString()} TZS`;
+                    $('#school-fees-error').remove();
+                    saveBtn.disabled = false;
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching school fees:', error);
+                    invoiceAmountInput.placeholder = 'Error fetching school fees data';
+                }
+            });
+
+            // Fetch remaining balance
+            if (invoiceAmount) {
+                validateAndUpdateRemainingBalance();
+            }
+        }
+    }
+
+    function validateAndUpdateRemainingBalance() {
+        const studentId = studentSelect.value;
+        const sessionId = sessionSelect.value;
+        const invoiceAmount = invoiceAmountInput.value;
+        const invoiceId = {% if form.instance.pk %}{{ form.instance.pk }}{% else %}null{% endif %};
+
+        if (!invoiceAmount || invoiceAmount <= 0) {
+            invoiceAmountError.innerHTML = 'Invoice amount must be greater than zero.';
+            invoiceAmountInput.classList.add('is-invalid');
+            saveBtn.disabled = true;
+            return;
+        }
+
+        if (studentId && sessionId && invoiceAmount) {
+            $.ajax({
+                url: '/finance/ajax/get-remaining-balance/',
+                data: {
+                    'student_id': studentId,
+                    'session_id': sessionId,
+                    'invoice_amount': invoiceAmount,
+                    'invoice_id': invoiceId
+                },
+                success: function(data) {
+                    if (data.error) {
+                        console.error('Remaining balance error:', data.error);
+                        invoiceAmountInput.classList.add('is-invalid');
+                        invoiceAmountError.innerHTML = data.error;
+                        saveBtn.disabled = true;
+                        return;
+                    }
+                    console.log('Remaining balance:', data.remaining_balance);
+                    invoiceAmountInput.classList.remove('is-invalid');
+                    invoiceAmountError.innerHTML = '';
+                    saveBtn.disabled = false;
+                    const remainingBalanceNote = $('#remaining-balance-note');
+                    const remainingBalanceLi = $('#remaining-balance');
+                    if (data.remaining_balance < 0) {
+                        invoiceAmountInput.classList.add('is-invalid');
+                        invoiceAmountError.innerHTML = `Invoice amount exceeds remaining annual balance (${(data.remaining_balance + parseInt(invoiceAmount)).toLocaleString()} TZS). Maximum allowable: ${(data.remaining_balance + parseInt(invoiceAmount)).toLocaleString()} TZS.`;
+                        saveBtn.disabled = true;
+                    } else {
+                        if (remainingBalanceNote.length) {
+                            remainingBalanceNote.html(`<strong>Remaining Annual Balance:</strong> ${data.remaining_balance.toLocaleString()} TZS`);
+                        } else {
+                            $('.instructions').append(`<p id="remaining-balance-note"><strong>Remaining Annual Balance:</strong> ${data.remaining_balance.toLocaleString()} TZS</p>`);
+                        }
+                        if (remainingBalanceLi.length) {
+                            remainingBalanceLi.html(`Remaining Annual Balance: ${data.remaining_balance.toLocaleString()} TZS`);
+                        } else {
+                            $('.summary-body ul').append(`<li id="remaining-balance">Remaining Annual Balance: ${data.remaining_balance.toLocaleString()} TZS</li>`);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching remaining balance:', error);
+                }
+            });
+        }
+    }
+
+    // Form submission handler
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                console.log('Form invalid, preventing submission');
+                return;
+            }
+            console.log('Submitting form:', {
+                student: studentSelect.value,
+                session: sessionSelect.value,
+                installment: installmentSelect.value,
+                invoice_amount: invoiceAmountInput.value,
+                status: document.getElementById('id_status').value
+            });
+        });
+    }
+
+    // Event listeners
+    if (studentSelect && sessionSelect && installmentSelect && invoiceAmountInput) {
+        studentSelect.addEventListener('change', debounce(updateSummary, 300));
+        sessionSelect.addEventListener('change', debounce(updateSummary, 300));
+        installmentSelect.addEventListener('change', debounce(updateSummary, 300));
+        invoiceAmountInput.addEventListener('input', debounce(validateAndUpdateRemainingBalance, 300));
+    }
+
+    // Cancel confirmation
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', (e) => {
+            if (form.checkValidity() && Array.from(form.elements).some(el => el.value)) {
+                if (!confirm('Are you sure you want to cancel? Unsaved changes will be lost.')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+
+    // Sticky header
+    const header = document.querySelector('.card-header');
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = debounce(() => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            header.classList.add('sticky');
+        } else {
+            header.classList.remove('sticky');
+        }
+        lastScrollY = currentScrollY;
+    }, 100);
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Fade-in animation
+    const card = document.querySelector('.card');
+    card.style.opacity = '0';
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+
+    // Initial update
+    if (studentSelect && sessionSelect && installmentSelect) {
+        updateSummary();
+        // Ensure Save button is enabled if students are available
+        if (studentSelect.options.length > 1) {
+            saveBtn.disabled = false;
+        }
+    }
+});
+</script>
+
+<style>
+:root {
+    --carrot: #f97316; /* Carrot orange */
+    --blue: #1e40af; /* Deep blue */
+    --red: #ef4444; /* Red */
+    --success: #10b981; /* Green */
+    --background: #f1f5f9; /* Light gray */
+    --card-bg: #ffffff; /* White */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --input-bg: #f9fafb; /* Light input background */
+    --input-border: #d1d5db; /* Gray border */
+}
+
+body {
+    background: var(--background);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 0 0 15px 15px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(20px);
+    animation: slideInDown 0.5s ease forwards;
+}
+
+.card-header {
+    background: var(--card-bg);
+    color: var(--blue);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+    position: relative;
+    z-index: 10;
+    padding: 1rem;
+}
+
+.card-header.sticky {
+    position: sticky;
+    top: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: var(--card-bg);
+}
+
+.card-header h2 {
+    font-size: clamp(1.4rem, 5vw, 1.6rem);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--blue);
+}
+
+.card-header hr {
+    border: 0;
+    border-top: 2px solid var(--blue);
+    margin: 0.5rem 0 0;
+    width: 100%;
+}
+
+.card-body {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.alert-danger {
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin-bottom: 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--red);
+}
+
+.instructions {
+    background: var(--card-bg);
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--blue);
+    margin-bottom: 1rem;
+}
+
+.instructions strong {
+    color: var(--red);
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+}
+
+.instructions p {
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: #374151;
+    margin: 0.5rem 0 0;
+}
+
+fieldset {
+    border: none;
+    border-radius: 12px;
+    background: var(--input-bg);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s ease;
+}
+
+fieldset:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+legend {
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+    font-weight: 600;
+    color: var(--blue);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+legend:hover {
+    color: var(--carrot);
+}
+
+legend + hr {
+    border: 0;
+    border-top: 1px solid var(--blue);
+    margin: 0.25rem 0 0.5rem;
+}
+
+.fieldset-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: var(--red);
+    margin-bottom: 0.25rem;
+}
+
+.form-control, .form-select {
+    border-radius: 25px;
+    border: 1px solid var(--input-border);
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    background: var(--input-bg);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: #6b7280;
+    opacity: 0.7;
+}
+
+.form-control.is-invalid {
+    border-color: var(--red);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-text {
+    border-radius: 25px 0 0 25px;
+    background: #e5e7eb;
+    border: none;
+    color: var(--carrot);
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    padding: 0.5rem 0.75rem;
+}
+
+.text-danger {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: var(--red);
+    margin-top: 0.25rem;
+}
+
+.text-muted {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.btn {
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    padding: 0.75rem 1.5rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--carrot);
+    transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: #fff;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.summary-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-top: 1rem;
+    border-radius: 12px;
+}
+
+.summary-header {
+    background: linear-gradient(135deg, var(--carrot), var(--blue));
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    font-weight: 700;
+    margin: -1.5rem -1.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.summary-header:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.summary-body h5 {
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 0.5rem;
+}
+
+.summary-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.summary-body ul li {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: #374151;
+}
+
+.summary-body ul li::before {
+    content: "💸";
+    position: absolute;
+    left: 0;
+    font-size: 0.9rem;
+    color: var(--carrot);
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    .card-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+    .fieldset-content {
+        grid-template-columns: 1fr;
+    }
+    .summary-header {
+        padding: 0.8rem 1.2rem;
+        font-size: clamp(0.9rem, 2.2vw, 1rem);
+    }
+}
+
+@media (max-width: 576px) {
+    .card-header h2 {
+        font-size: clamp(1.2rem, 4vw, 1.4rem);
+    }
+    .form-control, .form-select {
+        font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    }
+    .btn {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        padding: 0.6rem 1.2rem;
+    }
+}
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h2>
+            {% if form.instance.pk %}
+                <i class="fas fa-edit"></i> Update Invoice
+            {% else %}
+                <i class="fas fa-plus"></i> Add New Invoice
+            {% endif %}
+        </h2>
+        <hr>
+    </div>
+    <div class="card-body">
+        {% if form.non_field_errors %}
+            <div class="alert-danger">
+                <strong>Form Errors:</strong>
+                <ul class="mb-0">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="instructions">
+            <p>
+                <strong>Instructions:</strong><br>
+                Select a student registered for the current term, session, and installment. Enter the invoice amount, ensuring it does not exceed the remaining annual school fees balance. A school fees record must exist for the selected session (create one via the School Fees section if needed). Previous balances will be applied automatically.
+            </p>
+            {% if not has_registered_students %}
+                <p class="text-danger">
+                    <strong>No students available:</strong> No students are registered for the current term. Please assign students to the current term via the Students section.
+                </p>
+            {% endif %}
+            {% if previous_balance is not none %}
+                <p id="previous-balance-note"><strong>Previous Balance:</strong> {{ previous_balance|intcomma }} TZS</p>
+            {% endif %}
+            {% if remaining_balance is not none %}
+                <p id="remaining-balance-note"><strong>Remaining Annual Balance:</strong> {{ remaining_balance|intcomma }} TZS</p>
+            {% endif %}
+        </div>
+
+        <form method="post" id="invoiceForm">
+            {% csrf_token %}
+            <fieldset>
+                <legend><i class="fas fa-file-invoice"></i> Invoice Details</legend>
+                <hr>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <label for="id_student" class="form-label">{{ form.student.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">🧑</span>
+                            {{ form.student|add_class:"form-select form-control"|attr:"id:id_student" }}
+                        </div>
+                        {% if form.student.errors %}
+                            <div class="text-danger">
+                                {% for error in form.student.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Select a registered student</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_session" class="form-label">{{ form.session.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📅</span>
+                            {{ form.session|add_class:"form-select form-control"|attr:"id:id_session" }}
+                        </div>
+                        {% if form.session.errors %}
+                            <div class="text-danger">
+                                {% for error in form.session.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">e.g. 2025</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_installment" class="form-label">{{ form.installment.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📋</span>
+                            {{ form.installment|add_class:"form-select form-control"|attr:"id:id_installment" }}
+                        </div>
+                        {% if form.installment.errors %}
+                            <div class="text-danger">
+                                {% for error in form.installment.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Select installment</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_invoice_amount" class="form-label">{{ form.invoice_amount.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">💰</span>
+                            {{ form.invoice_amount|add_class:"form-control"|attr:"id:id_invoice_amount"|attr:"placeholder:Enter installment amount"|attr:"min:1"|attr:"required" }}
+                        </div>
+                        <div id="invoice-amount-error" class="text-danger"></div>
+                        {% if form.invoice_amount.errors %}
+                            <div class="text-danger">
+                                {% for error in form.invoice_amount.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Amount in TZS</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_status" class="form-label">{{ form.status.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">✅</span>
+                            {{ form.status|add_class:"form-select form-control" }}
+                        </div>
+                        {% if form.status.errors %}
+                            <div class="text-danger">
+                                {% for error in form.status.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Active or Closed</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" {% if not has_registered_students %}disabled{% endif %}><i class="fas fa-save"></i> Save</button>
+                <a class="btn btn-secondary" href="{% url 'invoice-list' %}"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+
+        {% if school_fees %}
+        <div class="summary-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="summary-header">
+                <i class="fas fa-file-invoice-dollar"></i> School Fees Summary
+            </div>
+            <div class="summary-body">
+                <h5>School Fees Details</h5>
+                <ul>
+                    <li>Session: {{ school_fees.session.name }}</li>
+                    <li>Total Annual Fees: {{ school_fees.total_annual_fees|intcomma }} TZS</li>
+                    <li>Suggested Installment: {{ school_fees.installment_amount|intcomma }} TZS</li>
+                    {% if previous_balance is not none %}
+                    <li>Previous Balance: {{ previous_balance|intcomma }} TZS</li>
+                    {% endif %}
+                    {% if remaining_balance is not none %}
+                    <li id="remaining-balance">Remaining Annual Balance: {{ remaining_balance|intcomma }} TZS</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Category List
+{% endblock title %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    :root {
+        --primary-color: #e67e22; /* Carrot color */
+        --secondary-color: #007aff;
+        --light-bg: #f0f8ff;
+        --lighter-bg: #e6f7ff;
+        --dark-bg: #1b1b1b;
+    }
+
+    html, body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom right, var(--light-bg), var(--lighter-bg));
+        min-height: 100vh;
+        color: #333;
+        transition: background-color 0.5s, color 0.5s;
+    }
+
+    [data-theme="dark"] {
+        background: linear-gradient(to bottom right, #1b1b1b, #444);
+        color: #fff;
+    }
+
+    h1 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size:1.6rem;
+        font-weight:600;
+        margin-bottom:20px;
+        color:inherit;
+    }
+
+    h1::before {
+        content: "📂";
+        font-size:1.4em;
+    }
+
+    .card-container {
+        background:#fff;
+        border-radius:20px;
+        box-shadow:0 2px 15px rgba(0,0,0,0.05);
+        padding:20px;
+        position:relative;
+    }
+
+    [data-theme="dark"] .card-container {
+        background:#2c2c2c;
+    }
+
+    .card-header {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:20px;
+    }
+
+    .card-header h1 {
+        margin-bottom:0;
+    }
+
+    .add-btn {
+        background-color: var(--primary-color);
+        color: #fff;
+        border:none;
+        border-radius:50px;
+        font-weight:600;
+        padding:10px 20px;
+        transition: background-color 0.3s, transform 0.2s;
+        display:flex;
+        align-items:center;
+        gap:0.5rem;
+        font-size:0.9rem;
+    }
+
+    .add-btn:hover {
+        background-color:#d35400;
+        transform:translateY(-2px);
+        box-shadow:0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    thead tr {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    [data-theme="dark"] thead tr {
+        background-color: #3a3a3a;
+    }
+
+    th, td {
+        padding:10px;
+        vertical-align: middle;
+        font-size:0.95rem;
+        border-bottom:1px solid #ddd;
+        transition: background-color 0.3s;
+    }
+
+    [data-theme="dark"] th, [data-theme="dark"] td {
+        border-color:#555;
+    }
+
+    tbody tr:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    [data-theme="dark"] tbody tr:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    td a {
+        color:inherit;
+        text-decoration:none;
+        transition:color 0.3s,transform 0.3s;
+    }
+
+    td a:hover {
+        color:var(--primary-color);
+        text-decoration:underline;
+        transform:scale(1.05);
+    }
+
+    .no-categories {
+        font-style:italic;
+        color:#999;
+    }
+
+    .btn {
+        border-radius:50px;
+        font-weight:600;
+        font-size:0.9rem;
+        transition: background-color 0.3s, color 0.3s, transform 0.2s;
+        border:none;
+    }
+
+    .btn:hover {
+        transform:translateY(-2px);
+        box-shadow:0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .btn-success {
+        background-color:#28a745;
+    }
+    .btn-success:hover {
+        background-color:#218838;
+    }
+
+    .btn-danger {
+        background-color:#dc3545;
+    }
+    .btn-danger:hover {
+        background-color:#c82333;
+    }
+
+    .category-count {
+        margin-top:20px;
+        font-size:0.9rem;
+        color:#555;
+    }
+
+    [data-theme="dark"] .category-count {
+        color:#ccc;
+    }
+
+    /* top-actions for theme toggle and dashboard link */
+    .top-actions {
+        position:absolute;
+        top:20px;
+        right:20px;
+        display:flex;
+        align-items:center;
+        gap:15px;
+        z-index:2000; /* Ensure this is on top */
+        pointer-events:all;
+    }
+
+    .top-actions a, .top-actions div {
+        cursor:pointer;
+        font-size:1.5em;
+        color:var(--primary-color);
+        transition:transform 0.3s,color 0.3s;
+        font-weight:600;
+        text-decoration:none;
+    }
+
+    .top-actions a:hover, .top-actions div:hover {
+        transform:scale(1.1);
+        color:#d35400;
+    }
+
+    [data-theme="dark"] .top-actions a, [data-theme="dark"] .top-actions div {
+        color:#ffcc00;
+    }
+
+    [data-theme="dark"] .top-actions a:hover, [data-theme="dark"] .top-actions div:hover {
+        color:#ffc107;
+    }
+
+    /* Animate table rows appearing */
+    .table tbody tr {
+        opacity:0;
+    }
+
+    /* icon before category name */
+    .category-icon {
+        color:var(--primary-color);
+        margin-right:5px;
+    }
+
+    /* Responsive adjustments */
+    @media(max-width:576px) {
+        th,td {
+            font-size:0.85rem;
+        }
+        h1 {
+            font-size:1.5rem;
+        }
+        .add-btn {
+            font-size:0.85rem;
+            padding:8px 16px;
+        }
+        .top-actions a, .top-actions div {
+            font-size:1.2em;
+        }
+    }
+</style>
+
+<div class="container py-4" data-aos="fade-up" data-aos-duration="1000">
+    <div class="card-container">
+        <!-- top actions: theme toggle, and return to dashboard -->
+        <div class="top-actions">
+            <!-- Make sure the URL name 'select_link' is correct according to your urls.py -->
+            <a href="{% url 'select_link' %}" title="Return to Dashboard">
+                <i class="fas fa-home"></i>
+            </a>
+            <div class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-sun"></i>
+            </div>
+        </div>
+
+        <div class="card-header">
+            <h1>Category List</h1>
+            <a href="{% url 'category_create' %}" class="add-btn" title="Add New Category">
+                <i class="fas fa-plus"></i> Add New Category
+            </a>
+        </div>
+
+        <table class="table" data-aos="fade-up" data-aos-duration="1000">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-list-alt"></i> Category</th>
+                    <th><i class="fas fa-info-circle"></i> Detail</th>
+                    <th><i class="fas fa-pen"></i> Update</th>
+                    <th><i class="fas fa-trash"></i> Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in object_list %}
+                <tr data-aos="fade-up" data-aos-duration="1000">
+                    <td>
+                        <a href="{% url 'expenditure_create' %}?category={{ category.pk }}">
+                            <i class="fas fa-tag category-icon"></i>{{ category.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'category_detail' category.pk %}" title="View Details"><i class="fas fa-eye"></i></a>
+                    </td>
+                    <td>
+                        <a href="{% url 'category_update' category.pk %}" class="btn btn-success" title="Update Category">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'category_delete' category.pk %}" class="btn btn-danger" title="Delete Category">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr data-aos="fade-up" data-aos-duration="1000">
+                    <td colspan="4" class="no-categories">No categories found. 🙁</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if object_list %}
+        <div class="category-count">
+            Total Categories: <span id="categoryCount">{{ object_list|length }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init();
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+
+    function toggleTheme() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        htmlElement.setAttribute('data-theme', newTheme);
+        themeToggle.innerHTML = newTheme === 'dark' 
+            ? '<i class="fas fa-moon"></i>' 
+            : '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', newTheme);
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        htmlElement.setAttribute('data-theme', savedTheme);
+        themeToggle.innerHTML = savedTheme === 'dark' 
+            ? '<i class="fas fa-moon"></i>' 
+            : '<i class="fas fa-sun"></i>';
+    }
+
+    // Animate table rows appearing
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+        setTimeout(() => {
+            row.style.opacity = 1;
+        }, 150 * index);
+    });
+
+    // Optional: log category count * 2 to console
+    const categoryCountEl = document.getElementById('categoryCount');
+    if (categoryCountEl) {
+        const count = parseInt(categoryCountEl.textContent, 10);
+        console.log("Double the number of categories:", count * 2);
+    }
+</script>
+{% endblock %}

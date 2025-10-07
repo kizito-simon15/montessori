@@ -1,0 +1,13 @@
+<div class="summary-section" style="display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 1000px; margin-bottom: 15px; flex-wrap: wrap; font-size: 16px; font-weight: bold;">
+    📚 Students: <strong id="totalStudents">{{ data|length }}</strong> | 
+    📈 Class Average: <strong id="classAverage">{{ class_average|floatformat:"2" }}</strong>
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .summary-section {
+            font-size: 14px;
+            gap: 10px;
+        }
+    }
+</style>

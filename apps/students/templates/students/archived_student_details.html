@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+div.student-details {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+div.student-details p {
+    margin: 10px 0;
+}
+
+div.student-details img {
+    display: block;
+    margin-top: 10px;
+    max-width: 200px;
+    max-height: 200px;
+}
+</style>
+
+<h2>Student Details</h2>
+<div class="student-details">
+    <p><strong>Registration Number:</strong> {{ student.registration_number }}</p>
+    <p><strong>First Name:</strong> {{ student.firstname }}</p>
+    <p><strong>Middle Name:</strong> {{ student.middle_name }}</p>
+    <p><strong>Surname:</strong> {{ student.surname }}</p>
+    <p><strong>Gender:</strong> {{ student.get_gender_display }}</p>
+    <p><strong>Date of Birth:</strong> {{ student.date_of_birth }}</p>
+    <p><strong>Current Class:</strong> {{ student.current_class }}</p>
+    <p><strong>Date of Admission:</strong> {{ student.date_of_admission }}</p>
+    <p><strong>Parent Mobile Number:</strong> {{ student.parent_mobile_number }}</p>
+    <p><strong>Address:</strong> {{ student.address }}</p>
+    <p><strong>Others:</strong> {{ student.others }}</p>
+    <p>Archived: {{ student.archived }}</p>
+    <p>Archive Date: {{ student.archive_date }}</p>
+    {% if student.passport %}
+    <p><strong>Passport:</strong> <img src="{{ student.passport.url }}" alt="Student Passport"></p>
+    {% endif %}
+    <p><strong>Current Status:</strong> {{ student.get_current_status_display }}</p>
+</div>
+{% endblock %}

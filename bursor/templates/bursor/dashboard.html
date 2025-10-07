@@ -1,0 +1,136 @@
+{% extends "bursor/bursor_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ─── glass cards ─── */
+.glass{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(14px) saturate(150%);
+  border-radius:18px; box-shadow:0 8px 24px #0002;
+}
+.kpi{flex:1 1 160px;padding:1.2rem;display:flex;flex-direction:column;
+    align-items:flex-start;gap:.25rem;color:#fff;}
+.kpi .val{font-size:1.7rem;font-weight:700;}
+.kpi .lbl{font-size:.8rem;opacity:.85;}
+
+canvas{max-width:100%;height:320px!important}
+
+@media (prefers-color-scheme: light){
+  body{color:#0f172a}
+  .glass{background:rgba(255,255,255,.7);border:1px solid #e2e8f0;
+         backdrop-filter:blur(12px);}
+  .kpi{color:#0f172a}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+  <!-- ─── KPI ROW ─── -->
+  <div class="d-flex flex-wrap gap-3 mb-4">
+    {% for card in kpis %}
+      <div class="glass kpi" style="background:linear-gradient(135deg,{{ card.grad_from }},{{ card.grad_to }})">
+        <span class="lbl">{{ card.label }}</span>
+        <span class="val">{{ card.value|floatformat:2 }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- ─── CHARTS ─── -->
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="glass p-3"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="col-lg-6">
+      <div class="glass p-3"><canvas id="categoryChart"></canvas></div>
+    </div>
+    <div class="col-12">
+      <div class="glass p-3"><canvas id="salaryChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(() => {
+  /* ---------- helpers ---------- */
+  const makeGrad = (ctx,clr1,clr2) =>{
+    const grad = ctx.createLinearGradient(0,0,0,300);
+    grad.addColorStop(0,clr1); grad.addColorStop(1,clr2);
+    return grad;
+  };
+
+  /* ---------- stacked bar: revenue vs collection ---------- */
+  (() => {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels: {{ month_labels|safe }},
+        datasets:[
+          {
+            label:'Invoiced',
+            data:{{ invoice_series|safe }},
+            backgroundColor: makeGrad(ctx,'#14b8a6','#0d9488'),
+            stack:'fin'
+          },
+          {
+            label:'Collected',
+            data:{{ receipt_series|safe }},
+            backgroundColor: makeGrad(ctx,'#fde047','#facc15'),
+            stack:'fin'
+          }
+        ]
+      },
+      options:{responsive:true,plugins:{legend:{position:'top'}}}
+    });
+  })();
+
+  /* ---------- doughnut: spend by category ---------- */
+  (() => {
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx,{
+      type:'doughnut',
+      data:{
+        labels:{{ cat_labels|safe }},
+        datasets:[{
+          data:{{ cat_values|safe }},
+          backgroundColor:['#34d399','#60a5fa','#c084fc','#f87171','#fbbf24','#38bdf8']
+        }]
+      },
+      options:{cutout:'55%',plugins:{legend:{position:'right'}}}
+    });
+  })();
+
+  /* ---------- poly-line: salaries per month ---------- */
+  (() => {
+    const ctx = document.getElementById('salaryChart').getContext('2d');
+    new Chart(ctx,{
+      type:'line',
+      data:{
+        labels: {{ month_labels|safe }},
+        datasets:[{
+          label:'Net salaries',
+          data: {{ salary_series|safe }},
+          fill:true,
+          tension:.35,
+          borderWidth:2,
+          borderColor:'#0ea5e9',
+          backgroundColor: makeGrad(ctx,'#0ea5e933','#0ea5e900'),
+          pointRadius:3
+        }]
+      },
+      options:{
+        responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{y:{beginAtZero:true}}
+      }
+    });
+  })();
+})();
+</script>
+{% endblock %}

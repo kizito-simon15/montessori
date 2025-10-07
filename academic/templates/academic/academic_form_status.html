@@ -1,0 +1,436 @@
+{% extends "academic/academic_base.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Status</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS for animations -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #343a40;
+            font-family: 'Poppins', sans-serif;
+        }
+        .center-content {
+            text-align: center;
+            margin: 20px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+        }
+        .form-control {
+            border-radius: 50px;
+            padding: 10px 20px;
+            border: 2px solid #ced4da;
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+        .btn-primary, .btn-success, .record-btn, .stop-btn {
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: #ffffff;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+        .btn-success {
+            background-color: #28a745;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .record-btn {
+            background-color: #dc3545;
+        }
+        .record-btn.recording {
+            background-color: #ffc107;
+        }
+        .stop-btn {
+            background-color: #28a745;
+        }
+        .stop-btn:disabled, .record-btn:disabled {
+            background-color: #6c757d;
+        }
+        .audio-container {
+            margin-top: 10px;
+        }
+        .print-button {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 18px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        .print-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+        #recordingIndicator {
+            display: none;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-content" data-aos="fade-up" data-aos-duration="1000">
+        <div class="no-print mb-4">
+            <form id="filter-form" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="session" class="sr-only">Session</label>
+                    <select id="session" name="session" class="form-control text-primary">
+                        {% for session in sessions %}
+                            <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>{{ session.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="term" class="sr-only">Term</label>
+                    <select id="term" name="term" class="form-control text-primary">
+                        {% for term in terms %}
+                            <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>{{ term.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="exam" class="sr-only">Exam</label>
+                    <select id="exam" name="exam" class="form-control text-primary">
+                        {% for exam in exams %}
+                            <option value="{{ exam.id }}" {% if exam.id == current_exam_type.id %}selected{% endif %}>{{ exam.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Filter</button>
+            </form>
+        </div>
+
+        <h1><u>FOM ZILIZOJAZWA KWA DARASA: {{ student_class.name }}</u></h1>
+        <br>
+
+        <form method="GET" data-aos="fade-up" data-aos-duration="1000">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="q" placeholder="Search by name or registration number">
+                <button type="submit" class="btn btn-success">Search</button>
+            </div>
+        </form>
+
+        <p data-aos="fade-up" data-aos-duration="1000"><u style="color:darkgreen">UFUNGUO:</u></p>
+        <p data-aos="fade-up" data-aos-duration="1000" class="text-success">Fom zilizokamilika: &#10004;</p>
+        <p data-aos="fade-up" data-aos-duration="1000" class="text-danger">Fom ambazo hazijakamilika: &#10060;</p>
+        <p data-aos="fade-up" data-aos-duration="1000" class="text-warning">Jumla ya fom zilizokamilika: {{ completed_forms_count }}</p>
+        <br><br>
+
+        {% if no_forms %}
+        <h4 class="text-center text-danger">No result cards have been created in this session, term and exam type</h4>
+        {% else %}
+        <table class="table table-bordered" data-aos="fade-up" data-aos-duration="1000">
+            <thead>
+                <tr>
+                    <th class="text-warning">S/N</th>
+                    <th style="color: cyan;">Jina la Mwanafunzi</th>
+                    <th style="color: chartreuse;">Namba ya Usajili</th>
+                    <th style="color: chocolate;">Maendeleo ya fom</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student_info in students_with_forms %}
+                <tr>
+                    <td class="text-warning">{{ forloop.counter }}</td>
+                    <td class="text-darkblue">{{ student_info.firstname }} {{ student_info.middle_name }} {{ student_info.surname }}</td>
+                    <td class="text-darkblue">{{ student_info.registration_number }}</td>
+                    <td>
+                        {% if student_info.studentinfos_set.last %}
+                            {% if student_info.studentinfos_set.last.disprine and student_info.studentinfos_set.last.sports and student_info.studentinfos_set.last.care_of_property and student_info.studentinfos_set.last.collaborations and student_info.studentinfos_set.last.date_of_closing and student_info.studentinfos_set.last.date_of_opening and student_info.studentinfos_set.last.teacher_comments and student_info.studentinfos_set.last.head_comments %}
+                                <span class="text-success">&#10004;</span>
+                            {% else %}
+                                <span class="text-danger">&#10060;</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-danger">&#10060;</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr><br>
+
+        {% for student_result in student_results %}
+        <div class="student-info" data-aos="fade-up" data-aos-duration="1000">
+            <h1 class="text-primary"><u>ELEMENTS LAKEZONE PRE & PRIMARY SCHOOL</u></h1>
+            <div style="display: flex; align-items: center;">
+                <div class="image-container" style="margin-right: 20px;">
+                    {% if student_result.student.passport %}
+                        <img src="{{ student_result.student.passport.url }}" alt="Student Image" width="100">
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 class="text-magenta"><u>TAARIFA YA MAENDELEO YA TAALUMA NA TABIA</u></h2>
+                    <h3 class="text-primary">
+                        DARASA: <u>{{ student_class.name }}</u> MHULA:
+                        <u>{{ current_term.name }}</u> MWAKA:
+                        <u>{{ current_session.name }}</u>
+                        MTIHANI:<u>{{ current_exam_type.name }}</u>
+                    </h3>
+                    <h4 class="text-primary">Jina la mwanafunzi: <u>{{ student_result.student.firstname }} {{ student_result.student.middle_name }} {{ student_result.student.surname }}</u></h4>
+                    <h5 class="text-primary">Namba ya usajili: <u>{{ student_result.student.registration_number }}</u></h5>
+                </div>
+            </div>
+            <table class="table table-bordered" data-aos="fade-up" data-aos-duration="1000">
+                <thead>
+                    <tr>
+                        <th style="color: brown;">SOMO</th>
+                        <th style="color: brown;">JARIBIO</th>
+                        <th style="color: brown;">MHULA</th>
+                        <th style="color: brown;">WASTANI</th>
+                        <th style="color: brown;">DARAJA</th>
+                        <th style="color: brown;">MAONI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in student_result.results %}
+                    <tr>
+                        <td class="text-warning">{{ result.subject }}</td>
+                        <td class="text-darkblue">{{ result.test_score }}</td>
+                        <td class="text-darkblue">{{ result.exam_score }}</td>
+                        <td class="text-darkblue">{{ result.average }}</td>
+                        <td class="text-success">{{ result.calculate_grade }}</td>
+                        <td class="text-darkgreen">{{ result.calculate_comments }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="text-center text-darkblue" data-aos="fade-up" data-aos-duration="1000">
+                JUMLA YA ALAMA ALIZOPATA <u class="text-success">{{ student_result.total_average|default:"None"|floatformat:"2" }}</u> KATI YA ALAMA
+                <u class="text-success">{{ student_result.overall_total_marks|default:"None"|floatformat:"2" }}</u> WASTANI
+                <u class="text-success">{{ student_result.overall_average|default:"None"|floatformat:"2" }}</u> DARAJA
+                <u class="text-success">{{ student_result.overall_grade }}</u> NAFASI YAKE DARASANI
+                <u class="text-success">{{ student_result.position }}</u> KATI YA WANAFUNZI
+                <u class="text-success">{{ total_active_students }}</u>
+            </p>
+            {% for student_info in students_with_forms %}
+                {% if student_info.id == student_result.student.id %}
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                        <u class="text-primary">TABIA YAKE KWA UJUMLA</u>
+                    </p>
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                        <span class="text-danger">A.</span>VIZURI SANA <span class="text-danger">B.</span>VIZURI <span class="text-danger">C.</span>WASTANI <span class="text-danger">D.</span>HAFIFU <span class="text-danger">F.</span>MBAYA
+                    </p>
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                        Nidhamu:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.disprine }}</u>
+                        Michezo:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.sports }}</u>
+                        Kujali Mali:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.care_of_property }}</u>
+                        Ushirikiano:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.collaborations }}</u>
+                    </p>
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                        Shule imefungwa tarehe:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.date_of_closing }}</u>
+                        Itafunguliwa tarehe:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.date_of_opening }}</u>
+                    </p>
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                        Maoni ya mwalimu wa darasa:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.teacher_comments }}</u>
+                    </p>
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                        Mwalimu mkuu:
+                        <u class="text-primary">{{ student_info.studentinfos_set.last.head_comments }}</u>
+                    </p>
+                    <p data-aos="fade-up" data-aos-duration="1000">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 50px; margin-top: 20px;">
+                        <div style="text-align: center;">
+                            <strong>SAHIHI:</strong><br>
+                            {% if headmaster_signature %}
+                                <img src="{{ headmaster_signature.signature_image.url }}" alt="Headmaster's Signature" width="150">
+                            {% else %}
+                                <p>Signature not available</p>
+                            {% endif %}
+                        </div>
+                        <div style="text-align: center;">
+                            <strong>MHURI:</strong><br>
+                            <img src="{% static 'images/COMPANY.jpg' %}" alt="School Seal" width="150">
+                        </div>
+                    </div>
+                    </p>
+                    <br><br>
+                    <p class="text-black" data-aos="fade-up" data-aos-duration="1000">
+                        <u>MAONI YA MZAZI:</u>
+                    </p>
+                    <div data-aos="fade-up" data-aos-duration="1000" class="text-darkblue" style="color: cornflowerblue;">
+                        {% if student_result.parent_comment %}
+                            <p>{{ student_result.parent_comment.comment }}</p>
+                            {% if student_result.parent_comment.audio_comment %}
+                                <div class="audio-container">
+                                    <audio controls>
+                                        <source src="{{ student_result.parent_comment.audio_comment.url }}" type="audio/mpeg">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <p>Hakuna maoni kutoka kwa mzazi.</p>
+                        {% endif %}
+                    </div>
+                    <p class="text-black" data-aos="fade-up" data-aos-duration="1000">
+                        <u>Majibu ya mtaaluma:</u>
+                    </p>
+                    {% if student_result.academic_answer %}
+                        <div data-aos="fade-up" data-aos-duration="1000" style="color: cadetblue;">
+                            <p>{{ student_result.academic_answer.answer }}</p>
+                            {% if student_result.academic_answer.audio_answer %}
+                                <div class="audio-container">
+                                    <audio controls>
+                                        <source src="{{ student_result.academic_answer.audio_answer.url }}" type="audio/mpeg">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                            {% endif %}
+                            <a href="{% url 'edit_academic_answer' student_result.academic_answer.id %}" class="btn btn-primary mt-2">
+                                <i class="fas fa-pen"></i> Edit Academic Answer
+                            </a>                        
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'academic_form_status' class_id=student_class.id %}" class="academic-answer-form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <textarea name="answer" rows="4" cols="30" class="form-control"></textarea>
+                            <input type="file" name="audio_answer" class="form-control mt-2" accept="audio/*">
+                            <button type="button" class="btn btn-info record-btn mt-2">Record</button>
+                            <button type="button" class="btn btn-warning stop-btn mt-2" disabled>Stop</button>
+                            <p id="recordingIndicator">Recording... <span id="recordingTime">0</span> seconds</p>
+                            <input type="hidden" name="session" value="{{ current_session.id }}">
+                            <input type="hidden" name="term" value="{{ current_term.id }}">
+                            <input type="hidden" name="exam" value="{{ current_exam_type.id }}">
+                            <input type="hidden" name="student_id" value="{{ student_result.student.id }}">
+                            <button type="submit" class="btn btn-primary mt-2">Save</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <hr data-aos="fade-up" data-aos-duration="1000">
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="center-content" data-aos="fade-up" data-aos-duration="1000">
+        <button class="btn btn-success print-button" onclick="printAllForms()">Print All Forms</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init();
+    
+        function printForm(studentName) {
+            window.print();
+        }
+    
+        function printAllForms() {
+            window.print();
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            const recordBtns = document.querySelectorAll('.record-btn');
+            const stopBtns = document.querySelectorAll('.stop-btn');
+            const recordingIndicator = document.getElementById('recordingIndicator');
+            const recordingTimeDisplay = document.getElementById('recordingTime');
+    
+            let mediaRecorder;
+            let audioChunks = [];
+            let recordingTime = 0;
+            let recordingInterval;
+    
+            recordBtns.forEach(recordBtn => {
+                recordBtn.addEventListener('click', () => {
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(stream => {
+                            mediaRecorder = new MediaRecorder(stream);
+                            mediaRecorder.start();
+                            audioChunks = [];
+                            recordingTime = 0;
+    
+                            recordBtn.disabled = true;
+                            stopBtns.forEach(btn => btn.disabled = false);
+                            recordingIndicator.style.display = 'block';
+                            recordingTimeDisplay.textContent = recordingTime;
+    
+                            recordingInterval = setInterval(() => {
+                                recordingTime++;
+                                recordingTimeDisplay.textContent = recordingTime;
+                            }, 1000);
+    
+                            mediaRecorder.addEventListener('dataavailable', event => {
+                                audioChunks.push(event.data);
+                            });
+    
+                            mediaRecorder.addEventListener('stop', () => {
+                                clearInterval(recordingInterval);
+                                recordingIndicator.style.display = 'none';
+    
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                                const audioFile = new File([audioBlob], 'recorded_audio.mp3', { type: 'audio/mpeg' });
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(audioFile);
+    
+                                document.querySelector('.academic-answer-form input[name="audio_answer"]').files = dataTransfer.files;
+    
+                                recordBtn.disabled = false;
+                                stopBtns.forEach(btn => btn.disabled = true);
+                            });
+                        })
+                        .catch(err => {
+                            console.error('Error accessing microphone:', err);
+                            alert('Failed to access the microphone. Please check your device settings.');
+                        });
+                });
+            });
+    
+            stopBtns.forEach(stopBtn => {
+                stopBtn.addEventListener('click', () => {
+                    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                });
+            });
+        });
+    </script>
+    </body>
+</html>
+{% endblock content %}    

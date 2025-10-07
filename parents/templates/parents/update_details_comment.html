@@ -1,0 +1,25 @@
+{% extends 'parents/parent_base.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="card-header bg-primary text-white">
+  <div class="card-tools">
+    <button class="btn btn-outline-light btn-sm" onclick="printPage()">Print</button>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<h2 class="text-primary"><u>Update Comment for {{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</u></h2>
+<br>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    {{ form.comment.label_tag }}<br>
+    {{ form.comment }}
+  </div>
+  <button type="submit" class="btn btn-primary">Update Comment</button>
+</form>
+
+{% endblock content %}

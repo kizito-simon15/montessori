@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static humanize widget_tweaks %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Seasonal Purchase{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#1e40af; --rose:#e11d48; --bg:#f1f5f9; --card:#ffffff; --rad:22px;
+}
+body{background:var(--bg);font-family:Inter,sans-serif;margin:0}
+.card{background:var(--card);border-radius:var(--rad);box-shadow:0 4px 14px rgba(0,0,0,.07);
+      opacity:0;transform:translateY(32px);transition:.45s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.header{padding:.9rem 1.4rem;border-bottom:1px solid #e2e8f0;font-weight:700}
+.form-wrap{padding:1.2rem 1.4rem}
+.grid{display:grid;gap:1rem}
+@media(min-width:720px){.cols-2{grid-template-columns:1fr 1fr}}
+.label{font-size:.85rem;font-weight:600;margin-bottom:.25rem;display:flex;align-items:center;gap:.25rem}
+.star{color:var(--rose);font-weight:700}
+.hint{font-size:.75rem;color:#64748b;margin-top:.15rem}
+.form-control,.form-select{width:100%;padding:.55rem 1rem;font-size:.9rem;
+  border:1px solid #cbd5e1;border-radius:var(--rad);background:#fff}
+.form-control:focus,.form-select:focus{border-color:var(--indigo);
+  box-shadow:0 0 0 3px rgba(30,64,175,.15);outline:none}
+.form-file{padding:.4rem;border-radius:var(--rad);background:#f8fafc}
+.text-danger{color:var(--rose);font-size:.8rem;margin-top:.25rem}
+.btn{padding:.5rem 1.3rem;border:none;border-radius:var(--rad);font-weight:600;
+     font-size:.9rem;cursor:pointer;transition:background .15s,transform .15s}
+.btn-primary{background:var(--indigo);color:#fff}
+.btn-primary:hover{background:#0f172a;transform:translateY(-2px)}
+.btn-danger{background:var(--rose);color:#fff}
+.btn-danger:hover{filter:brightness(.9);transform:translateY(-2px)}
+.actions{display:flex;gap:.8rem;justify-content:flex-end;margin-top:1.4rem}
+.callout{background:#eef2ff;border-left:4px solid var(--indigo);border-radius:var(--rad);
+        padding:.7rem 1rem;font-size:.78rem;margin-bottom:1rem;color:#1e293b}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>(
+  document.querySelector(".card")?.classList.add("show")
+),80));
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="header">
+    {% if form.instance.pk %}✏️ Edit Seasonal Purchase{% else %}➕ Add Seasonal Purchase{% endif %}
+  </div>
+
+  <div class="form-wrap">
+    {% if form.non_field_errors %}
+      <div class="text-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    {# ───────────────────────── instructions ─────────────────────── #}
+    <div class="callout">
+      <strong>How to fill:</strong><br>
+      <ul style="margin:.25rem 0 .25rem 1rem;padding:0">
+        <li><b>Bags count</b> is <em>always</em> required ✶.</li>
+        <li>Add <b>Bag weight</b> only if you track kilograms.</li>
+        <li>Price is per <em>kg</em> when weight is given, otherwise per <em>bag</em>.</li>
+      </ul>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <!-- 1 ▸ envelope + product -->
+      <div class="grid cols-2">
+        <div>
+          <label class="label" for="id_budget">Budget envelope <span class="star">✶</span></label>
+          {{ form.budget|add_class:"form-select" }}{% if form.budget.errors %}
+          <div class="text-danger">{{ form.budget.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_product">Seasonal product <span class="star">✶</span></label>
+          {{ form.product|add_class:"form-select" }}{% if form.product.errors %}
+          <div class="text-danger">{{ form.product.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- 2 ▸ quantities -->
+      <div class="grid cols-2" style="margin-top:1rem">
+        <div>
+          <label class="label" for="id_bags_count">Bags count <span class="star">✶</span></label>
+          {{ form.bags_count|add_class:"form-control" }}
+          {% if form.bags_count.errors %}<div class="text-danger">{{ form.bags_count.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_bag_weight">{{ form.bag_weight.label }}</label>
+          {{ form.bag_weight|add_class:"form-control" }}
+          <div class="hint">Leave blank if you don’t track kg.</div>
+          {% if form.bag_weight.errors %}<div class="text-danger">{{ form.bag_weight.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- 3 ▸ money + date -->
+      <div class="grid cols-2" style="margin-top:1rem">
+        <div>
+          <label class="label" for="id_price_per_unit">Price per unit (TZS) <span class="star">✶</span></label>
+          {{ form.price_per_unit|add_class:"form-control" }}
+          {% if form.price_per_unit.errors %}<div class="text-danger">{{ form.price_per_unit.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_date">Purchase date <span class="star">✶</span></label>
+          {{ form.date|add_class:"form-control" }}
+          {% if form.date.errors %}<div class="text-danger">{{ form.date.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- 4 ▸ invoice + notes -->
+      <div class="grid cols-2" style="margin-top:1rem">
+        <div>
+          <label class="label" for="id_invoice_file">Invoice file</label>
+          {{ form.invoice_file|add_class:"form-file" }}
+          {% if form.invoice_file.errors %}<div class="text-danger">{{ form.invoice_file.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_notes">Notes / remarks</label>
+          {{ form.notes|add_class:"form-control" }}
+          {% if form.notes.errors %}<div class="text-danger">{{ form.notes.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- 5 ▸ actions -->
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+        <a href="{% url 'seasonalpurchase_list' %}" class="btn btn-danger">❌ Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

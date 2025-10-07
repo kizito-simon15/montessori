@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+{% if object %}
+Update Subject
+{% else %}
+Add New Subject
+{% endif %}
+{% endblock title %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 800px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-top: 50px;
+        background: #f9f9f9;
+    }
+
+    .card-header {
+        background: #0d6efd;
+        color: #fff;
+        border-radius: 20px 20px 0 0;
+        text-align: center;
+        padding: 1.5rem;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .card-header i {
+        margin-right: 10px;
+    }
+
+    .form-control {
+        border-radius: 50px;
+        color: deepskyblue;
+        border: 1px solid #ccc;
+    }
+    .form-control::placeholder {
+        color: #8fcceb; 
+    }
+
+    .input-group-text {
+        border-radius: 50px 0 0 50px; 
+        background: #eaf7ff; 
+        border: none;
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background-color: #478ed1;
+        border-color: #478ed1;
+        font-weight: 600;
+        border-radius: 50px;
+    }
+    .btn-primary:hover {
+        background-color: #3569a5;
+        border-color: #3569a5;
+    }
+
+    .btn-secondary {
+        font-weight: 600;
+        border-radius: 50px;
+    }
+
+    .text-muted {
+        font-size: 0.85rem;
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease;
+    }
+</style>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            {% if object %}
+                <i class="fas fa-book"></i> Update Subject
+            {% else %}
+                <i class="fas fa-book"></i> Add New Subject
+            {% endif %}
+        </div>
+        <div class="card-body" style="background: #f9f9f9;">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger mb-4">
+                    <strong>Form Errors:</strong>
+                    <ul class="mb-0">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="row g-4" style="font-size:0.95rem;">
+                {% csrf_token %}
+
+                <div class="col-12">
+                    <label for="id_name" class="form-label fw-bold">Subject Name <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-book-open"></i></span>
+                        {{ form.name|add_class:"form-control" }}
+                    </div>
+                    {% if form.name.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">e.g. Mathematics, English, Science</small>
+                    {% endif %}
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4 py-2">
+                        <i class="fas fa-save"></i> 
+                        {% if object %}Update Subject{% else %}Save Subject{% endif %}
+                    </button>
+                    <a class="btn btn-secondary px-4 py-2 ms-2" href="{% url 'subjects' %}">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Make sure it appears above other content */
+  }
+
+  .overlay-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .preview-img {
+    display: none;
+    margin-top: 10px;
+    max-width: 150px; /* Set the maximum width */
+    max-height: 150px; /* Set the maximum height */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<div class="overlay">
+  <div class="overlay-content">
+    <h2 class="text-center mb-4">Update Academic Profile</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        {{ form.profile_picture.label_tag }}
+        {{ form.profile_picture }}
+      </div>
+      <img id="imagePreview" class="preview-img" alt="Image Preview">
+      <button type="submit" class="btn btn-primary mt-3 w-100">Save</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.querySelector('.overlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+    }
+
+    const fileInput = document.querySelector('input[type="file"]');
+    const imagePreview = document.getElementById('imagePreview');
+
+    fileInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,209 @@
+/* salary_list.css  –  2025-06-24
+   ------------------------------------------------------------------------
+   Modern pastel palette, soft shadows, sticky table headers, hover states,
+   and smooth collapsible buckets.  Works nicely in both light & dark mode
+   (prefers-color-scheme).  Uses only vanilla CSS – no frameworks required.
+   ------------------------------------------------------------------------ */
+
+/* ---------- Colour system ---------- */
+:root{
+  --hue-prim:215;                 /* base hue – tweak once for whole theme */
+  --bg-1:hsl(var(--hue-prim) 60% 98%);
+  --bg-2:hsl(var(--hue-prim) 40% 95%);
+  --txt-1:hsl(var(--hue-prim) 20% 25%);
+  --txt-2:hsl(var(--hue-prim) 10% 40%);
+  --accent:hsl(28 100% 50%);      /* carat orange */
+  --green:hsl(162 73% 42%);
+  --blue: hsl(200 80% 45%);
+  --red:  hsl(0 72% 47%);
+  --card-bg:#fff;
+  --line:#e2e8f0;
+  --shadow:0 2px 6px rgba(0,0,0,.07);
+}
+
+/* Dark-mode overrides */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg-1:hsl(var(--hue-prim) 20% 12%);
+    --bg-2:hsl(var(--hue-prim) 15% 16%);
+    --txt-1:hsl(var(--hue-prim) 15% 90%);
+    --txt-2:hsl(var(--hue-prim) 10% 70%);
+    --card-bg:hsl(var(--hue-prim) 10% 18%);
+    --line:hsl(var(--hue-prim) 10% 30%);
+    --shadow:none;
+  }
+}
+
+/* ---------- Base ---------- */
+html,body{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+
+body{
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg-1);
+  color:var(--txt-1);
+  line-height:1.45;
+  transition:background .3s,color .3s;
+}
+
+.vs-wrapper{
+  max-width:1400px;
+  margin:0 auto;
+  padding:1rem;
+}
+
+/* ---------- Filter bar ---------- */
+.flt{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+  margin-bottom:1.4rem;
+}
+
+.flt input,
+.flt select,
+.flt button,
+.flt a{
+  height:40px;
+  padding:0 .9rem;
+  font-size:.88rem;
+  border-radius:8px;
+  border:1px solid var(--line);
+  outline:none;
+  background:#fff;
+  transition:box-shadow .2s,transform .2s;
+}
+
+@media (prefers-color-scheme: dark){
+  .flt input,
+  .flt select,
+  .flt button,
+  .flt a{background:var(--bg-2)}
+}
+
+.flt input{flex:1 1 160px}
+.flt select{min-width:150px;cursor:pointer}
+
+.flt button:hover,
+.flt a:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+
+.btn-green{background:var(--green);color:#fff;border:none}
+.btn-blue {background:var(--blue); color:#fff;border:none}
+.btn-carat{background:var(--accent);color:#fff;text-decoration:none;display:flex;align-items:center;border:none}
+
+/* ---------- Buckets ---------- */
+.bucket{
+  margin-bottom:1.6rem;
+  background:var(--card-bg);
+  box-shadow:var(--shadow);
+  border-radius:8px;
+  overflow:hidden;
+  transition:box-shadow .2s;
+}
+.bucket:hover{box-shadow:0 4px 12px rgba(0,0,0,.09)}
+
+.bucket header{
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  padding:.55rem .9rem;
+  background:linear-gradient(90deg,
+    hsl(var(--hue-prim) 70% 35%) 0%,
+    hsl(var(--hue-prim) 75% 45%) 100%);
+  color:#fff;
+  cursor:pointer;
+  user-select:none;
+}
+
+.bucket header h3{
+  flex:1;
+  font-size:1rem;
+  font-weight:600;
+  margin:0;
+}
+
+.bucket header small{
+  font-size:.75rem;
+  opacity:.85;
+}
+
+.bucket header .tgl{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:1rem;
+  transform:rotate(0deg);
+  transition:transform .25s;
+}
+
+.bucket header.closed .tgl{transform:rotate(-90deg)}
+
+.bucket .body{overflow:auto;animation:fadeIn .3s}
+
+/* ---------- Table ---------- */
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.80rem;
+  min-width:950px;             /* allow horiz. scroll on small screens */
+}
+
+th,td{
+  padding:.5rem .7rem;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+  text-align:right;
+}
+
+td:first-child,th:first-child{text-align:center}
+td:nth-child(3),th:nth-child(3){text-align:left}
+
+th{
+  position:sticky;
+  top:0;
+  background:var(--bg-2);
+  text-transform:uppercase;
+  font-weight:700;
+  color:var(--txt-2);
+  z-index:2;
+}
+
+tbody tr:nth-child(odd){background:rgba(0,0,0,.03)}
+@media (prefers-color-scheme: dark){
+  tbody tr:nth-child(odd){background:rgba(255,255,255,.035)}
+}
+
+tbody tr:hover{background:rgba(0,0,0,.05)}
+@media (prefers-color-scheme: dark){
+  tbody tr:hover{background:rgba(255,255,255,.07)}
+}
+
+tr.tot{
+  background:hsl(50 100% 90%);
+  font-weight:600;
+}
+
+@media (prefers-color-scheme: dark){
+  tr.tot{background:hsl(50 20% 35%)}
+}
+
+.net{font-weight:700}
+.neg{color:var(--red);font-weight:600}
+a.lnk{color:var(--blue);text-decoration:none;font-weight:600}
+a.lnk:hover{text-decoration:underline}
+
+/* ---------- Empty-state ---------- */
+.no-data{
+  margin:2rem 0 3rem;
+  color:var(--txt-2);
+  text-align:center;
+  font-style:italic;
+  opacity:.8;
+}
+
+/* ---------- Animations ---------- */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(-4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+

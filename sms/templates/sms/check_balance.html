@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}💳 SMS Credit Balance{% endblock %}
+
+{# ────────────────  CSS  ──────────────── #}
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --clr-bg:#f1f5f9;        --clr-card:#ffffff40;   --clr-primary:#6366f1;
+  --clr-secondary:#0ea5e9;  --clr-danger:#ef4444;  --radius:22px;
+  --blur:14px;             --shadow:0 8px 32px rgba(0,0,0,.15);
+}
+html,body{margin:0;background:var(--clr-bg);font-family:Inter,sans-serif;font-size:16px}
+
+/* header bar */
+.title-section{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  padding:2.25rem 1rem;color:#fff;text-align:center;border-radius:0 0 30px 30px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.title-section::after{content:"";position:absolute;inset:0;background:inherit;opacity:.32;filter:blur(60px)}
+.title-section h2{display:flex;gap:.65rem;align-items:center;justify-content:center;
+  font-size:clamp(1.8rem,5vw,2.5rem);font-weight:700;position:relative;z-index:1}
+
+/* main card */
+.balance-card{width:92%;max-width:650px;margin:-65px auto 3rem;padding:2.3rem 2rem;
+  border-radius:var(--radius);background:var(--clr-card);backdrop-filter:blur(var(--blur));
+  box-shadow:var(--shadow);color:#fff;text-align:center;position:relative}
+.balance-card::after{content:"";position:absolute;inset:0;background:inherit;opacity:.24;filter:blur(45px);border-radius:inherit}
+.balance-card h3{margin:0 0 .9rem;font-size:1.25rem;font-weight:600;letter-spacing:.4px}
+.balance-card span{font-size:3.2rem;font-weight:700;letter-spacing:.5px;display:inline-block}
+
+/* buttons */
+.btn-main{display:inline-flex;gap:.55rem;align-items:center;padding:.7rem 1.7rem;border:none;border-radius:28px;
+  font-weight:700;color:#fff;cursor:pointer;margin-top:1.6rem;transition:.25s;
+  background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  box-shadow:var(--shadow);backdrop-filter:blur(var(--blur))}
+.btn-main:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.btn-alt {background:linear-gradient(135deg,#22c55e,#4ade80)}
+.btn-alt:hover{filter:brightness(1.08)}
+</style>
+{% endblock %}
+
+{# ────────────────  HTML  ──────────────── #}
+{% block content %}
+<div class="title-section"><h2>💳 SMS Credit Balance</h2></div>
+
+{% if error %}
+  <div class="balance-card" style="background:linear-gradient(135deg,var(--clr-danger),#f87171cc)">
+    <h3>⚠️ Something went wrong</h3>
+    <span style="font-size:1.1rem">{{ error }}</span>
+    <a href="{% url 'sms_history' %}" class="btn-main">← Back to SMS</a>
+  </div>
+{% else %}
+  <div class="balance-card" style="background:linear-gradient(135deg,#22c55ecc,#4ade80cc)">
+    <h3>Available Credits</h3>
+    <span>{{ balance|intcomma }}</span>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{% url 'send_sms_form' %}" class="btn-main btn-alt">✉️ Send SMS</a>
+      <a href="{% url 'sms_history' %}"  class="btn-main">📜 SMS History</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

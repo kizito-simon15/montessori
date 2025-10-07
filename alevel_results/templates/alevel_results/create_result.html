@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- 🏫 Heading -->
+<h2 class="single-line-text mb-2">
+    <span class="emoji">👩‍🎓</span> Select A-Level Student(s)
+</h2>
+
+<!-- 🔍 Search Section -->
+<div class="search-form mb-2">
+    <input type="text" id="searchInput" placeholder="Search by Name" class="form-control search-input" autocomplete="off">
+    <button type="button" id="searchBtn" class="btn btn-primary search-button" aria-label="Search">
+        <i class="fas fa-search"></i>
+    </button>
+    <a href="{% url 'alevel_results:edit_results' %}" class="btn btn-warning edit-button" aria-label="Update Results">
+        <i class="fas fa-pen"></i>
+    </a>
+</div>
+
+<form method="POST" id="select-students-form" action="{% url 'alevel_results:create_result' %}">
+    {% csrf_token %}
+
+    <!-- 🚀 Proceed Button (Top) -->
+    <button type="submit" class="btn btn-success create-button mb-2">
+        <i class="fas fa-rocket me-1"></i> Proceed
+    </button>
+
+    {% for class_key, students in students_by_class.items %}
+        <h4 class="single-line-text mb-2">
+            <span class="emoji">🏫</span> Class: <u>{{ class_key }}</u>
+        </h4>
+        <div class="table-responsive">
+            <table class="table class-table" data-class-key="{{ class_key }}">
+                <thead class="table-header">
+                    <tr>
+                        <th scope="col" style="width: 5%;">S/N</th>
+                        <th scope="col" style="width: 5%;">
+                            <input class="select-all-check" type="checkbox" data-class-key="{{ class_key }}">
+                        </th>
+                        <th scope="col" style="width: 40%;">Name</th>
+                        <th scope="col" style="width: 15%;">Gender</th>
+                        <th scope="col" style="width: 35%;">Class</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr class="table-row">
+                            <td class="truncate-text">{{ forloop.counter }}</td>
+                            <td>
+                                <input
+                                    class="student-check"
+                                    type="checkbox"
+                                    name="students"
+                                    value="{{ student.id }}"
+                                >
+                            </td>
+                            <td class="truncate-text">{{ student }}</td>
+                            <td class="truncate-text">{{ student.gender|capfirst }}</td>
+                            <td class="truncate-text">{{ student.current_class }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+
+    <!-- 🚀 Proceed Button (Bottom) -->
+    <button type="submit" class="btn btn-success create-button mt-2">
+        <i class="fas fa-rocket me-1"></i> Proceed
+    </button>
+</form>
+
+<!-- 🎨 Styling -->
+<style>
+    :root {
+        --carrot: #F28C38;
+        --carrot-dark: #c8702a;
+        --gradient-start: #f6f8fa;
+        --gradient-end: #e9ecef;
+    }
+
+    body {
+        background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .dark-mode body {
+        background: linear-gradient(180deg, #2b2b2b, #1e1e1e);
+    }
+
+    .single-line-text {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--carrot);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .emoji {
+        font-size: 1.75rem;
+    }
+
+    .create-button {
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+        border-radius: 25px;
+        border: none;
+        padding: 0.5rem 1rem;
+        transition: transform 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #218838, #1e7e34);
+    }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .search-input {
+        border-radius: 25px;
+        border: 1px solid #ced4da;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: border-color 0.3s ease;
+        flex: 2;
+        max-width: 300px;
+    }
+
+    .search-input:focus {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        outline: none;
+    }
+
+    .search-button, .edit-button {
+        font-size: 1rem;
+        padding: 0.5rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-button {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+    }
+
+    .edit-button {
+        background: linear-gradient(135deg, var(--carrot), var(--carrot-dark));
+    }
+
+    .search-button:hover, .edit-button:hover {
+        transform: scale(1.1);
+    }
+
+    .search-button:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+    }
+
+    .edit-button:hover {
+        background: linear-gradient(135deg, var(--carrot-dark), #a85a22);
+    }
+
+    .table-responsive {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 0;
+        padding: 0;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    .class-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+        margin: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+    }
+
+    .dark-mode .class-table {
+        background: #2b2b2b;
+        border: 1px solid #444;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, var(--carrot), var(--carrot-dark));
+        color: white;
+    }
+
+    .class-table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        padding: 0.75rem;
+        border: none;
+    }
+
+    .class-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+        border-right: none;
+        border-left: none;
+        border-top: none;
+        color: #212529;
+    }
+
+    .dark-mode .class-table td {
+        color: #d1d1d1;
+        border-bottom: 1px solid #444;
+    }
+
+    .truncate-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+    }
+
+    .select-all-check, .student-check {
+        transform: scale(1.2);
+        cursor: pointer;
+        accent-color: #28a745;
+    }
+
+    .table-row:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+
+    .dark-mode .table-row:hover {
+        background-color: #343a40;
+    }
+
+    /* iPhone-like Interface Adjustments */
+    @media (max-width: 768px) {
+        .single-line-text {
+            font-size: 1.25rem;
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+        }
+
+        .search-form {
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            max-width: 180px;
+            font-size: 0.875rem;
+        }
+
+        .search-button, .edit-button {
+            width: 36px;
+            height: 36px;
+            font-size: 0.875rem;
+        }
+
+        .create-button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .class-table th, .class-table td {
+            padding: 0.5rem;
+        }
+
+        .class-table th:nth-child(3), .class-table td:nth-child(3) {
+            /* Name column */
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .class-table th:nth-child(5), .class-table td:nth-child(5) {
+            /* Class column */
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<!-- 🚀 Direct JS Filtering -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const tables = document.querySelectorAll('.class-table');
+        const form = document.getElementById('select-students-form');
+
+        const filterTables = () => {
+            const term = searchInput.value.toLowerCase();
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tbody tr');
+                let visibleIndex = 0;
+                rows.forEach(row => {
+                    const nameText = row.cells[2].textContent.toLowerCase();
+                    const show = !term || nameText.includes(term);
+                    row.style.display = show ? '' : 'none';
+                    if (show) {
+                        visibleIndex++;
+                        row.cells[0].textContent = visibleIndex;
+                    }
+                });
+            });
+        };
+
+        searchInput.addEventListener('input', filterTables);
+        searchBtn.addEventListener('click', filterTables);
+
+        document.querySelectorAll('.select-all-check').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const classKey = checkbox.dataset.classKey;
+                const table = document.querySelector(`table[data-class-key="${classKey}"]`);
+                const studentChecks = table.querySelectorAll('.student-check');
+                const isChecked = checkbox.checked;
+                studentChecks.forEach(check => {
+                    check.checked = isChecked;
+                });
+            });
+        });
+
+        document.querySelectorAll('.student-check').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const table = checkbox.closest('table');
+                const allChecks = table.querySelectorAll('.student-check');
+                const selectAll = table.querySelector('.select-all-check');
+                selectAll.checked = Array.from(allChecks).every(c => c.checked);
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            const selected = document.querySelectorAll('.student-check:checked');
+            if (selected.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one student.');
+            }
+        });
+
+        filterTables();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Include Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+  /* Container Styling */
+  .form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  /* Header Styling */
+  .form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: slideInDown 1s ease-out;
+  }
+
+  /* Form Group Styling */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #fff;
+    padding: 10px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.9);
+    animation: fadeInUp 0.7s ease-in-out;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    color: #fff;
+  }
+
+  /* Button Styling */
+  .btn-primary, .btn-secondary {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: none;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+  }
+
+  /* Price Display Styling */
+  .price-display {
+    font-weight: bold;
+    color: #fff;
+    margin-top: 10px;
+    animation: fadeInUp 0.7s ease-in-out;
+  }
+
+  .price-amount {
+    color: #ffeb3b;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideInDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+
+<div class="form-container">
+  <h2>Update Uniform</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="id_student">Student</label>
+      {{ form.student }}
+    </div>
+    <div class="form-group">
+      <label for="id_student_class">Class</label>
+      {{ form.student_class }}
+    </div>
+    <div class="form-group">
+      <label for="id_uniform_type">Uniform Type</label>
+      {{ form.uniform_type }}
+    </div>
+    <div class="form-group">
+      <label for="id_quantity">Quantity</label>
+      {{ form.quantity }}
+    </div>
+    <div class="price-display">Price: <span class="price-amount">0.00</span> TZS</div>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i> Update Uniform</button>
+  </form>
+  <a href="{% url 'uniform_list' %}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left"></i> Cancel</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const uniformTypeSelect = document.getElementById('id_uniform_type');
+    const quantitySelect = document.getElementById('id_quantity');
+    const priceDisplay = document.querySelector('.price-amount');
+
+    // JavaScript object mapping uniform type IDs to prices
+    const uniformTypePrices = {{ uniform_type_prices|safe }};
+
+    // Function to update the price based on uniform type and quantity
+    function updatePrice() {
+      const uniformTypeId = uniformTypeSelect.value;
+      const quantity = quantitySelect.value;
+      const price = parseFloat(uniformTypePrices[uniformTypeId]);
+      let totalPrice = 0;
+
+      if (!isNaN(price)) {
+        totalPrice = quantity === 'Jozi 2' ? price * 2 : price;
+      }
+
+      priceDisplay.textContent = totalPrice.toFixed(2) + ' TZS';
+    }
+
+    // Initialize price on page load
+    updatePrice();
+
+    // Update price when uniform type or quantity changes
+    uniformTypeSelect.addEventListener('change', updatePrice);
+    quantitySelect.addEventListener('change', updatePrice);
+  });
+</script>
+{% endblock %}

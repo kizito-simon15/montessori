@@ -1,0 +1,9 @@
+<div style="margin-top:.6rem;text-align:center">
+  {% if page_obj.has_previous %}
+    <a href="{{ request.get_full_path|add:'&page='|add:page_obj.previous_page_number }}">« prev</a>
+  {% endif %}
+  Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+  {% if page_obj.has_next %}
+    <a href="{{ request.get_full_path|add:'&page='|add:page_obj.next_page_number }}">next »</a>
+  {% endif %}
+</div>

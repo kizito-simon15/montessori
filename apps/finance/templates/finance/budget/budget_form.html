@@ -1,0 +1,37 @@
+{% extends "finance/partials/modern_form.html" %}
+{% load static %}
+
+{# ──────────────────────────────────────────────────────────────── #}
+{% block title   %}Budget: Create / Edit{% endblock %}
+{% block heading %}📦 Budget Envelope{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+  /* prettier native <select> arrow (fully CSS, no JS) */
+  select {
+    background-image:
+      linear-gradient(45deg, transparent 50%, #6d28d9 50%),
+      linear-gradient(135deg, #6d28d9 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) calc(1em + 2px),
+      calc(100% - 13px) calc(1em + 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 2.5rem;     /* keep text off the arrow */
+  }
+  select:focus {
+    background-image:
+      linear-gradient(45deg, transparent 50%, #6366f1 50%),
+      linear-gradient(135deg, #6366f1 50%, transparent 50%);
+  }
+</style>
+{% endblock %}
+
+{# ──────────────────────────────────────────────────────────────── #}
+{% comment %}
+No extra_fields or Alpine needed:
+  • “Name”, “Category”, “Session”, “Allocated amount”
+    all render via the partial’s visible-field loop.
+  • Hidden fields (e.g., csrf, pk, etc.) already handled.
+{% endcomment %}

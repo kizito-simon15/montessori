@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .receipt-container {
+            width: 80%;
+            margin: auto;
+            border: 1px solid #f57c00;
+            padding: 20px;
+            background-color: #fff;
+            color: #000;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header img {
+            width: 100px;
+        }
+        .header .title {
+            text-align: right;
+            color: #f57c00;
+        }
+        .header .title h2 {
+            margin: 0;
+        }
+        .header .title p {
+            margin: 0;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        .info, .amounts {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .info div, .amounts div {
+            width: 48%;
+        }
+        .info div p, .amounts div p {
+            margin: 5px 0;
+        }
+        .info div p span, .amounts div p span {
+            font-weight: bold;
+        }
+        .amounts .total {
+            font-size: 1.5rem;
+            color: #f57c00;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .footer div {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="header">
+            <img src="{% static 'your_app/img/lake.png' %}" alt="Logo">
+            <div class="title">
+                <h2>ELEMENT LAKEZONE PRE & PRIMARY SCHOOL</h2>
+                <p>Money Receipt</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="info">
+                <div>
+                    <p>Memo No: <span>{{ receipt.id }}</span></p>
+                    <p>Date: <span>{{ receipt.date_paid }}</span></p>
+                    <p>Received with thanks from: <span style="color: blue;">{{ student.full_name }}</span></p>
+                </div>
+                <div>
+                    <p>Session: <span>{{ current_session.name }}</span></p>
+                    <p>Term: <span>{{ current_term.name }}</span></p>
+                    <p>Installment: <span>{{ current_installment.name }}</span></p>
+                </div>
+            </div>
+
+            <div class="info">
+                <div>
+                    <p>Class: <span>{{ invoice.class_for.name }}</span></p>
+                    <p>Total Amount Payable: <span>{{ invoice.total_amount_payable }}</span></p>
+                    <p>Total Amount Paid: <span>{{ invoice.total_amount_paid }}</span></p>
+                    <p>Balance: <span>{{ invoice.balance }}</span></p>
+                    <p>Payment Method: <span>{{ receipt.get_payment_method_display }}</span></p>
+                </div>
+            </div>
+
+            <div class="amounts">
+                <div></div>
+                <div class="total">
+                    <p>Total Amount Paid: <span>{{ receipt.amount_paid }}</span></p>
+                </div>
+                <div></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>
+                <p>Received By</p>
+            </div>
+            <div>
+                <p>Authorized Signature</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,317 @@
+{% extends 'bursor/bursor_base.html' %}
+{% block content %}
+<!-- Include Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+  /* Container Styling */
+  .form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  /* Header Styling */
+  .form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: slideInDown 1s ease-out;
+  }
+
+  /* Form Group Styling */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #fff;
+    padding: 10px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.9);
+    animation: fadeInUp 0.7s ease-in-out;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    color: #fff;
+  }
+
+  /* Button Styling */
+  .btn-primary, .btn-secondary, .btn-add, .btn-remove {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: none;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+  }
+
+  .btn-add {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .btn-add:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+  }
+
+  .btn-remove {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .btn-remove:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+  }
+
+  /* Student Filter Styling */
+  .student-filter {
+    margin-bottom: 10px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #fff;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Price Display Styling */
+  .price-display {
+    font-weight: bold;
+    color: #fff;
+    margin-top: 10px;
+    animation: fadeInUp 0.7s ease-in-out;
+  }
+
+  .price-amount {
+    color: #ffeb3b;
+  }
+
+  /* Form Divider Styling */
+  .form-divider {
+    border-bottom: 2px solid #007bff;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    animation: slideInRight 1s ease;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideInDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+</style>
+
+<div class="form-container">
+  <h2>{{ is_update|yesno:"Update,Create" }} Uniform</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div id="uniform-formset">
+      {{ formset.management_form }}
+      {% for form in formset %}
+        <div class="uniform-form-item">
+          <input type="text" class="form-control student-filter" placeholder="Filter by student name or registration number">
+          {{ form.as_p }}
+          <div class="price-display">Price: <span class="price-amount">0.00</span> TZS</div>
+          <button type="button" class="btn btn-remove"><i class="fas fa-trash-alt"></i> Remove</button>
+          {% if not forloop.last %}
+            <div class="form-divider"></div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" class="btn btn-add"><i class="fas fa-plus-circle"></i> Add New Form</button>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i> {{ is_update|yesno:"Update,Submit" }} All Forms</button>
+  </form>
+  <a href="{% url 'bursor_uniform_list' %}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left"></i> Cancel</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const formsetContainer = document.getElementById('uniform-formset');
+    const addUniformButton = document.querySelector('.btn-add');
+    let formIndex = {{ formset.total_form_count }};
+
+    // Assuming you pass student_class_map as a context variable in the view
+    const studentClassMap = {{ student_class_map|safe }};
+    const uniformTypePrices = {{ uniform_type_prices|safe }};  // Pass uniform type prices
+
+    // Function to add student filter functionality to each form
+    function addStudentFilter(inputElement, studentSelect) {
+      inputElement.addEventListener('input', function() {
+        const filterValue = inputElement.value.toLowerCase();
+        for (let i = 0; i < studentSelect.options.length; i++) {
+          const option = studentSelect.options[i];
+          const studentName = option.text.toLowerCase();
+          const studentRegNumber = option.value.toLowerCase();
+          if (studentName.includes(filterValue) || studentRegNumber.includes(filterValue)) {
+            option.style.display = '';
+          } else {
+            option.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    // Function to update the student class field based on the selected student
+    function updateStudentClass(studentSelect, studentClassSelect) {
+      studentSelect.addEventListener('change', function() {
+        const selectedStudentId = studentSelect.value;
+        const studentClassId = studentClassMap[selectedStudentId];
+        if (studentClassId) {
+          studentClassSelect.value = studentClassId;
+        } else {
+          studentClassSelect.value = ''; // Clear if no class found
+        }
+      });
+    }
+
+    // Function to update the price based on uniform type and quantity
+    function updatePrice(uniformTypeSelect, quantitySelect, priceDisplay) {
+      const uniformTypeId = uniformTypeSelect.value;
+      const quantity = quantitySelect.value;
+      const price = uniformTypePrices[uniformTypeId];
+      let totalPrice = 0;
+
+      if (price) {
+        totalPrice = quantity === 'Jozi 2' ? price * 2 : price;
+      }
+
+      priceDisplay.textContent = totalPrice.toFixed(2) + ' TZS';
+    }
+
+    // Apply the student filter, update class, and price functionality to all initial forms
+    document.querySelectorAll('.uniform-form-item').forEach(function(formItem) {
+      const studentFilterInput = formItem.querySelector('.student-filter');
+      const studentSelect = formItem.querySelector('select[name$="student"]');
+      const studentClassSelect = formItem.querySelector('select[name$="student_class"]');
+      const uniformTypeSelect = formItem.querySelector('select[name$="uniform_type"]');
+      const quantitySelect = formItem.querySelector('select[name$="quantity"]');
+      const priceDisplay = formItem.querySelector('.price-amount');
+
+      addStudentFilter(studentFilterInput, studentSelect);
+      updateStudentClass(studentSelect, studentClassSelect);
+      updatePrice(uniformTypeSelect, quantitySelect, priceDisplay);
+
+      // Update price when uniform type or quantity changes
+      uniformTypeSelect.addEventListener('change', function() {
+        updatePrice(uniformTypeSelect, quantitySelect, priceDisplay);
+      });
+
+      quantitySelect.addEventListener('change', function() {
+        updatePrice(uniformTypeSelect, quantitySelect, priceDisplay);
+      });
+    });
+
+    // Add new uniform form
+    addUniformButton.addEventListener('click', function() {
+      const newForm = document.createElement('div');
+      newForm.classList.add('uniform-form-item');
+
+      // Replace __prefix__ with the current formIndex in the form template
+      const emptyFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, formIndex);
+      newForm.innerHTML = emptyFormHtml;
+
+      // Add remove button to the new form
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.textContent = 'Remove';
+      removeButton.classList.add('btn', 'btn-remove');
+      newForm.appendChild(removeButton);
+
+      formsetContainer.appendChild(newForm);
+      formIndex++;
+
+      // Update the total forms count
+      document.getElementById('id_form-TOTAL_FORMS').value = formIndex;
+
+      // Apply student filter, update class, and price to the new form
+      const studentFilterInput = newForm.querySelector('.student-filter');
+      const studentSelect = newForm.querySelector('select[name$="student"]');
+      const studentClassSelect = newForm.querySelector('select[name$="student_class"]');
+      const uniformTypeSelect = newForm.querySelector('select[name$="uniform_type"]');
+      const quantitySelect = newForm.querySelector('select[name$="quantity"]');
+      const priceDisplay = newForm.querySelector('.price-amount');
+
+      addStudentFilter(studentFilterInput, studentSelect);
+      updateStudentClass(studentSelect, studentClassSelect);
+      updatePrice(uniformTypeSelect, quantitySelect, priceDisplay);
+
+      // Update price when uniform type or quantity changes
+      uniformTypeSelect.addEventListener('change', function() {
+        updatePrice(uniformTypeSelect, quantitySelect, priceDisplay);
+      });
+
+      quantitySelect.addEventListener('change', function() {
+        updatePrice(uniformTypeSelect, quantitySelect, priceDisplay);
+      });
+    });
+
+    // Remove a uniform form
+    formsetContainer.addEventListener('click', function(e) {
+      if (e.target.matches('.btn-remove')) {
+        e.target.closest('.uniform-form-item').remove();
+
+        // Update the total forms count
+        formIndex--;
+        document.getElementById('id_form-TOTAL_FORMS').value = formIndex;
+      }
+    });
+  });
+</script>
+
+<!-- Empty form template (not rendered, used for adding new forms dynamically) -->
+<script type="text/template" id="empty-form-template">
+  <div class="uniform-form-item">
+    <input type="text" class="form-control student-filter" placeholder="Filter by student name or registration number">
+    {{ formset.empty_form.as_p }}
+    <div class="price-display">Price: <span class="price-amount">0.00</span> TZS</div>
+  </div>
+</script>
+{% endblock %}

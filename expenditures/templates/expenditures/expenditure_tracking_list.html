@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Expenditure Tracking List</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Expenditure ID</th>
+        <th>Item Name</th>
+        <th>Initial Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tracking_record in tracking_records %}
+        <tr>
+          <td>{{ tracking_record.expenditure.id }}</td>
+          <td>{{ tracking_record.expenditure.item.name }}</td>
+          <td>{{ tracking_record.initial_balance }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

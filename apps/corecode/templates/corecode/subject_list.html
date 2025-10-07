@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Subjects List
+{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #eff5fc, #dbeafe);
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-header h1 i {
+        font-size: 1.5rem;
+        color: #478ed1;
+    }
+
+    .page-header .btn-add-subject {
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+        transition: transform 0.3s ease;
+        background-color: #478ed1;
+        border-color: #478ed1;
+        color: #fff;
+    }
+
+    .page-header .btn-add-subject:hover {
+        transform: scale(1.05);
+        background-color: #3569a5;
+        border-color: #3569a5;
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .search-container input {
+        border-radius: 50px;
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        width: 100%;
+        border: 1px solid #ccc;
+        color: #333;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        background-color: #fff;
+    }
+
+    .search-container input:focus {
+        border-color: #478ed1;
+        outline: none;
+        background-color: #f9fbfd;
+    }
+
+    .search-container .fa-search {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+    }
+
+    .subject-card {
+        border: none;
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        position: relative;
+    }
+
+    .subject-card:hover {
+        transform: translateY(-3px);
+        background-color: #f9fafb;
+    }
+
+    .subject-icon {
+        font-size: 2rem;
+        margin-right: 15px;
+        color: #478ed1;
+    }
+
+    .subject-info {
+        flex: 1;
+    }
+
+    .subject-info h5 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .subject-info p {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .action-buttons a {
+        text-decoration: none;
+        font-size: 1.2rem;
+        color: #333;
+        transition: color 0.3s ease;
+    }
+
+    .action-buttons a:hover {
+        color: #478ed1;
+    }
+
+    .no-subjects {
+        text-align: center;
+        margin-top: 50px;
+        color: #777;
+        font-size: 1.1rem;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .container {
+        margin-top: 20px;
+        background: #ffffffb3;
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    @media(max-width: 575.98px) {
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        .page-header .btn-add-subject {
+            font-size: 0.85rem;
+        }
+        .subject-info h5 {
+            font-size: 1.1rem;
+        }
+        .search-container input {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="page-header">
+        <h1><i class="fas fa-book"></i> Subjects</h1>
+        <a href="{% url 'subject-create' %}" class="btn btn-primary btn-add-subject">
+            <i class="fas fa-plus-circle"></i> Add New Subject
+        </a>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="subjectSearch" placeholder="Search subjects..." autocomplete="off" value="{{ search_query }}">
+        <i class="fas fa-search"></i>
+    </div>
+
+    <div id="subjectList">
+        {% if subjects %}
+            {% for subject in subjects %}
+                <div class="subject-card fade-in" data-name="{{ subject.name|lower }}">
+                    <div class="subject-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="subject-info">
+                        <h5>{{ subject.name }}</h5>
+                        <p>Explore, Learn, and Excel! 📚✨</p>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'subject-update' subject.id %}" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'subject-delete' subject.id %}" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-subjects">
+                <i class="fas fa-info-circle"></i> No subjects found. Consider adding one.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('subjectSearch');
+    const subjectCards = document.querySelectorAll('.subject-card');
+
+    searchInput.addEventListener('keyup', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = false;
+        subjectCards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            if (name.includes(query)) {
+                card.style.display = 'flex';
+                found = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const noSubjects = document.querySelector('.no-subjects');
+        if (!found) {
+            if (!noSubjects) {
+                const noSubjDiv = document.createElement('div');
+                noSubjDiv.classList.add('no-subjects');
+                noSubjDiv.innerHTML = '<i class="fas fa-info-circle"></i> No subjects match your search.';
+                document.getElementById('subjectList').appendChild(noSubjDiv);
+            }
+        } else {
+            if (noSubjects) {
+                noSubjects.remove();
+            }
+        }
+    });
+});
+</script>
+{% endblock content %}

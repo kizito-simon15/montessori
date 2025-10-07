@@ -1,0 +1,42 @@
+{% extends 'bursor/bursor_base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Create Expenditure</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_category">Category:</label>
+            <select name="category" id="id_category" class="form-control">
+                {% for category in categories %}
+                <option value="{{ category.pk }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_item_name">Item:</label>
+            <input type="text" name="item_name" id="id_item_name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="id_amount">Amount:</label>
+            <input type="number" name="amount" id="id_amount" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="id_date">Date:</label>
+            <input type="date" name="date" id="id_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="id_description">Description:</label>
+            <textarea name="description" id="id_description" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="id_quantity">Quantity:</label>
+            <input type="text" name="quantity" id="id_quantity" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="id_attachment">Attachment:</label>
+            <input type="file" name="attachment" id="id_attachment" class="form-control-file">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

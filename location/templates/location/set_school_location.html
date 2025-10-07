@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set School Location and Time Settings</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        body {
+            background-color: #f0f4f8;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 {
+            color: #0066cc;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0, 102, 204, 0.5);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            border-color: #005bb5;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #005bb5;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .alert-danger ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>{% if location %}Update{% else %}Set{% endif %} School Location and Time Settings</h1>
+    
+    <!-- Display form errors here -->
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    <li><strong>{{ field }}</strong>: {{ errors|striptags }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+        </div>
+
+        <!-- The map container -->
+        <div id="map"></div>
+
+        <div class="form-group">
+            {{ form.latitude.label_tag }}
+            {{ form.latitude }}
+        </div>
+
+        <div class="form-group">
+            {{ form.longitude.label_tag }}
+            {{ form.longitude }}
+        </div>
+
+        <div class="form-group">
+            {{ form.distance.label_tag }}  <!-- New field for distance -->
+            {{ form.distance }}
+        </div>
+
+        <div class="form-group">
+            {{ form.start_day.label_tag }}
+            {{ form.start_day }}
+        </div>
+
+        <div class="form-group">
+            {{ form.end_day.label_tag }}
+            {{ form.end_day }}
+        </div>
+
+        <div class="form-group">
+            {{ form.start_time.label_tag }}
+            {{ form.start_time }}
+        </div>
+
+        <div class="form-group">
+            {{ form.end_time.label_tag }}
+            {{ form.end_time }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">{% if location %}Update{% else %}Save{% endif %} Location and Time Settings</button>
+    </form>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script>
+    var initialLat = {{ form.latitude.value|default:"-6.7924" }};
+    var initialLng = {{ form.longitude.value|default:"39.2083" }};
+    var map = L.map('map').setView([initialLat, initialLng], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var marker = L.marker([initialLat, initialLng]).addTo(map);
+
+    // Geocoder control to search for locations
+    var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false
+    })
+    .on('markgeocode', function(e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+        var latitude = e.geocode.center.lat;
+        var longitude = e.geocode.center.lng;
+        
+        marker.setLatLng([latitude, longitude]).update();
+
+        // Automatically fill the form fields with latitude and longitude
+        document.getElementById('id_latitude').value = latitude;
+        document.getElementById('id_longitude').value = longitude;
+
+        // Set the suggested distance (manually calculated or a default value)
+        document.getElementById('id_distance').value = 25.6;  // Replace 25.6 with the calculated distance
+    })
+    .addTo(map);
+
+    map.on('click', function(e) {
+        var latitude = e.latlng.lat;
+        var longitude = e.latlng.lng;
+
+        marker.setLatLng([latitude, longitude]).update();
+
+        // Automatically fill the form fields with latitude and longitude
+        document.getElementById('id_latitude').value = latitude;
+        document.getElementById('id_longitude').value = longitude;
+    });
+</script>
+
+</body>
+</html>
+{% endblock content %}

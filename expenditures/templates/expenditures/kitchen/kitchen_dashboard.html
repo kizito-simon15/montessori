@@ -1,0 +1,147 @@
+{% extends "base.html" %}{% load humanize %}
+{% block title %}Kitchen · Dashboard{% endblock %}
+
+{# ─────────── CSS ─────────── #}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#3b82f6;--green:#22c55e;--pink:#ec4899;--slate:#0f172a;
+  --muted:#64748b;--bg:#f8fafc;--card:#ffffff;--rad:20px;
+}
+html,body{margin:0;background:var(--bg);color:var(--slate);font-family:Poppins,sans-serif}
+h3{margin:.1rem 0 .55rem;font-size:1rem;font-weight:700}
+.card{background:var(--card);border-radius:var(--rad);padding:1.25rem;
+      box-shadow:0 6px 22px rgba(0,0,0,.08);opacity:0;transform:translateY(42px);
+      transition:.45s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.tiles{display:grid;gap:1rem;margin-top:.9rem}
+@media(min-width:760px){.tiles{grid-template-columns:repeat(3,1fr)}}
+.tile{display:flex;flex-direction:column;align-items:center;color:#fff}
+.tile h2{margin:0;font-size:1.55rem;font-weight:800}
+.tile p{margin:0;font-size:.78rem;font-weight:600}
+.tb{background:linear-gradient(135deg,#60a5fa,#3b82f6)}
+.tg{background:linear-gradient(135deg,#4ade80,#22c55e)}
+.tp{background:linear-gradient(135deg,#f472b6,#ec4899)}
+.section{margin-top:1.3rem}
+.table{width:100%;border-collapse:collapse;font-size:.83rem}
+.table th,.table td{padding:.45rem .6rem}
+.table tbody tr:nth-child(odd){background:#f1f5ff}
+.table tbody tr:hover{background:#e2e8ff}
+.alert{background:#fef3c7;border-left:4px solid #fbbf24;color:#b45309;
+       border-radius:14px;padding:.7rem 1rem;font-size:.83rem}
+.links{display:grid;gap:.8rem;margin-top:.95rem}
+@media(min-width:560px){.links{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}}
+.link{display:flex;align-items:center;gap:.55rem;padding:.65rem .9rem;border-radius:16px;
+      background:var(--card);text-decoration:none;color:var(--slate);font-weight:600;font-size:.83rem;
+      box-shadow:0 4px 12px rgba(0,0,0,.07);transition:transform .18s}
+.link:hover{transform:translateY(-3px)}
+canvas{user-select:none}
+</style>
+{% endblock %}
+
+{# ─────────── JS ─────────── #}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  /* slide-in cards */
+  document.querySelectorAll(".card").forEach((c,i)=>setTimeout(()=>c.classList.add("show"),70*i));
+
+  /* count-up tiles */
+  const roll=(id,val)=>{
+    const el=document.getElementById(id);let n=0,step=Math.max(1,Math.ceil(val/60));
+    (function tick(){n+=step;if(n>=val){el.textContent=val.toLocaleString();return}
+      el.textContent=n.toLocaleString();requestAnimationFrame(tick)})();};
+  roll("spent", {{ total_spent|floatformat:0 }});
+  roll("used",  {{ total_used_qty|floatformat:0 }});
+  roll("stock", {{ total_stock|floatformat:0 }});
+
+  /* multi-axis line + bar  (TZS vs Qty) */
+  new Chart("flow",{type:"bar",
+    data:{
+      labels:{{ chart_labels|safe }},
+      datasets:[
+        {type:"line",label:"Usage (qty)",
+         data:{{ chart_use|safe }},yAxisID:"y2",tension:.35,
+         borderColor:"rgba(34,197,94,.85)",backgroundColor:"rgba(34,197,94,.15)",fill:true},
+        {label:"Purchases (TZS)",data:{{ chart_buy|safe }},
+         backgroundColor:"rgba(59,130,246,.8)",yAxisID:"y1"},
+      ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+      scales:{
+        y1:{beginAtZero:true,position:"left",title:{text:"TZS",display:true}},
+        y2:{beginAtZero:true,position:"right",grid:{drawOnChartArea:false},
+            title:{text:"Qty",display:true}}
+      },
+      plugins:{legend:{position:"top"}}
+    }});
+
+  /* donut */
+  new Chart("donut",{type:"doughnut",
+    data:{labels:["On-hand","Used"],
+          datasets:[{data:[{{ total_stock }},{{ total_used_qty }}],
+            backgroundColor:["rgba(34,197,94,.9)","rgba(148,163,184,.3)"],borderWidth:0}]},
+    options:{cutout:"68%",plugins:{legend:{display:false}}}});
+});
+</script>
+{% endblock %}
+
+{# ─────────── CONTENT ─────────── #}
+{% block content %}
+
+<!-- KPI tiles -->
+<div class="tiles">
+  <div class="card tile tb"><h2 id="spent">0</h2><p>Spent&nbsp;TZS</p></div>
+  <div class="card tile tg"><h2 id="used">0</h2><p>Total&nbsp;Used</p></div>
+  <div class="card tile tp"><h2 id="stock">0</h2><p>Stock&nbsp;On-Hand</p></div>
+</div>
+
+{% if low_kitchen %}
+  <div class="card section alert">
+    {{ low_kitchen|length }} kitchen item{{ low_kitchen|pluralize }} below threshold – restock soon!
+  </div>
+{% endif %}
+
+<!-- donut + top-used -->
+<div class="section" style="display:grid;gap:1rem">
+  <div class="card" style="height:230px;display:flex;align-items:center;justify-content:center">
+    <canvas id="donut" width="200" height="200"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Top&nbsp;5&nbsp;Most-Used</h3>
+    <table class="table">
+      <thead><tr><th>Product</th><th style="text-align:right">Qty</th></tr></thead>
+      <tbody>
+        {% for row in top_used %}
+          <tr><td>{{ row.product__name }}</td>
+              <td style="text-align:right">{{ row.q|floatformat:2 }} {{ row.product__unit }}</td></tr>
+        {% empty %}
+          <tr><td colspan="2">— no usage yet —</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- monthly flow line+bar -->
+<div class="card section" style="height:300px">
+  <h3>{{ now|date:"Y" }} Kitchen Flow</h3>
+  <canvas id="flow"></canvas>
+</div>
+
+<!-- quick links -->
+<div class="card section">
+  <h3>Quick Links</h3>
+  <div class="links">
+    <a class="link" href="{% url 'kitchenproduct_list'  %}">🥫 Products</a>
+    <a class="link" href="{% url 'kitchenpurchase_list' %}">🛒 Purchases</a>
+    <a class="link" href="{% url 'kitchenusage_list'   %}">🍴 Usage</a>
+    <a class="link" href="{% url 'dailyconsumption_list' %}">📅 Daily&nbsp;Consumptions</a>
+    <a class="link" href="{% url 'kitchen_dashboard'   %}">📈 Dashboard</a>
+  </div>
+</div>
+{% endblock %}

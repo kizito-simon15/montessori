@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Signature List{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #ffe6e6, #e0f7fa);
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        margin-top: 50px;
+        background: #ffffffb3;
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .header-row h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-row h2 .emoji {
+        font-size: 2rem;
+    }
+
+    .btn-create {
+        background-color: #28a745;
+        color: #fff;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-create:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .search-container input {
+        border-radius: 50px;
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        width: 100%;
+        border: 1px solid #ccc;
+        color: #333;
+        font-size: 1rem;
+        background-color: #fff;
+        transition: border-color 0.3s ease;
+    }
+
+    .search-container input:focus {
+        border-color: #478ed1;
+        outline: none;
+        background-color: #f9fbfd;
+    }
+
+    .search-container .fa-search {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+    }
+
+    .table {
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    thead {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    thead th {
+        font-weight: 600;
+        border: none;
+    }
+
+    tbody tr {
+        background-color: #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+
+    tbody tr:hover {
+        background-color: #e9ecef;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+
+    .sn-cell {
+        color: #17a2b8;
+        font-weight: bold;
+    }
+
+    .name-cell {
+        color: #007bff;
+        font-weight: 600;
+    }
+
+    .signature-img {
+        border: 2px solid #17a2b8;
+        border-radius: 5px;
+        padding: 2px;
+        width: 150px;
+        background-color: #e9ecef;
+        transition: transform 0.3s ease;
+    }
+
+    .signature-img:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
+    }
+
+    .no-signatures {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #777;
+        padding: 30px;
+    }
+
+    @media (max-width: 575.98px) {
+        .header-row h2 {
+            font-size: 1.5rem;
+        }
+
+        .sn-cell, .name-cell {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+    <div class="header-row">
+        <h2 class="text-primary" style="font-weight: bold;">
+            <span class="emoji">✍️</span> Signature List
+        </h2>
+        <a href="{% url 'create_signature' %}" class="btn btn-create btn-lg">
+            <i class="fas fa-plus"></i> Create Signature
+        </a>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="signatureSearch" placeholder="Search by name..." autocomplete="off">
+        <i class="fas fa-search"></i>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped" id="signatureTable">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">S/N</th>
+                    <th scope="col">Name</th>
+                    <th scope="col" class="text-center">Signature</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signature in signatures %}
+                <tr>
+                    <td class="text-center sn-cell">{{ forloop.counter }}</td>
+                    <td class="name-cell">{{ signature.name }}</td>
+                    <td class="text-center">
+                        <img src="{{ signature.signature_image.url }}" alt="Signature" class="signature-img">
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'delete_signature' signature.pk %}" class="btn btn-delete btn-sm">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="no-signatures">
+                        <i class="fas fa-info-circle"></i> No signatures available.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('signatureSearch');
+    const table = document.getElementById('signatureTable');
+    const rows = table.getElementsByTagName('tr');
+
+    searchInput.addEventListener('keyup', function() {
+        const query = this.value.toLowerCase().trim();
+
+        let found = false;
+        for (let i = 1; i < rows.length; i++) {
+            const nameCell = rows[i].getElementsByTagName('td')[1];
+            if (nameCell) {
+                const name = nameCell.textContent.toLowerCase();
+                if (name.includes(query)) {
+                    rows[i].style.display = '';
+                    found = true;
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load humanize static %}
+{% block title %}📊 Accounts Dashboard{% endblock %}
+
+{# ──────────────  CSS  ────────────── #}
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --clr-bg:#f1f5f9; --clr-card:#ffffff40; --clr-primary:#6366f1;
+  --clr-secondary:#0ea5e9; --clr-success:#22c55e; --clr-danger:#ef4444;
+  --clr-info:#3b82f6; --radius:18px; --blur:14px; --shadow:0 8px 32px rgba(0,0,0,.15);
+}
+html,body{margin:0;background:var(--clr-bg);font-family:Inter,sans-serif;font-size:15px}
+
+/* ── header ─────────────────────────────────────── */
+.title-section{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  padding:2rem 1rem;color:#fff;text-align:center;border-radius:0 0 28px 28px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.title-section::after{content:"";position:absolute;inset:0;background:inherit;opacity:.35;filter:blur(60px)}
+.title-section h2{display:flex;gap:.6rem;align-items:center;justify-content:center;
+  font-size:clamp(1.8rem,5vw,2.4rem);font-weight:800;position:relative;z-index:1}
+.title-section p{margin-top:.3rem;font-size:.9rem;opacity:.9;position:relative;z-index:1}
+
+/* ── KPI cards ───────────────────────────────────── */
+.kpi-section{width:95%;margin:-50px auto 1.6rem}
+.kpi-wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center}
+.kpi-card{flex:1 1 180px;min-width:150px;padding:1.2rem;border-radius:var(--radius);
+  background:var(--clr-card);backdrop-filter:blur(var(--blur));
+  box-shadow:var(--shadow);color:#fff;text-align:center;position:relative}
+.kpi-card h3{margin:0 0 .4rem;font-size:.85rem;font-weight:600;opacity:.9}
+.kpi-card span{font-size:1.5rem;font-weight:800;display:block}
+
+/* ── action buttons ─────────────────────────────── */
+.actions{width:95%;margin:0 auto 2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.btn-main{border:none;border-radius:25px;padding:.6rem 1.4rem;font-weight:700;color:#fff;cursor:pointer;
+  box-shadow:var(--shadow);transition:.25s;text-decoration:none;display:inline-block}
+.btn-main:hover{filter:brightness(1.08)}
+.btn-create{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary))}
+.btn-list{background:linear-gradient(135deg,var(--clr-success),#4ade80)}
+
+/* ── chart panels ──────────────────────────────── */
+.chart-section{width:95%;margin:0 auto 2rem;display:grid;gap:1.5rem;grid-template-columns:1fr; }
+@media(min-width:992px){.chart-section{grid-template-columns:1fr 1fr}}
+.chart-box{background:var(--clr-card);backdrop-filter:blur(var(--blur));
+  box-shadow:var(--shadow);border-radius:var(--radius);padding:1.2rem}
+.chart-box h3{font-weight:600;margin-bottom:.6rem;font-size:1rem;color:#1e293b}
+.chart-box canvas{width:100%!important;height:320px!important}
+</style>
+{% endblock %}
+
+{# ──────────────  CONTENT  ────────────── #}
+{% block content %}
+<div class="title-section">
+  <h2>📊 Accounts Dashboard</h2>
+  <p>Overview of user accounts at Maria Montessori School</p>
+</div>
+
+<section class="kpi-section">
+  <div class="kpi-wrap">
+    <div class="kpi-card" style="background:linear-gradient(135deg,var(--clr-info),#60a5fa)">
+      <h3>Total Accounts</h3><span>{{ total_users|intcomma }}</span>
+    </div>
+    {% for r in rows %}
+      <div class="kpi-card" style="background:linear-gradient(135deg,var(--clr-success),#4ade80)">
+        <h3>{{ r.label }}</h3>
+        <span>{{ r.total|intcomma }}</span>
+        <small>{{ r.active }} active</small>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="actions">
+  <a href="{% url 'select_user_type' %}" class="btn-main btn-create">➕ Create User</a>
+  <a href="{% url 'list_users' %}" class="btn-main btn-list">📋 All Users</a>
+</div>
+
+<section class="chart-section">
+  <div class="chart-box">
+    <h3>Accounts Overview</h3>
+    <canvas id="bar"></canvas>
+  </div>
+  <div class="chart-box">
+    <h3>Active vs Inactive</h3>
+    <canvas id="donut"></canvas>
+  </div>
+</section>
+{% endblock %}

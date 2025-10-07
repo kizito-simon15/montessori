@@ -1,0 +1,810 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block title %}Maria Montessori - {% if object %}Update{% else %}Add New{% endif %} Pupil{% endblock %}
+
+{% block content %}
+<div class="card animate__animated animate__fadeIn">
+    <div class="card-header">
+        <h2>
+            {% if object %}
+                <i class="fas fa-user-edit"></i> Update Pupil
+            {% else %}
+                <i class="fas fa-user-plus"></i> Add New Pupil
+            {% endif %}
+        </h2>
+    </div>
+    <div class="card-body">
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>Form Errors:</strong>
+                <ul class="mb-0">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <fieldset>
+                <legend><i class="fas fa-user"></i> Personal Information</legend>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <label for="id_current_status" class="form-label">Current Status <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">✅</span>
+                            {{ form.current_status|add_class:"form-select" }}
+                        </div>
+                        {% if form.current_status.errors %}
+                            <div class="text-danger">
+                                {% for error in form.current_status.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Choose Active or Inactive</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_registration_number" class="form-label">Registration Number <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">📜</span>
+                            {{ form.registration_number|add_class:"form-control" }}
+                        </div>
+                        {% if form.registration_number.errors %}
+                            <div class="text-danger">
+                                {% for error in form.registration_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Format: S1234567/0032/2025</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_firstname" class="form-label">First Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">🧑</span>
+                            {{ form.firstname|add_class:"form-control" }}
+                        </div>
+                        {% if form.firstname.errors %}
+                            <div class="text-danger">
+                                {% for error in form.firstname.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">e.g. John</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_middle_name" class="form-label">Middle Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📛</span>
+                            {{ form.middle_name|add_class:"form-control" }}
+                        </div>
+                        {% if form.middle_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.middle_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Optional</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_surname" class="form-label">Surname <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">🧑</span>
+                            {{ form.surname|add_class:"form-control" }}
+                        </div>
+                        {% if form.surname.errors %}
+                            <div class="text-danger">
+                                {% for error in form.surname.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">e.g. Doe</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">⚧</span>
+                            {{ form.gender|add_class:"form-select"|attr:"required" }}
+                        </div>
+                        {% if form.gender.errors %}
+                            <div class="text-danger">
+                                {% for error in form.gender.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="invalid-feedback">Please select a gender.</div>
+                            <small class="text-muted">Select Male or Female</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">🎂</span>
+                            {{ form.date_of_birth|add_class:"form-control"|attr:"type:date" }}
+                        </div>
+                        {% if form.date_of_birth.errors %}
+                            <div class="text-danger">
+                                {% for error in form.date_of_birth.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">YYYY-MM-DD</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-school"></i> Academic Details</legend>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <label for="id_date_of_admission" class="form-label">Date of Admission <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">📅</span>
+                            {{ form.date_of_admission|add_class:"form-control"|attr:"type:date" }}
+                        </div>
+                        {% if form.date_of_admission.errors %}
+                            <div class="text-danger">
+                                {% for error in form.date_of_admission.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">When pupil joined</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_current_class" class="form-label">Current Class <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">🏫</span>
+                            {{ form.current_class|add_class:"form-select" }}
+                        </div>
+                        {% if form.current_class.errors %}
+                            <div class="text-danger">
+                                {% for error in form.current_class.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Select the current class</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_category" class="form-label">Category <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">🏠</span>
+                            {{ form.category|add_class:"form-select" }}
+                        </div>
+                        {% if form.category.errors %}
+                            <div class="text-danger">
+                                {% for error in form.category.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Select the pupil's category</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-phone"></i> Contact Information</legend>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <label for="id_guardian1_mobile_number" class="form-label">Guardian 1 Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📱</span>
+                            {{ form.guardian1_mobile_number|add_class:"form-control" }}
+                        </div>
+                        {% if form.guardian1_mobile_number.errors %}
+                            <div class="text-danger">
+                                {% for error in form.guardian1_mobile_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-danger"></div>
+                            <small class="text-muted">+255XXXXXXXXX (Optional)</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_guardian2_mobile_number" class="form-label">Guardian 2 Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📱</span>
+                            {{ form.guardian2_mobile_number|add_class:"form-control" }}
+                        </div>
+                        {% if form.guardian2_mobile_number.errors %}
+                            <div class="text-danger">
+                                {% for error in form.guardian2_mobile_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-danger"></div>
+                            <small class="text-muted">+255XXXXXXXXX (Optional)</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_address" class="form-label">Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text">🏠</span>
+                            {{ form.address|add_class:"form-control" }}
+                        </div>
+                        {% if form.address.errors %}
+                            <div class="text-danger">
+                                {% for error in form.address.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">e.g. 123 Apple St (Optional)</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-heartbeat"></i> Health Information</legend>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <div class="form-check form-switch">
+                            {{ form.has_nhif|add_class:"form-check-input custom-toggle" }}
+                            <label for="id_has_nhif" class="form-check-label">Has NHIF</label>
+                        </div>
+                        {% if form.has_nhif.errors %}
+                            <div class="text-danger">
+                                {% for error in form.has_nhif.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Check if pupil has NHIF coverage</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_nhif_source" class="form-label">NHIF Source {% if form.has_nhif.value %}<span class="text-danger">*</span>{% endif %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">🏥</span>
+                            {{ form.nhif_source|add_class:"form-select" }}
+                        </div>
+                        {% if form.nhif_source.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nhif_source.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Required if NHIF is checked</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_nhif_number" class="form-label">NHIF Number {% if form.has_nhif.value %}<span class="text-danger">*</span>{% endif %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">🔢</span>
+                            {{ form.nhif_number|add_class:"form-control" }}
+                        </div>
+                        {% if form.nhif_number.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nhif_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Required if NHIF is checked</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-info-circle"></i> Additional Information</legend>
+                <div class="fieldset-content">
+                    <div class="form-group">
+                        <label for="id_parent_student_id" class="form-label">Parent Student ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📜</span>
+                            {{ form.parent_student_id|add_class:"form-control" }}
+                        </div>
+                        {% if form.parent_student_id.errors %}
+                            <div class="text-danger">
+                                {% for error in form.parent_student_id.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Optional</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_passport" class="form-label">Passport Photo</label>
+                        <div class="input-group">
+                            <span class="input-group-text">🖼️</span>
+                            {{ form.passport|add_class:"form-control" }}
+                        </div>
+                        {% if form.passport.errors %}
+                            <div class="text-danger">
+                                {% for error in form.passport.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Upload .jpg or .png (Optional)</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_others" class="form-label">Additional Information</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📝</span>
+                            {{ form.others|add_class:"form-control" }}
+                        </div>
+                        {% if form.others.errors %}
+                            <div class="text-danger">
+                                {% for error in form.others.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Any extra notes (Optional)</small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check form-switch">
+                            {{ form.completed|add_class:"form-check-input custom-toggle" }}
+                            <label for="id_completed" class="form-check-label">Completed</label>
+                        </div>
+                        {% if form.completed.errors %}
+                            <div class="text-danger">
+                                {% for error in form.completed.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="text-muted">Check if pupil has completed studies</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}
+                        <i class="fas fa-save"></i> Save
+                    {% else %}
+                        <i class="fas fa-plus-circle"></i> Add Pupil
+                    {% endif %}
+                </button>
+                <a class="btn btn-secondary" href="{% url 'student-list' %}"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+:root {
+    --clr-primary: #1d4ed8; /* Vibrant Blue */
+    --clr-accent: #93c5fd; /* Light Blue */
+    --clr-complementary: #2dd4bf; /* Teal */
+    --clr-neutral: #1f2937; /* Dark Gray */
+    --clr-light: #f8fafc; /* Light Background */
+}
+
+body {
+    background: var(--clr-light);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.card {
+    background: #fff;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.card-header {
+    background: linear-gradient(145deg, var(--clr-primary), var(--clr-complementary));
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+    position: relative;
+    z-index: 10;
+}
+
+.card-header.sticky {
+    position: sticky;
+    top: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-header h2 {
+    font-size: clamp(1.4rem, 5vw, 1.6rem);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body {
+    display: grid;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.alert-danger {
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin-bottom: 1rem;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid #dc2626;
+    color: var(--clr-neutral);
+}
+
+fieldset {
+    border: none;
+    border-radius: 12px;
+    background: var(--clr-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+fieldset:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+legend {
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+    font-weight: 600;
+    color: #fff;
+    background: var(--clr-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+legend:hover {
+    background: var(--clr-complementary);
+}
+
+legend.collapsed::after {
+    content: '▶';
+    margin-left: 0.5rem;
+}
+
+legend:not(.collapsed)::after {
+    content: '▼';
+    margin-left: 0.5rem;
+}
+
+.fieldset-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: var(--clr-neutral);
+    margin-bottom: 0.25rem;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid var(--clr-accent);
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: var(--clr-neutral);
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.25);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: #6b7280;
+    opacity: 0.7;
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+    border-color: #dc2626;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    background: var(--clr-light);
+    border: 2px solid var(--clr-accent);
+    border-right: none;
+    color: var(--clr-complementary);
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    padding: 0.5rem 0.75rem;
+}
+
+.text-danger {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #dc2626;
+    margin-top: 0.25rem;
+}
+
+.text-muted {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    padding: 0.75rem 1.5rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--clr-primary);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: var(--clr-complementary);
+    color: #fff;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #5eead4;
+    transform: translateY(-2px);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.form-check-input.custom-toggle {
+    width: 2rem;
+    height: 1.25rem;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+    .fieldset-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-header h2 {
+        font-size: clamp(1.2rem, 4vw, 1.4rem);
+    }
+    .form-control, .form-select {
+        font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    }
+    .btn {
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        padding: 0.6rem 1.2rem;
+    }
+    .fieldset-content {
+        display: none;
+    }
+    legend:not(.collapsed) + .fieldset-content {
+        display: grid;
+    }
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const guardian1Input = document.getElementById('id_guardian1_mobile_number');
+    const guardian2Input = document.getElementById('id_guardian2_mobile_number');
+    const cancelBtn = document.querySelector('.btn-secondary');
+    const hasNhifInput = document.getElementById('id_has_nhif');
+    const nhifSourceInput = document.getElementById('id_nhif_source');
+    const nhifNumberInput = document.getElementById('id_nhif_number');
+    const genderSelect = document.getElementById('id_gender');
+
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Toggle NHIF fields visibility
+    function toggleNhifFields() {
+        const hasNhif = hasNhifInput.checked;
+        nhifSourceInput.disabled = !hasNhif;
+        nhifNumberInput.disabled = !hasNhif;
+        if (!hasNhif) {
+            nhifSourceInput.value = '';
+            nhifNumberInput.value = '';
+        }
+    }
+
+    hasNhifInput.addEventListener('change', toggleNhifFields);
+    toggleNhifFields(); // Initial call
+
+    // Client-side validation for mobile numbers
+    function validateMobile(input, fieldName, isRequired) {
+        const value = input.value;
+        const regex = /^\+255[0-9]{9}$/;
+        const errorDiv = input.closest('.form-group').querySelector('.text-danger');
+        if (value && !regex.test(value)) {
+            errorDiv.textContent = `Please enter a valid ${fieldName} mobile number (e.g., +255XXXXXXXXX)`;
+            input.classList.add('is-invalid');
+        } else if (isRequired && !value) {
+            errorDiv.textContent = `${fieldName} mobile number is required`;
+            input.classList.add('is-invalid');
+        } else {
+            errorDiv.textContent = '';
+            input.classList.remove('is-invalid');
+        }
+    }
+
+    guardian1Input.addEventListener('input', debounce(() => validateMobile(guardian1Input, "Guardian 1", false), 300));
+    guardian2Input.addEventListener('input', debounce(() => validateMobile(guardian2Input, "Guardian 2", false), 300));
+
+    // Ensure gender dropdown displays selected value and opens on click
+    function updateGenderDisplay() {
+        const selectedValue = genderSelect.value;
+        const options = genderSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === selectedValue) {
+                genderSelect.options[i].selected = true;
+                break;
+            }
+        }
+    }
+
+    genderSelect.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent fieldset toggle from interfering
+        genderSelect.focus();
+        genderSelect.size = 3; // Show all options (adjust if needed)
+        setTimeout(() => {
+            genderSelect.size = 1; // Reset after brief display
+        }, 2000);
+    });
+
+    genderSelect.addEventListener('change', updateGenderDisplay);
+
+    // Initialize gender display
+    updateGenderDisplay();
+
+    // Toggle fieldset visibility
+    const fieldsets = document.querySelectorAll('.card-body fieldset');
+    fieldsets.forEach((fieldset, index) => {
+        const legend = fieldset.querySelector('legend');
+        const content = fieldset.querySelector('.fieldset-content');
+        const isCollapsed = localStorage.getItem(`student-form-fieldset-${index}`) === 'collapsed';
+        
+        if (isCollapsed) {
+            content.style.display = 'none';
+            legend.classList.add('collapsed');
+        }
+
+        legend.addEventListener('click', () => {
+            const isNowCollapsed = content.style.display === 'none';
+            content.style.display = isNowCollapsed ? 'grid' : 'none';
+            legend.classList.toggle('collapsed', !isNowCollapsed);
+            localStorage.setItem(`student-form-fieldset-${index}`, isNowCollapsed ? 'expanded' : 'collapsed');
+        });
+    });
+
+    // Cancel confirmation
+    cancelBtn.addEventListener('click', (e) => {
+        if (form.checkValidity() && Array.from(form.elements).some(el => el.value)) {
+            if (!confirm('Are you sure you want to cancel? Unsaved changes will be lost.')) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    // Sticky header on scroll
+    const header = document.querySelector('.card-header');
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = debounce(() => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            header.classList.add('sticky');
+        } else {
+            header.classList.remove('sticky');
+        }
+        lastScrollY = currentScrollY;
+    }, 100);
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Bootstrap form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Fade-in animation for card
+    const card = document.querySelector('.card');
+    card.style.opacity = '0';
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+});
+</script>
+{% endblock %}

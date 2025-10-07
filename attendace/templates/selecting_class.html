@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Class</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            animation: colorChange2 3s infinite alternate;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            animation: colorChange1 2s infinite alternate;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        p {
+            animation: colorChange3 4s infinite alternate;
+        }
+
+        @keyframes colorChange1 {
+            0% { color: red; }
+            50% { color: orange; }
+            100% { color: yellow; }
+        }
+
+        @keyframes colorChange2 {
+            0% { color: green; }
+            50% { color: blue; }
+            100% { color: indigo; }
+        }
+
+        @keyframes colorChange3 {
+            0% { color: violet; }
+            50% { color: magenta; }
+            100% { color: cyan; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select a Class</h1>
+        <ul>
+            {% for class in classes %}
+            <li>
+                <a href="{% url 'class_attendance' class.id %}">{{ class.name|title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% if error_message %}
+        <p>{{ error_message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+{% endblock content %}

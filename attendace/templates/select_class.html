@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Student Class</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+        }
+        h2 {
+            display: block;
+            margin: 10px auto;
+            animation: colorChange2 3s infinite alternate;
+        }
+        label, select, input {
+            display: block;
+            margin: 10px auto;
+            animation: colorChange1 2s infinite alternate;
+        }
+        .btn-primary {
+            animation: colorChange3 4s infinite alternate;
+        }
+
+        @keyframes colorChange1 {
+            0% { color: red; }
+            50% { color: orange; }
+            100% { color: yellow; }
+        }
+
+        @keyframes colorChange2 {
+            0% { color: green; }
+            50% { color: blue; }
+            100% { color: indigo; }
+        }
+
+        @keyframes colorChange3 {
+            0% { color: violet; }
+            50% { color: magenta; }
+            100% { color: cyan; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Select Student Class</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="class">Select Class:</label>
+                <select name="class" id="class" class="form-control">
+                    {% for student_class in student_classes %}
+                    <option value="{{ student_class.id }}">{{ student_class.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" value="Proceed" class="btn btn-primary">
+        </form>
+    </div>
+</body>
+</html>
+{% endblock content %}

@@ -1,0 +1,66 @@
+{% comment %}
+Reusable card for each user-group.
+Required context:
+  label, users, gradA, gradB,
+  filter_label_list,
+  toggle_all_url, update_url, delete_url, toggle_url
+{% endcomment %}
+
+{% if users %}
+<div class="card mb-4" style="--gradA:{{ gradA }};--gradB:{{ gradB }};">
+  <div class="card-header"
+       style="background:linear-gradient(135deg,var(--gradA),var(--gradB));color:#fff">
+    <span>{{ label }}</span>
+    <a href="{% url toggle_all_url %}" class="btn btn-sm btn-light fw-bold">
+      {% firstof users.0.is_active as is_on %}
+      {% if is_on %}Deactivate All{% else %}Activate All{% endif %}
+    </a>
+  </div>
+
+  <div class="card-body p-3">
+    {# optional filters #}
+    {% for spec in filter_label_list|default_if_none:""|split:", " %}
+      {% with parts=spec|split:":" %}
+        <input type="text" class="form-control mb-2 filter-input"
+               placeholder="Filter by {{ parts.0 }}"
+               onkeyup="filterTable('{{ label|slugify }}Filter{{ forloop.counter }}',
+                                    '{{ label|slugify }}Table',
+                                    {{ parts.1 }})"
+               id="{{ label|slugify }}Filter{{ forloop.counter }}">
+      {% endwith %}
+    {% endfor %}
+
+    <div class="table-responsive">
+      <table id="{{ label|slugify }}Table" class="table table-hover">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Username</th><th>Password</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              {% if u.student %}{{ u.student }}{% elif u.staff %}{{ u.staff }}{% else %}{{ u }}{% endif %}
+            </td>
+            <td>{{ u.username }}</td>
+            <td><input type="password" disabled value="••••••" class="pass-input"></td>
+            <td class="d-flex gap-1">
+              <a href="{% url update_url u.pk %}" class="btn btn-primary btn-sm">✏️</a>
+              <a href="{% url delete_url u.pk %}" class="btn btn-danger  btn-sm">🗑️</a>
+              <a href="{% url toggle_url u.pk %}"
+                 class="btn btn-sm {% if u.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                 {% if u.is_active %}🚫{% else %}✅{% endif %}
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-end fw-bold mb-0">
+      Total: {{ users|length }}
+    </p>
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,18 @@
+{% extends "parents/parent_base.html" %}
+
+{% block content %}
+<h1>Student Details</h1>
+<p>Name: {{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</p>
+<p>Registration Number: {{ student.registration_number }}</p>
+<p>Class: {{ student.current_class }}</p>
+<p>Gender: {{ student.gender }}</p>
+<p>Date of Birth: {{ student.date_of_birth }}</p>
+<p>Date of Admission: {{ student.date_of_admission }}</p>
+
+<h2>Payments</h2>
+<ul>
+    {% for payment in payments %}
+        <li>{{ payment.date }} - {{ payment.amount }} - {{ payment.status }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

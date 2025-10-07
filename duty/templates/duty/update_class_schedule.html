@@ -1,0 +1,256 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f0f4f8;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+
+    h2 {
+        color: #007aff;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        background-color: #f0f4f8;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .formset-container {
+        padding: 15px;
+        border-radius: 12px;
+        background-color: #f8fbff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .field-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        color: #007aff;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    input, select, .form-control {
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #d1d1d1;
+        background-color: #f9f9f9;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .subject-field, .staff-field, .description-field {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .delete-checkbox {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .delete-checkbox label {
+        font-size: 14px;
+        color: #ff3b30;
+        font-weight: 600;
+        margin-right: 5px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 20px;
+        cursor: pointer;
+        text-align: center;
+        border: none;
+        transition: background-color 0.3s;
+        color: #ffffff;
+    }
+
+    .btn-primary {
+        background-color: #34c759;
+    }
+
+    .btn-primary:hover {
+        background-color: #28a745;
+    }
+
+    .btn-secondary {
+        background-color: #007aff;
+        color: #ffffff;
+        margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #005bb5;
+    }
+
+    #add-more-fields {
+        background-color: #5856d6;
+    }
+
+    #add-more-fields:hover {
+        background-color: #4b45c6;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2>Update Schedule for 
+        {% if class_schedule %}
+            {{ class_schedule.student_class }}
+        {% else %}
+            Class
+        {% endif %}
+        on {{ daily_schedule.day }}
+    </h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ formset.management_form }}
+        <div id="formset-container" class="formset-container">
+            {% for form in formset %}
+                <div class="form-row">
+                    <div class="field-group">
+                        {{ form.start_time.label_tag }} {{ form.start_time }}
+                    </div>
+                    <div class="field-group">
+                        {{ form.end_time.label_tag }} {{ form.end_time }}
+                    </div>
+                    <div class="field-group">
+                        {{ form.activity_type.label_tag }} {{ form.activity_type }}
+                    </div>
+                    <div class="field-group subject-field">
+                        {{ form.subject.label_tag }} {{ form.subject }}
+                    </div>
+                    <div class="field-group staff-field">
+                        {{ form.staff.label_tag }} {{ form.staff }}
+                    </div>
+                    <div class="field-group description-field">
+                        {{ form.description.label_tag }} {{ form.description }}
+                    </div>
+                    
+                    <div class="delete-checkbox">
+                        <label for="{{ form.prefix }}-DELETE">Delete:</label>
+                        {{ form.DELETE }}
+                    </div>
+                    
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-secondary mt-3" id="add-more-fields">+ Add More Schedule</button>
+        <button type="submit" class="btn btn-primary mt-3">Update Schedule</button>
+        <a href="{% url 'daily-schedule-list' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const formsetContainer = document.getElementById("formset-container");
+    const addMoreFieldsButton = document.getElementById("add-more-fields");
+    const totalFormsInput = document.querySelector('input[name="{{ formset.prefix }}-TOTAL_FORMS"]');
+
+    // Initialize show/hide logic on all activity type fields
+    function initializeFieldToggles(container) {
+        container.querySelectorAll('.activity-select').forEach(activitySelect => {
+            toggleFields(activitySelect);
+            activitySelect.addEventListener("change", function() {
+                toggleFields(this);
+            });
+        });
+    }
+
+    // Show/hide fields based on the activity type selected
+    function toggleFields(activitySelect) {
+        const parentForm = activitySelect.closest('.form-row');
+        const subjectField = parentForm.querySelector('.subject-field');
+        const staffField = parentForm.querySelector('.staff-field');
+        const descriptionField = parentForm.querySelector('.description-field');
+
+        // Reset visibility
+        subjectField.style.display = "none";
+        staffField.style.display = "none";
+        descriptionField.style.display = "none";
+
+        // Show relevant fields
+        if (activitySelect.value === "study") {
+            subjectField.style.display = "block";
+            staffField.style.display = "block";
+        } else if (activitySelect.value === "event") {
+            descriptionField.style.display = "block";
+        }
+    }
+
+    // Add more fields
+    addMoreFieldsButton.addEventListener("click", function() {
+        const currentFormCount = parseInt(totalFormsInput.value);
+        const newFormTemplate = formsetContainer.children[0].cloneNode(true);
+
+        newFormTemplate.querySelectorAll("input, select, textarea, label").forEach(element => {
+            if (element.name) {
+                element.name = element.name.replace(`-0-`, `-${currentFormCount}-`);
+            }
+            if (element.id) {
+                element.id = element.id.replace(`-0-`, `-${currentFormCount}-`);
+            }
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.value = "";
+            } else if (element.tagName === 'SELECT') {
+                element.selectedIndex = 0;
+            }
+        });
+
+        // Append the new form template to the container
+        formsetContainer.appendChild(newFormTemplate);
+
+        // Update total form count
+        totalFormsInput.value = currentFormCount + 1;
+
+        // Reinitialize the show/hide functionality for new form
+        initializeFieldToggles(newFormTemplate);
+    });
+
+    // Initialize show/hide functionality for existing forms
+    initializeFieldToggles(formsetContainer);
+});
+</script>
+{% endblock %}

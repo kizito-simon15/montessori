@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}✉️ Send SMS{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --clr-bg:#f1f5f9;        --clr-card:#ffffff40;     --clr-primary:#6366f1;
+  --clr-secondary:#0ea5e9;  --clr-success:#22c55e;   --clr-danger:#ef4444;
+  --radius:18px;           --blur:14px;             --shadow:0 8px 32px rgba(0,0,0,.15);
+}
+html,body{margin:0;background:var(--clr-bg);font-family:Inter,sans-serif;font-size:15px}
+
+.title-section{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  padding:2rem 1rem;color:#fff;text-align:center;border-radius:0 0 28px 28px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.title-section::after{content:"";position:absolute;inset:0;background:inherit;opacity:.35;filter:blur(60px)}
+.title-section h2{display:flex;gap:.6rem;align-items:center;justify-content:center;
+  font-size:clamp(1.8rem,5vw,2.4rem);font-weight:800;position:relative;z-index:1}
+
+/* form card — now full-width with smaller padding */
+.form-card{width:100%;max-width:1100px;margin:-58px auto 2rem;padding:1.5rem 1.2rem;
+  border-radius:var(--radius);background:var(--clr-card);backdrop-filter:blur(var(--blur));
+  box-shadow:var(--shadow)}
+@media(max-width:600px){.form-card{padding:1.2rem 1rem;margin-top:-52px}}
+
+.form-card label{font-weight:600;margin-bottom:.35rem}
+
+/* solid white inputs for clarity */
+.form-control,.form-select{border:none;border-radius:25px;padding:.7rem 1.1rem;font-weight:600;
+  background:#ffffffee;color:#111}
+.form-control:focus,.form-select:focus{outline:2px solid var(--clr-primary)}
+
+.btn-main{display:inline-flex;gap:.5rem;align-items:center;padding:.65rem 1.6rem;border:none;border-radius:30px;
+  font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  box-shadow:var(--shadow);backdrop-filter:blur(var(--blur));transition:.25s}
+.btn-main:hover{filter:brightness(1.07)}
+.table-wrap{overflow-x:auto;border-radius:var(--radius);margin-top:1rem}
+.custom-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem}
+.custom-table thead{background:linear-gradient(135deg,var(--clr-success),var(--clr-secondary));color:#fff}
+.custom-table th,.custom-table td{white-space:nowrap;padding:.7rem 1rem}
+.custom-table tbody tr:nth-child(even){background:#ffffff38}
+.custom-table tbody tr:hover{background:#0ea5e93b}
+.select-all-icon{cursor:pointer;font-size:1.2rem;color:var(--clr-primary)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="title-section"><h2>✉️ Send SMS</h2></div>
+
+<div class="form-card">
+  <form method="post" action="{% url 'send_sms_form' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="message">📨 Message</label>
+      <textarea id="message" name="message" rows="4" class="form-control" required></textarea>
+      <div class="invalid-feedback">Please enter a message.</div>
+    </div>
+
+    <div class="mb-4">
+      <label for="recipient_type">👥 Recipient Type</label>
+      <select id="recipient_type" name="recipient_type" class="form-select" required onchange="toggleRecipients(this.value)">
+        <option value="">Choose…</option>
+        <option value="students">Parents / Guardians</option>
+        <option value="staff">Staff</option>
+      </select>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="student_filters" class="row g-3 mb-3" style="display:none;">
+      <div class="col-md-6">
+        <label>🔍 Student Name</label>
+        <input type="text" id="student_name_filter" class="form-control" placeholder="Search name…"
+               onkeyup="filterTable('student_name_filter','student_table')">
+      </div>
+      <div class="col-md-6">
+        <label>🏷️ Class</label>
+        <select id="student_class_filter" class="form-select"
+                onchange="filterTable('student_class_filter','student_table')">
+          <option value="">All Classes</option>
+          {% for cls in classes %}
+            <option value="{{ cls.name }}">{{ cls.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div id="student_recipients" style="display:none;">
+      <label class="fw-bold mb-2">🎓 Parents / Guardians</label>
+      <div class="table-wrap">
+        <table id="student_table" class="custom-table">
+          <thead>
+            <tr>
+              <th><i class="fas fa-check-square select-all-icon" onclick="selectAll('student_recipients_check')"></i></th>
+              <th>Name</th><th>Class</th><th>Guardian 1</th><th>Guardian 2</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for stu in students %}
+              <tr>
+                <td><input type="checkbox" name="student_recipients" value="{{ stu.id }}" class="student_recipients_check"></td>
+                <td>{{ stu.firstname }} {{ stu.middle_name }} {{ stu.surname }}</td>
+                <td>{{ stu.current_class.name|default:"—" }}</td>
+                <td>{{ stu.guardian1_mobile_number }}</td>
+                <td>{{ stu.guardian2_mobile_number }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STAFF -->
+    <div id="staff_filters" class="mb-3" style="display:none;">
+      <label>🔍 Staff Name</label>
+      <input type="text" id="staff_name_filter" class="form-control" placeholder="Search…"
+             onkeyup="filterTable('staff_name_filter','staff_table')">
+    </div>
+
+    <div id="staff_recipients" style="display:none;">
+      <label class="fw-bold mb-2">🧑‍💼 Staff</label>
+      <div class="table-wrap">
+        <table id="staff_table" class="custom-table">
+          <thead>
+            <tr>
+              <th><i class="fas fa-check-square select-all-icon" onclick="selectAll('staff_recipients_check')"></i></th>
+              <th>Name</th><th>Mobile</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in staff %}
+              <tr>
+                <td><input type="checkbox" name="staff_recipients" value="{{ s.id }}" class="staff_recipients_check"></td>
+                <td>{{ s.firstname }} {{ s.middle_name }} {{ s.surname }}</td>
+                <td>{{ s.mobile_number }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- buttons -->
+    <div class="d-flex gap-3 justify-content-center mt-4">
+      <button type="submit" class="btn-main">📨 Send SMS</button>
+      <a href="{% url 'sms_history' %}" class="btn-main" style="background:linear-gradient(135deg,#22c55e,#4ade80)">📜 SMS History</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<script>
+function toggleRecipients(t){const s=t==='students',st=t==='staff';
+  document.getElementById('student_filters').style.display=s?'flex':'none';
+  document.getElementById('student_recipients').style.display=s?'block':'none';
+  document.getElementById('staff_filters').style.display=st?'block':'none';
+  document.getElementById('staff_recipients').style.display=st?'block':'none';}
+
+function selectAll(c){document.querySelectorAll('.'+c).forEach(cb=>cb.checked=!cb.checked);}
+
+function filterTable(inputId,tableId){
+  const term=document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#'+tableId+' tbody tr').forEach(r=>{
+    r.style.display=r.textContent.toLowerCase().includes(term)?'':'none';
+  });
+}
+
+(function(){
+  document.querySelectorAll('.needs-validation').forEach(f=>{
+    f.addEventListener('submit',e=>{
+      if(!f.checkValidity()){e.preventDefault();e.stopPropagation();}
+      f.classList.add('was-validated');
+    });
+  });
+})();
+</script>
+{% endblock %}

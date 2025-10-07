@@ -1,0 +1,161 @@
+<!-- management_home.html -->
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h1 class="text-center mb-5">📱 Management Dashboard</h1>
+  <div class="row">
+    <!-- Sessions -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #a8edea, #fed6e3);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Years</h5>
+          <p class="card-text">Manage years for your school.</p>
+          <a href="{% url 'sessions' %}" class="btn btn-light">
+            <i class="fas fa-calendar-alt"></i> View years
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #fad0c4, #ffd1ff);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Terms</h5>
+          <p class="card-text">Manage academic terms.</p>
+          <a href="{% url 'terms' %}" class="btn btn-light">
+            <i class="fas fa-book-open"></i> View Terms
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exams -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Exams</h5>
+          <p class="card-text">Manage examinations.</p>
+          <a href="{% url 'exams' %}" class="btn btn-light">
+            <i class="fas fa-poll"></i> View Exams
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Installations -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #b3ffab, #12fff7);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Installations</h5>
+          <p class="card-text">Manage installations.</p>
+          <a href="{% url 'installs' %}" class="btn btn-light">
+            <i class="fas fa-tools"></i> View Installations
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classes -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #f6d365, #fda085);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Classes</h5>
+          <p class="card-text">Manage classes and sections.</p>
+          <a href="{% url 'classes' %}" class="btn btn-light">
+            <i class="fas fa-chalkboard-teacher"></i> View Classes
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subjects -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #f093fb, #f5576c);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Subjects</h5>
+          <p class="card-text">Manage subjects and courses.</p>
+          <a href="{% url 'subjects' %}" class="btn btn-light">
+            <i class="fas fa-book"></i> View Subjects
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Signatures -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #c2e9fb, #a1c4fd);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Signatures</h5>
+          <p class="card-text">Manage digital signatures.</p>
+          <a href="{% url 'signature_list' %}" class="btn btn-light">
+            <i class="fas fa-signature"></i> View Signatures
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Move Students -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #f9cada, #fad0c4);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Move Students</h5>
+          <p class="card-text">Move students between classes.</p>
+          <a href="{% url 'move_students' %}" class="btn btn-light">
+            <i class="fas fa-exchange-alt"></i> Move Students
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Students -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow"
+           style="border-radius: 15px; background: linear-gradient(135deg, #c2ffd8, #465efb);
+                  transition: transform 0.3s ease;">
+        <div class="card-body text-center" style="color: #333;">
+          <h5 class="card-title">Delete Students</h5>
+          <p class="card-text">Remove students from records.</p>
+          <a href="{% url 'delete_students' %}" class="btn btn-light">
+            <i class="fas fa-trash-alt"></i> Delete Students
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<style>
+  body {
+    background-color: #fef9d7; /* or keep the gradient from base if you prefer */
+  }
+  .card:hover {
+    transform: translateY(-5px); /* subtle hover lift */
+  }
+</style>
+{% endblock %}

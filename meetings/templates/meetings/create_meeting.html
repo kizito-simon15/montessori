@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    AOS.init();
+
+    // Function to add a new set of agenda input fields
+    document.getElementById('add-agenda-btn').addEventListener('click', function() {
+      const agendaContainer = document.getElementById('agenda-container');
+      const newAgendaDiv = document.createElement('div');
+      newAgendaDiv.classList.add('agenda-form');
+      newAgendaDiv.innerHTML = `
+        <div class="form-group">
+          <input type="text" name="agenda_description" class="form-control" placeholder="Agenda description">
+        </div>
+        <div class="form-group">
+          <input type="datetime-local" name="agenda_start_time" class="form-control" placeholder="Start time">
+        </div>
+        <div class="form-group">
+          <input type="datetime-local" name="agenda_end_time" class="form-control" placeholder="End time">
+        </div>
+      `;
+      agendaContainer.appendChild(newAgendaDiv);
+    });
+  });
+</script>
+
+<style>
+  /* Styling for iPhone-like user interface */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+  }
+
+  .form-container {
+    max-width: 700px;
+    margin: 50px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  .form-header {
+    text-align: center;
+    color: #007aff;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    color: #555;
+  }
+
+  .form-control {
+    border: 1px solid #e0e7f1;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .btn-primary, .add-agenda-btn {
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    margin-top: 20px;
+  }
+
+  .agenda-form {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e7f1;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+
+  .add-agenda-btn {
+    background-color: #34c759;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .add-agenda-btn:hover {
+    background-color: #28a745;
+  }
+</style>
+
+<div class="form-container" data-aos="fade-up">
+  <h2 class="form-header">Create a New Meeting</h2>
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Meeting fields -->
+    <div class="form-group">
+      {{ meeting_form.title.label_tag }}
+      {{ meeting_form.title }}
+    </div>
+    <div class="form-group">
+      {{ meeting_form.start_time.label_tag }}
+      {{ meeting_form.start_time }}
+    </div>
+    <div class="form-group">
+      {{ meeting_form.end_time.label_tag }}
+      {{ meeting_form.end_time }}
+    </div>
+
+    <h3 class="form-header">Agendas</h3>
+    
+    <div id="agenda-container">
+      <!-- Initial Agenda Form -->
+      <div class="agenda-form">
+        <div class="form-group">
+          <input type="text" name="agenda_description" class="form-control" placeholder="Agenda description">
+        </div>
+        <div class="form-group">
+          <input type="datetime-local" name="agenda_start_time" class="form-control" placeholder="Start time">
+        </div>
+        <div class="form-group">
+          <input type="datetime-local" name="agenda_end_time" class="form-control" placeholder="End time">
+        </div>
+      </div>
+    </div>
+
+    <!-- Button to add a new agenda dynamically -->
+    <button type="button" class="add-agenda-btn" id="add-agenda-btn">+ Add Agenda</button>
+    
+    <!-- Submit button -->
+    <button type="submit" class="btn btn-primary w-100">Create Meeting</button>
+  </form>
+</div>
+{% endblock %}

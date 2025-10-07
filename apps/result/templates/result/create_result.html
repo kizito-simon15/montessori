@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load result_filters %}
+
+{% block content %}
+<h2>Create Results</h2>
+<div class="container mt-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if not students_by_class %}
+        <p class="text-warning">No students available to create results for. Please add students and assign them to classes.</p>
+    {% else %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="class_select" class="form-label">Select Class:</label>
+                <select name="class_select" id="class_select" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Select a Class --</option>
+                    {% for class, students in students_by_class.items %}
+                        <option value="{{ class.id }}" {% if class_select == class.id|stringformat:"s" %}selected{% endif %}>
+                            {{ class.name }} ({{ students|length }} students)
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if class_select %}
+                <div class="mb-3">
+                    <label for="students" class="form-label">Select Students:</label>
+                    <select name="students" id="students" class="form-select" multiple>
+                        {% for student in students_by_class|get_item:class_select %}
+                            <option value="{{ student.id }}">{{ student.firstname }} {{ student.surname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" name="finish" class="btn btn-primary">Finish Selection</button>
+            {% endif %}
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const classSelect = document.getElementById('class_select');
+        const studentsSelect = document.getElementById('students');
+        if (classSelect && studentsSelect) {
+            classSelect.addEventListener('change', function() {
+                if (!this.value) {
+                    studentsSelect.disabled = true;
+                } else {
+                    studentsSelect.disabled = false;
+                }
+            });
+            if (!classSelect.value) {
+                studentsSelect.disabled = true;
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Available Books</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS styles */
+        body {
+            padding-top: 50px;
+            padding-bottom: 20px;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .class-table {
+            margin-bottom: 50px;
+        }
+        .table {
+            transition: transform 0.3s ease-in-out;
+        }
+        .table:hover {
+            transform: scale(1.02);
+        }
+        .button-group {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .button-group a {
+            margin: 0 5px;
+        }
+        .header-magenta {
+            color: magenta;
+        }
+        .sn-gray {
+            color: gray;
+        }
+        .filter-input {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .filter-input input {
+            margin: 0 10px;
+            padding: 10px;
+            width: 200px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: all 0.3s ease-in-out;
+        }
+        .filter-input input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .filter-input input.animate__animated {
+            display: inline-block;
+        }
+        .total-books {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center animate__animated animate__fadeInDown header-magenta">Available Books</h1>
+        <div class="button-group animate__animated animate__fadeInUp">
+            <a href="{% url 'add_book' %}" class="btn btn-success">Add New Book</a>
+            <a href="{% url 'issue_new_book' %}" class="btn btn-deepskyblue" style="background-color: deepskyblue; color: white;">Issue Book to Student</a>
+            <a href="{% url 'issued_students' %}" class="btn btn-darkblue" style="background-color: darkblue; color: white;">Issued Students</a>
+            <a href="{% url 'issue_new_staff' %}" class="btn btn-brown" style="background-color: brown; color: white;">Issue Book to Staff</a>
+            <a href="{% url 'issued_staffs' %}" class="btn btn-primary">Issued Staffs</a>
+        </div>
+        <div class="filter-input animate__animated animate__fadeInUp">
+            <input type="text" id="bookNameFilter" placeholder="Filter by Book Name" onkeyup="filterBooks()">
+            <input type="text" id="categoryFilter" placeholder="Filter by Category" onkeyup="filterBooks()">
+        </div>
+        {% for class_name, books in grouped_books.items %}
+        <div class="class-table animate__animated animate__fadeInUp">
+            <h2 class="text-primary">{{ class_name }}</h2>
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" class="sn-gray">S/N</th>
+                        <th scope="col">Book Name</th>
+                        <th scope="col">Number of Books</th>
+                        <th scope="col">Author</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bookTable{{ forloop.counter }}">
+                    {% for book in books %}
+                    <tr>
+                        <td class="sn-gray">{{ forloop.counter }}</td>
+                        <td class="book-name">{{ book.book_name }}</td>
+                        <td>{{ book.quantity }}</td>
+                        <td>{{ book.author }}</td>
+                        <td class="book-category">{{ book.category }}</td>
+                        <td>{{ book.description }}</td>
+                        <td><a href="{% url 'book_detail' book.id %}" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a></td>
+                        <td>
+                            <a href="{% url 'update_book' book.id %}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'delete_book' book.id %}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="total-books">
+                Total: <span id="totalBooks{{ forloop.counter }}"></span>
+            </div>
+        </div>
+        {% endfor %}
+
+        <h2 class="text-center mt-5">Overall Total Books</h2>
+        <div class="overall-total animate__animated animate__fadeInUp">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="overallTotal"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Bootstrap 5 JavaScript (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript for animations and filtering -->
+    <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+    const tables = document.querySelectorAll('.class-table');
+    const filters = document.querySelectorAll('.filter-input input');
+
+    // Animate tables and filtering fields on page load
+    animateElements(tables, filters);
+
+    // Calculate and display total number of books in each table
+    calculateTotalBooks();
+
+    // Calculate and display overall total number of books
+    calculateOverallTotal();
+});
+
+function animateElements(tables, filters) {
+    // Animate tables
+    tables.forEach((table, index) => {
+        setTimeout(() => {
+            table.classList.add('animate__animated', 'animate__fadeInUp');
+        }, index * 100);
+    });
+
+    // Animate filtering fields
+    filters.forEach((input, index) => {
+        setTimeout(() => {
+            input.classList.add('animate__animated', 'animate__fadeInUp');
+        }, index * 100);
+    });
+}
+
+function calculateTotalBooks() {
+    const tables = document.querySelectorAll('.class-table');
+
+    tables.forEach((table, index) => {
+        const rows = table.querySelectorAll('tbody tr');
+        let total = 0;
+        rows.forEach(row => {
+            total += parseInt(row.querySelector('td:nth-child(3)').textContent);
+        });
+        document.getElementById(`totalBooks${index + 1}`).textContent = total;
+    });
+}
+
+function calculateOverallTotal() {
+    const tables = document.querySelectorAll('.class-table');
+    let overallTotal = 0;
+
+    tables.forEach(table => {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            overallTotal += parseInt(row.querySelector('td:nth-child(3)').textContent);
+        });
+    });
+
+    document.getElementById('overallTotal').textContent = overallTotal;
+}
+
+function filterBooks() {
+    const bookNameFilter = document.getElementById('bookNameFilter').value.toLowerCase();
+    const categoryFilter = document.getElementById('categoryFilter').value.toLowerCase();
+    const tables = document.querySelectorAll('.class-table');
+    let overallFilteredTotal = 0;
+
+    tables.forEach((table, index) => {
+        const rows = table.querySelectorAll('tbody tr');
+        let filteredTotal = 0;
+
+        rows.forEach(row => {
+            const bookName = row.querySelector('.book-name').textContent.toLowerCase();
+            const bookCategory = row.querySelector('.book-category').textContent.toLowerCase();
+
+            if (bookName.includes(bookNameFilter) && bookCategory.includes(categoryFilter)) {
+                row.style.display = '';
+                filteredTotal += parseInt(row.querySelector('td:nth-child(3)').textContent);
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        document.getElementById(`totalBooks${index + 1}`).textContent = filteredTotal;
+        overallFilteredTotal += filteredTotal;
+    });
+
+    // Update overall total with the sum of filtered totals
+    document.getElementById('overallTotal').textContent = overallFilteredTotal;
+}
+    </script>
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</body>
+</html>
+{% endblock content %}

@@ -1,0 +1,132 @@
+{# ──────────────────────────────────────────────────────────────────────
+   Seasonal products  •  revised 08 Jul 2025
+   – shows BOTH bag-level and kilogram-level aggregates
+   – no custom template filters required
+──────────────────────────────────────────────────────────────────────── #}
+{% extends "base.html" %}{% load humanize %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#1e3a8a;--amber:#fbbf24;--rose:#e11d48;--paper:#f1f5f9;
+  --card:#ffffff;--rad:24px;
+}
+html,body{margin:0;background:var(--paper);font-family:Inter,sans-serif;color:#0f172a}
+h2{margin:0;font-size:clamp(1.25rem,4vw,1.55rem);font-weight:700}
+.card{background:var(--card);border-radius:var(--rad);box-shadow:0 6px 18px rgba(0,0,0,.06);
+      opacity:0;transform:translateY(32px);transition:.5s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.header{display:flex;justify-content:space-between;align-items:center;
+        padding:.9rem 1.4rem;border-bottom:1px solid #e2e8f0}
+.kpis{display:flex;flex-wrap:wrap;gap:1rem;padding:.7rem 1.4rem .3rem}
+.kpi{background:linear-gradient(135deg,#818cf8,#1e40af);color:#fff;border-radius:14px;
+     padding:.55rem 1.2rem;flex:1 1 110px;text-align:center}
+.kpi h4{margin:0;font-size:.8rem;font-weight:600;letter-spacing:.1px}
+.kpi p{margin:.1rem 0 0;font-size:1rem;font-weight:700;letter-spacing:.2px}
+.table-box{overflow-x:auto;padding:1rem 1.4rem}
+table{width:100%;min-width:1100px;border-collapse:collapse;font-size:.88rem}
+thead{background:var(--indigo);color:#fff}
+th,td{padding:.48rem .7rem;border-bottom:1px solid #e2e8f0}
+tbody tr:nth-child(odd){background:#f8fafc}
+tbody tr:hover{background:#e2e8f0}
+.text-end{text-align:right}
+.badge{display:inline-block;padding:.15rem .45rem;border-radius:12px;font-size:.7rem;font-weight:600}
+.badge.raw{background:var(--amber);color:#78350f}
+.btn{border:none;border-radius:14px;padding:.35rem .9rem;font-size:.8rem;font-weight:600;
+     cursor:pointer;transition:transform .15s}
+.btn-primary{background:var(--indigo);color:#fff}
+.btn-primary:hover{filter:brightness(.93);transform:translateY(-2px)}
+.btn-danger{background:var(--rose);color:#fff}
+.btn-danger:hover{filter:brightness(.93);transform:translateY(-2px)}
+@media(max-width:680px){
+  .table-box{padding:1rem .7rem}
+  table{font-size:.8rem}
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* slide-in card */
+document.addEventListener("DOMContentLoaded",()=>{
+  const c=document.querySelector(".card");
+  if(c) setTimeout(()=>c.classList.add("show"),80);
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <!-- header -->
+  <div class="header">
+    <h2>🌾 Seasonal Products</h2>
+    <a href="{% url 'seasonalproduct_create' %}" class="btn btn-primary">➕ New</a>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="kpis">
+    <div class="kpi"><h4>Bags purchased</h4><p>{{ total_bags }}</p></div>
+    <div class="kpi" style="background:linear-gradient(135deg,#4ade80,#16a34a)">
+      <h4>Kg purchased</h4><p>{{ total_kg|floatformat:2|intcomma }}</p></div>
+    <div class="kpi" style="background:linear-gradient(135deg,#fbbf24,#eab308)">
+      <h4>Kg processed</h4><p>{{ total_processed|floatformat:2|intcomma }}</p></div>
+    <div class="kpi" style="background:linear-gradient(135deg,#f87171,#e11d48)">
+      <h4>Kg remaining</h4><p>{{ total_remaining|floatformat:2|intcomma }}</p></div>
+  </div>
+
+  <!-- table -->
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Name</th><th>Unit</th>
+          <th class="text-end">Bags</th>
+          <th class="text-end">Kg</th>
+          <th class="text-end">Processed&nbsp;Kg</th>
+          <th class="text-end">Remaining&nbsp;Kg</th>
+          <th class="text-end">Latest&nbsp;Price</th>
+          <th class="text-end">Avg&nbsp;Price</th>
+          <th>Flags</th><th>⚙︎</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for p in rows %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.unit }}</td>
+
+          <td class="text-end">{{ p.bags_total }}</td>
+          <td class="text-end">
+            {% if p.kg_total %}{{ p.kg_total|floatformat:2|intcomma }}{% else %}—{% endif %}
+          </td>
+          <td class="text-end">
+            {% if p.kg_total %}{{ p.kg_processed|floatformat:2|intcomma }}{% else %}—{% endif %}
+          </td>
+          <td class="text-end">
+            {% if p.kg_total %}{{ p.kg_remaining|floatformat:2|intcomma }}{% else %}—{% endif %}
+          </td>
+
+          <td class="text-end">{{ p.latest_price|floatformat:2|intcomma }}</td>
+          <td class="text-end">{{ p.avg_price|floatformat:2|intcomma }}</td>
+
+          <td>
+            {% if not p.processable %}
+              <span class="badge raw">raw</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'seasonalproduct_update' p.pk %}" class="btn btn-primary">✏️</a>
+            <a href="{% url 'seasonalproduct_delete' p.pk %}" class="btn btn-danger">🗑️</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="11">No seasonal products defined yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,343 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="card-header bg-gradient-primary text-white">
+  <div class="card-tools">
+    <button class="btn btn-outline-light btn-sm" onclick="printPage()">Print</button>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<style>
+  /* General Styling */
+  .filter-select, .filter-input {
+    border-radius: 15px;
+    border: 2px solid #6c63ff; /* Vibrant Indigo */
+    color: #6c63ff;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    background-color: #f4f4f4;
+  }
+
+  .table thead th {
+    background-color: #6c63ff; /* Indigo header */
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: bold;
+    border-radius: 15px 15px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .table tbody td {
+    background-color: #ffffff;
+    border-radius: 10px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    color: #333;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .new-comment {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 20px;
+    margin-left: 10px;
+  }
+
+  .thumb-icon {
+    cursor: pointer;
+    color: #6c63ff;
+    margin-left: 10px;
+  }
+
+  .blue-tick {
+    color: blue;
+    margin-left: 10px;
+  }
+
+  .comment-dates, .answer-dates {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+  }
+
+  .answer-form {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(108, 99, 255, 0.2); /* Indigo shadow */
+  }
+
+  .audio-recorder {
+    margin-top: 10px;
+  }
+
+  .record-btn {
+    margin-top: 5px;
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .record-btn:hover {
+    background-color: #5a56d6;
+  }
+
+  .recording-indicator {
+    color: red;
+    font-weight: bold;
+    display: none;
+  }
+
+  .audio-upload-input {
+    margin-top: 10px;
+  }
+
+  .audio-preview {
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* Add some animation effects */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .container {
+    animation: fadeIn 1s ease-in-out;
+    background: #f4f4f4; /* Light gray background */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <h2 class="text-center mb-4">Student Invoice Comments</h2>
+  
+  <div class="filters mb-3">
+    <div class="row justify-content-center">
+      <div class="col-md-4 mb-2">
+        <select id="filterSession" class="form-control filter-select">
+          <option value="">Select Session</option>
+          {% for session in sessions %}
+          <option value="{{ session.id }}" {% if session.id|stringformat:"s" == current_session|stringformat:"s" %}selected{% endif %}>{{ session.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4 mb-2">
+        <input type="text" id="studentFilter" class="form-control filter-input" placeholder="Filter by student name...">
+      </div>
+      <div class="col-md-4 mb-2">
+        <input type="text" id="classFilter" class="form-control filter-input" placeholder="Filter by class...">
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive" data-aos="fade-up" data-aos-duration="1000">
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Student Name</th>
+          <th>Student Class</th>
+          <th>Comments</th>
+          <th>Bursor Answer</th>
+        </tr>
+      </thead>
+      <tbody id="commentsTableBody">
+        {% for comment in invoice_comments %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td class="student-name">{{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</td>
+          <td class="student-class">{{ comment.student.current_class.name }}</td>
+          <td>
+            <p>{{ comment.comment }}</p>
+            {% if comment.audio_comment %}
+              <audio controls class="audio-player">
+                <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+            {% endif %}
+            <div class="comment-dates">
+              <span>Commented on: {{ comment.date_commented|date:"d M Y, H:i" }}</span>
+              <span>Updated on: {{ comment.date_updated_comments|date:"d M Y, H:i" }}</span>
+            </div>
+            {% if not comment.satisfied %}
+            <span class="new-comment">N</span>
+            <a href="{% url 'mark_comment_as_satisfied' comment.id %}" class="thumb-icon">
+              <i class="fas fa-thumbs-up"></i>
+            </a>
+            {% else %}
+            <span class="blue-tick">
+              <i class="fas fa-check-circle"></i>
+            </span>
+            {% endif %}
+          </td>
+          <td>
+            {% if comment.bursor_answer %}
+              <p>{{ comment.bursor_answer.answer }}</p>
+              {% if comment.bursor_answer.audio_answer %}
+              <audio controls class="audio-player">
+                <source src="{{ comment.bursor_answer.audio_answer.url }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+              {% endif %}
+              <div class="answer-dates">
+                <span>Answered on: {{ comment.bursor_answer.date_commented|date:"d M Y, H:i" }}</span>
+                <span>Last updated on: {{ comment.bursor_answer.date_updated_comments|date:"d M Y, H:i" }}</span>
+              </div>
+              <button type="button" class="btn btn-warning answer-update-btn show-answer-form">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <form method="post" enctype="multipart/form-data" action="{% url 'save_bursor_answer' %}" class="answer-form mt-2" style="display: none;">
+                {% csrf_token %}
+                <textarea name="answer" class="form-control" rows="3">{{ comment.bursor_answer.answer }}</textarea>
+                <div class="audio-recorder mt-2">
+                  <button type="button" class="record-btn" onclick="startRecording(this)">Start Recording</button>
+                  <button type="button" class="record-btn" style="display:none;" onclick="stopRecording(this)">Stop Recording</button>
+                  <span class="recording-indicator">Recording...</span>
+                  <audio id="recorded-audio" controls class="audio-preview"></audio>
+                  <input type="file" name="audio_answer" accept="audio/*" class="form-control audio-upload-input mt-2">
+                </div>
+                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                <button type="submit" class="btn btn-warning">
+                  <i class="fas fa-save"></i> Save
+                </button>
+              </form>
+            {% else %}
+              <form method="post" enctype="multipart/form-data" action="{% url 'save_bursor_answer' %}" class="answer-form">
+                {% csrf_token %}
+                <textarea name="answer" class="form-control" rows="3"></textarea>
+                <div class="audio-recorder mt-2">
+                  <button type="button" class="record-btn" onclick="startRecording(this)">Start Recording</button>
+                  <button type="button" class="record-btn" style="display:none;" onclick="stopRecording(this)">Stop Recording</button>
+                  <span class="recording-indicator">Recording...</span>
+                  <audio id="recorded-audio" controls class="audio-preview"></audio>
+                  <input type="file" name="audio_answer" accept="audio/*" class="form-control audio-upload-input mt-2">
+                </div>
+                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Save
+                </button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let mediaRecorder;
+  let audioChunks = [];
+
+  function startRecording(button) {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+
+        audioChunks = [];
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audioPlayer = button.parentElement.querySelector('.audio-preview');
+          audioPlayer.src = audioUrl;
+          audioPlayer.style.display = 'block';
+
+          const fileInput = button.parentElement.querySelector('input[type="file"]');
+          const audioFile = new File([audioBlob], "recorded-audio.mp3", {
+            type: 'audio/mpeg',
+            lastModified: Date.now()
+          });
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(audioFile);
+          fileInput.files = dataTransfer.files;
+
+          button.style.display = 'inline-block';
+          button.nextElementSibling.style.display = 'none';
+          button.parentElement.querySelector('.recording-indicator').style.display = 'none';
+        });
+
+        button.style.display = 'none';
+        button.nextElementSibling.style.display = 'inline-block';
+        button.parentElement.querySelector('.recording-indicator').style.display = 'inline';
+      })
+      .catch(error => {
+        console.error("Error accessing microphone: ", error);
+        alert("Microphone access is required to record audio.");
+      });
+  }
+
+  function stopRecording(button) {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.show-answer-form').forEach(function(button) {
+      button.addEventListener('click', function() {
+        const form = this.nextElementSibling;
+        form.style.display = 'block';
+        this.style.display = 'none';
+      });
+    });
+
+    function filterCommentsBySession() {
+      const sessionId = document.getElementById('filterSession').value;
+      const url = "{% url 'bursor_comments' %}?session_id=" + sessionId;
+      window.location.href = url;
+    }
+
+    function filterComments() {
+      const studentFilter = document.getElementById('studentFilter').value.toLowerCase();
+      const classFilter = document.getElementById('classFilter').value.toLowerCase();
+      const rows = document.querySelectorAll('#commentsTableBody tr');
+
+      rows.forEach(row => {
+        const studentName = row.querySelector('.student-name').textContent.toLowerCase();
+        const studentClass = row.querySelector('.student-class').textContent.toLowerCase();
+        if (studentName.includes(studentFilter) && studentClass.includes(classFilter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    document.getElementById('filterSession').addEventListener('change', filterCommentsBySession);
+    document.getElementById('studentFilter').addEventListener('input', filterComments);
+    document.getElementById('classFilter').addEventListener('input', filterComments);
+  });
+</script>
+
+{% endblock content %}

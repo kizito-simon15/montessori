@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<link href="{% static 'css/aos.css' %}" rel="stylesheet">
+<script src="{% static 'js/aos.js' %}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 800,
+            once: true,
+        });
+    });
+</script>
+
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .heading-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        color: #007aff;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .btn-create-meeting {
+        background-color: #34c759;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 0.9em;
+        border-radius: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-create-meeting:hover {
+        background-color: #28a745;
+        transform: scale(1.05);
+    }
+
+    .meeting-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .meeting-item {
+        background-color: #f8f9fa;
+        margin: 15px 0;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        position: relative;
+    }
+
+    .meeting-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .meeting-title {
+        font-size: 1.2em;
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .meeting-time {
+        color: #555;
+        margin: 5px 0;
+    }
+
+    .agenda-list {
+        margin-top: 10px;
+        padding-left: 20px;
+    }
+
+    .agenda-item {
+        color: #333;
+        font-size: 0.95em;
+        margin: 5px 0;
+    }
+
+    .meeting-buttons {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        font-size: 0.9em;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+        padding: 8px 12px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #005bb5;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: #fff;
+    }
+
+    .btn-info:hover {
+        background-color: #117a8b;
+    }
+
+    .no-meetings {
+        color: #777;
+        font-style: italic;
+        text-align: center;
+    }
+</style>
+
+<div class="container" data-aos="fade-up">
+    <div class="heading-container">
+        <h2>Meetings</h2>
+        <a href="{% url 'create_meeting' %}" class="btn-create-meeting">+ Create Meeting</a>
+    </div>
+
+    <!-- Display Upcoming Meetings -->
+    <h3>Upcoming Meetings</h3>
+    {% if user_upcoming_meetings %}
+        <ul class="meeting-list">
+            {% for meeting in user_upcoming_meetings %}
+                <li class="meeting-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:"100" }}">
+                    <span class="meeting-title">{{ meeting.title }}</span>
+                    <div class="meeting-time">Starts at: {{ meeting.start_time|date:"F d, Y H:i" }}</div>
+                    <div class="meeting-time">Ends at: {{ meeting.end_time|date:"F d, Y H:i" }}</div>
+                    
+                    <h4>Agendas:</h4>
+                    <ul class="agenda-list">
+                        {% for agenda in meeting.agendas.all %}
+                            <li class="agenda-item">
+                                <strong>{{ agenda.description }}</strong>
+                                <div>Start: {{ agenda.start_time|date:"H:i, F d, Y" }}</div>
+                                <div>End: {{ agenda.end_time|date:"H:i, F d, Y" }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="meeting-buttons">
+                        <a href="{% url 'join_meeting' meeting.id %}" class="btn btn-primary">Join</a>
+                        <a href="{% url 'invite_participants' meeting.id %}" class="btn btn-info">
+                            <i class="fas fa-user-plus"></i> Invite Participants
+                        </a>
+                        <a href="{% url 'meeting_detail' meeting.id %}" class="btn btn-info">
+                            <i class="fas fa-info-circle"></i> View Details
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-meetings">No upcoming meetings.</p>
+    {% endif %}
+
+    <!-- Display Ongoing Meetings -->
+    <h3>Ongoing Meetings</h3>
+    {% if user_ongoing_meetings %}
+        <ul class="meeting-list">
+            {% for meeting in user_ongoing_meetings %}
+                <li class="meeting-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:"100" }}">
+                    <span class="meeting-title">{{ meeting.title }}</span>
+                    <div class="meeting-time">Ends at: {{ meeting.end_time|date:"F d, Y H:i" }}</div>
+                    
+                    <h4>Agendas:</h4>
+                    <ul class="agenda-list">
+                        {% for agenda in meeting.agendas.all %}
+                            <li class="agenda-item">
+                                <strong>{{ agenda.description }}</strong>
+                                <div>Start: {{ agenda.start_time|date:"H:i, F d, Y" }}</div>
+                                <div>End: {{ agenda.end_time|date:"H:i, F d, Y" }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="meeting-buttons">
+                        <a href="{% url 'join_meeting' meeting.id %}" class="btn btn-success">Join Now</a>
+                        <a href="{% url 'invite_participants' meeting.id %}" class="btn btn-info">
+                            <i class="fas fa-user-plus"></i> Invite Participants
+                        </a>
+                        <a href="{% url 'meeting_detail' meeting.id %}" class="btn btn-info">
+                            <i class="fas fa-info-circle"></i> View Details
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-meetings">No ongoing meetings at the moment.</p>
+    {% endif %}
+
+    <!-- Display Past Meetings -->
+    <h3>Past Meetings</h3>
+    {% if user_past_meetings %}
+        <ul class="meeting-list">
+            {% for meeting in user_past_meetings %}
+                <li class="meeting-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:"100" }}">
+                    <span class="meeting-title">{{ meeting.title }}</span>
+                    <div class="meeting-time">Ended on: {{ meeting.end_time|date:"F d, Y H:i" }}</div>
+                    
+                    <h4>Agendas:</h4>
+                    <ul class="agenda-list">
+                        {% for agenda in meeting.agendas.all %}
+                            <li class="agenda-item">
+                                <strong>{{ agenda.description }}</strong>
+                                <div>Start: {{ agenda.start_time|date:"H:i, F d, Y" }}</div>
+                                <div>End: {{ agenda.end_time|date:"H:i, F d, Y" }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-meetings">No past meetings.</p>
+    {% endif %}
+</div>
+{% endblock %}

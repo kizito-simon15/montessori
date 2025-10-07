@@ -1,0 +1,19 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load humanize %} <!-- Load the humanize template tag library -->
+
+{% block title %}Confirm Delete Expenditure Invoice{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Confirm Delete Expenditure Invoice</h1>
+    <p>Are you sure you want to delete this expenditure invoice?</p>
+    <p>Date: {{ invoice.date }}</p>
+    <p>Depositor Name: {{ invoice.depositor_name }}</p>
+    <p>Initial Balance: ${{ invoice.initial_balance|intcomma }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'bursor-expenditure-invoice-list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock content %}

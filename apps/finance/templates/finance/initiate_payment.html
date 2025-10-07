@@ -1,0 +1,223 @@
+{% extends "parents/parent_base.html" %}
+{% load widget_tweaks humanize %}
+
+{% block content %}
+<style>
+:root {
+    --primary: #1e3a8a;
+    --secondary: #d97706;
+    --sidebar-bg: #2e1065;
+    --sidebar-hover: #a78bfa;
+    --sidebar-active: #6d28d9;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --info: #0284c7;
+}
+
+body {
+    background: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.title-section {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    color: #fff;
+    border-radius: 0 0 15px 15px;
+    text-align: center;
+    animation: slideInDown 0.5s ease;
+    padding: 1rem;
+}
+
+.title-section h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: clamp(1.5rem, 5vw, 1.8rem);
+    font-weight: 700;
+    margin: 0;
+}
+
+.title-section p {
+    font-size: clamp(0.85rem, 4vw, 0.95rem);
+    opacity: 0.9;
+    margin: 0.5rem 0 0;
+}
+
+.payment-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 25px;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    background: #f9fafb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    outline: none;
+}
+
+.form-control:disabled {
+    background: #e5e7eb;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    border-radius: 25px;
+    font-weight: 600;
+    background: var(--primary);
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.text-danger {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: var(--danger);
+    margin-top: 0.25rem;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 576px) {
+    .payment-form { padding: 1rem; }
+    .form-control, .form-select { font-size: clamp(0.75rem, 2.5vw, 0.85rem); }
+    .btn-primary { font-size: clamp(0.8rem, 3vw, 0.9rem); padding: 0.6rem 1.2rem; }
+}
+</style>
+
+<div class="title-section" data-aos="fade-up">
+    <h2>💳 Initiate School Fees Payment</h2>
+    <p>Confirm payment details for your child's school fees using NMB or CRDB bank.</p>
+</div>
+
+<div class="payment-form" data-aos="fade-up" data-aos-delay="200">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-3" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="paymentForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-user"></i> Student Name</label>
+            <input type="text" class="form-control" value="{{ user.student.firstname }} {{ user.student.surname }}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-file-invoice"></i> Invoice</label>
+            <select name="invoice" class="form-select form-control" required>
+                <option value="">Select Invoice</option>
+                {% for invoice in invoices %}
+                    <option value="{{ invoice.id }}">{{ invoice.installment.name }} - {{ invoice.total_amount_expected|intcomma }} (Balance: {{ invoice.balance|intcomma }})</option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">Choose the invoice to pay.</small>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-money-bill-wave"></i> Amount Paid</label>
+            <input type="number" name="amount_paid" class="form-control" id="id_amount_paid" required min="0" placeholder="e.g. 50000">
+            <small class="form-text text-muted">Enter the amount paid (no commas).</small>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-calendar-alt"></i> Date Paid</label>
+            <input type="date" name="date_paid" class="form-control" required>
+            <small class="form-text text-muted">Specify the payment date.</small>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-credit-card"></i> Payment Method</label>
+            <select name="payment_method" class="form-select form-control" required>
+                <option value="NMB_BANK">NMB Bank</option>
+                <option value="CRDB_BANK">CRDB Bank</option>
+            </select>
+            <small class="form-text text-muted">Select the bank used for payment.</small>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-receipt"></i> Transaction ID</label>
+            <input type="text" name="transaction_id" class="form-control" required placeholder="e.g. TXN123456789">
+            <small class="form-text text-muted">Enter the bank transaction ID for verification.</small>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label"><i class="fas fa-comment"></i> Comment (Optional)</label>
+            <input type="text" name="comment" class="form-control" placeholder="Additional notes">
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn-primary"><i class="fas fa-check"></i> Confirm Payment</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 1000, once: true });
+
+function formatNumberWithCommas(x) {
+    if (!x) return '';
+    x = x.replace(/,/g, '');
+    return x.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+const amountField = document.getElementById('id_amount_paid');
+if (amountField) {
+    amountField.addEventListener('input', function() {
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        const formatted = formatNumberWithCommas(this.value);
+        this.value = formatted;
+        this.setSelectionRange(start, end);
+    });
+
+    const paymentForm = document.getElementById('paymentForm');
+    paymentForm.addEventListener('submit', function() {
+        amountField.value = amountField.value.replace(/,/g, '');
+    });
+}
+</script>
+{% endblock %}

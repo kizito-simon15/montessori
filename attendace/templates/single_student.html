@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Single Student Attendance</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .attendance-table {
+            width: 100%;
+            border: 2px solid #000;
+            animation: borderAnimation 3s infinite;
+        }
+        .attendance-table th, .attendance-table td {
+            border: 1px solid #000;
+            text-align: center;
+        }
+        .present {
+            color: green;
+        }
+        .absent {
+            color: red;
+        }
+        .permission {
+            color: blue;
+        }
+        /* Style for the permission circle */
+        .permission-circle {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: blue;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+        }
+        /* Custom style for h2 */
+        h2 {
+            color: purple;
+            animation: fadeInDown 1s ease-in-out;
+        }
+        /* Custom style for current session and current term */
+        .current-session, .current-term {
+            color: red;
+            animation: fadeInLeft 1s ease-in-out;
+        }
+        /* Custom style for Serial Number header and its generated numbers */
+        .serial-header, .serial-number {
+            color: gray;
+            animation: fadeInRight 1s ease-in-out;
+        }
+        /* Custom style for Attendance Date header and its displayed dates */
+        .attendance-date-header, .attendance-date {
+            color: deepskyblue;
+            animation: fadeInUp 1s ease-in-out;
+        }
+        /* Custom style for table headers */
+        .present-header {
+            color: green;
+            animation: fadeInDown 1s ease-in-out;
+        }
+        .absent-header {
+            color: red;
+            animation: fadeInRight 1s ease-in-out;
+        }
+        .permission-header {
+            color: blue;
+            animation: fadeInLeft 1s ease-in-out;
+        }
+        /* Additional CSS for border color animation */
+        @keyframes borderAnimation {
+            0% { border-color: red; }
+            33.33% { border-color: green; }
+            66.66% { border-color: blue; }
+            100% { border-color: red; }
+        }
+        /* Custom CSS animations */
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes fadeInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2 class="text-center">Attendance for {{ student.firstname }} {{ student.other_name }} {{ student.surname }}</h2>
+                <p class="text-center current-session">Current Session: {{ current_session }}</p>
+                <p class="text-center current-term">Current Term: {{ current_term }}</p>
+                <table id="attendanceTable" class="table table-bordered attendance-table">
+                    <thead>
+                        <tr>
+                            <th class="serial-header">Serial No.</th>
+                            <th class="attendance-date-header">Attendance Date</th>
+                            <th class="present-header">Present</th>
+                            <th class="absent-header">Absent</th>
+                            <th class="permission-header">Permission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attendance in attendances %}
+                        <tr>
+                            <td class="serial-number">{{ forloop.counter }}</td>
+                            <td class="attendance-date">{{ attendance.attendance_date }}</td>
+                            <td class="present">
+                                {% if attendance.present %}
+                                    &#10004;
+                                {% endif %}
+                            </td>
+                            <td class="absent">
+                                {% if attendance.absent %}
+                                    &#10060;
+                                {% endif %}
+                            </td>
+                            <td class="permission">
+                                {% if attendance.permission %}
+                                    <div class="permission-circle">P</div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock content %}

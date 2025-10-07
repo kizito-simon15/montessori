@@ -1,0 +1,309 @@
+{% extends 'bursor/bursor_base.html' %}
+{% block content %}
+<!-- Include Font Awesome CSS for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+  /* Container Styling */
+  .table-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #fefefe;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  /* Header Styling */
+  .table-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ffffff;
+    background-color: #007bff;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: slideInDown 1s ease-out;
+  }
+
+  /* Button Styling */
+  .btn-success {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 8px;
+    background-color: #28a745;
+    border: none;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    animation: pulse 2s infinite;
+  }
+
+  .btn-success:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+  }
+
+  /* Filter Styling */
+  .filter-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    animation: slideInUp 1s ease-out;
+  }
+
+  .filter-select, .filter-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    margin-right: 10px; /* Add spacing between filters */
+  }
+
+  .filter-select:focus, .filter-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+  }
+
+  /* Table Styling */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  .table th, .table td {
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    font-size: 16px;
+    animation: fadeInUp 0.5s ease-in-out;
+  }
+
+  .table th {
+    background-color: deepskyblue;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    animation: slideInRight 1s ease-out;
+  }
+
+  .table td {
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+  }
+
+  .table tbody tr:hover td {
+    background-color: #f1f3f5;
+  }
+
+  /* Status Badge Styling */
+  .status-badge {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 3px;
+    border-radius: 15px;
+    background-color: #6f42c1;
+    border: 1px solid #563d7c;
+    color: white;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    animation: pulse 1.5s infinite;
+  }
+
+  .status-badge:hover {
+    transform: scale(1.05);
+  }
+
+  /* Button Styling */
+  .btn {
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 3px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  .btn-warning {
+    background-color: #ffc107;
+    border: none;
+    color: white;
+  }
+
+  .btn-warning:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+  }
+
+  .btn-info {
+    background-color: #17a2b8;
+    border: none;
+    color: white;
+  }
+
+  .btn-info:hover {
+    background-color: #138496;
+    transform: scale(1.05);
+  }
+
+  .btn i {
+    margin-right: 8px;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideInDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slideInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+</style>
+
+<div class="table-container">
+  <h2>Uniform List for {{ selected_session.name }}</h2>
+  <div class="filter-container">
+    <select id="sessionFilter" class="filter-select">
+      {% for session in sessions %}
+        <option value="{{ session.id }}" {% if session.id == selected_session.id %}selected{% endif %}>{{ session.name }}</option>
+      {% endfor %}
+    </select>
+    <select id="classFilter" class="filter-select">
+      <option value="">All Classes</option>
+      {% for student_class in student_classes %}
+        <option value="{{ student_class.id }}">{{ student_class.name }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" id="studentFilter" class="filter-input" placeholder="Filter by student name or registration number">
+  </div>
+  <a href="{% url 'bursor_uniform_create' %}" class="btn btn-success">Add Uniform</a>
+  <table class="table" id="uniformTable">
+    <thead>
+      <tr>
+        <th>S/N</th>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Amount Paid</th>
+        <th>Amount Payable</th>
+        <th>Balance</th>
+        <th>Status</th>
+        <th>Actions</th>
+        <th>Payment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key, data in uniform_data.items %}
+      <tr data-student="{{ data.student.firstname }} {{ data.student.middle_name }} {{ data.student.surname }}" data-reg="{{ data.student.registration_number }}" data-class="{{ data.student_class_id }}">
+        <td>{{ forloop.counter }}</td>
+        <td>{{ data.student }}</td>
+        <td>{{ data.student_class }}</td>
+        <td>
+          <a href="{% url 'student_uniform_update' data.student_uniform_id %}">
+            {{ data.total_paid }} TZS
+          </a>
+        </td>
+        <td>{{ data.total_payable }} TZS</td>
+        <td>{{ data.balance }} TZS</td>
+        <td>
+          {% for item in data.types_bought %}
+            <a href="{% url 'uniform_update' item.uniform_id %}" class="status-badge">
+              {{ item.uniform_type }} x{{ item.quantity }}
+            </a>
+          {% endfor %}
+        </td>
+        <td>
+          <a href="{% url 'uniform_delete' data.uniform_id %}" class="btn btn-danger">
+            <i class="fas fa-trash-alt"></i>
+          </a>
+        </td>
+        <td>
+          <a href="{% url 'student_uniform_create' data.student_id %}?class={{ data.student_class_id }}" class="btn btn-info">
+            <i class="fas fa-money-bill-wave"></i> Pay
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Filter table by student name or registration number
+    document.getElementById('studentFilter').addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      document.querySelectorAll('#uniformTable tbody tr').forEach(function(row) {
+        const student = row.dataset.student.toLowerCase();
+        const reg = row.dataset.reg.toLowerCase();
+        if (student.includes(filter) || reg.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+
+    // Filter table by class
+    document.getElementById('classFilter').addEventListener('change', function() {
+      const selectedClass = this.value;
+      document.querySelectorAll('#uniformTable tbody tr').forEach(function(row) {
+        if (selectedClass === '' || row.dataset.class === selectedClass) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+
+    // Handle session filter change
+    document.getElementById('sessionFilter').addEventListener('change', function() {
+      window.location.href = '?session=' + this.value;
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,91 @@
+{# ================== processingbatch_list.html ================== #}
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--secondary:#d97706;--bg:#f1f5f9;--danger:#dc2626;--radius:25px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 4px 10px rgba(0,0,0,.06);
+      overflow:hidden;opacity:0;transform:translateY(25px);transition:.55s;}
+.card-header{background:#fff;padding:.6rem 1rem;display:flex;justify-content:space-between;
+             align-items:center;border-bottom:1px solid #e5e7eb;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--primary);}
+.card-body{padding:.8rem 1rem;display:flex;flex-direction:column;gap:.8rem;}
+/* table */
+.table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.table thead{background:var(--primary);color:#fff;}
+.table th,.table td{padding:.45rem .65rem;text-align:left;border-bottom:1px solid #e5e7eb;}
+.table tbody tr:nth-child(odd){background:#f8fafc;}
+.table tbody tr:hover{background:#e2e8f0;}
+.text-end{text-align:right;}
+/* buttons */
+.btn{border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;font-size:.8rem;
+     cursor:pointer;transition:background .15s,transform .15s;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--secondary);transform:translateY(-2px);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{opacity:.9;transform:translateY(-2px);}
+.form-select{border:1px solid #d1d5db;border-radius:var(--radius);padding:.35rem .75rem;
+             font-size:.85rem;background:#f9fafb;}
+@media(max-width:640px){.table th,.table td{padding:.35rem;font-size:.8rem;}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const c=document.querySelector('.card');if(c){setTimeout(()=>{c.style.opacity='1';c.style.transform='translateY(0)';},80);}
+});
+</script>
+
+<div class="card">
+  <div class="card-header">
+    <h2>🏭 Processing Batches</h2>
+    <a href="{% url 'processingbatch_create' %}" class="btn btn-primary">➕ New</a>
+  </div>
+
+  <div class="card-body">
+    <!-- Filter by processed product -->
+    <form method="get" style="display:flex;gap:.5rem;flex-wrap:wrap;">
+      <select name="product" class="form-select">
+        <option value="">All Processed Products</option>
+        {% for p in processed_products %}
+          <option value="{{ p.pk }}" {% if request.GET.product == p.pk|stringformat:'s' %}selected{% endif %}>
+            {{ p.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary" type="submit">🔍 Filter</button>
+      {% if request.GET.product %}<a href="{% url 'processingbatch_list' %}" class="btn btn-secondary">✖ Clear</a>{% endif %}
+    </form>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th><th>Date</th><th>Raw Product</th><th>Processed Product</th>
+          <th class="text-end">Input Qty</th><th class="text-end">Output Qty</th>
+          <th class="text-end">Yield %</th><th class="text-end">Fee</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in rows %}
+          <tr>
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.source_purchase.product.name }}</td>
+            <td>{{ b.processed_product.name }}</td>
+            <td class="text-end">{{ b.input_quantity|floatformat:2 }}</td>
+            <td class="text-end">{{ b.output_quantity|floatformat:2 }}</td>
+            <td class="text-end">{{ b.yield_pct|floatformat:1 }}</td>
+            <td class="text-end">{{ b.processing_fee|floatformat:2|intcomma }}</td>
+            <td>
+              <a href="{% url 'processingbatch_update' b.pk %}" class="btn btn-primary">✏️</a>
+              <a href="{% url 'processingbatch_delete' b.pk %}" class="btn btn-danger">🗑️</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9">No processing batches recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

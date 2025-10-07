@@ -1,0 +1,99 @@
+{% extends 'bursor/bursor_base.html' %}
+
+{% block title %}Bursor Student Management{% endblock title %}
+
+{% block content %}
+<div class="container py-5" style="background: linear-gradient(to right, #f0f9ff, #e6f7ff); border-radius: 12px;">
+  <h2 class="text-center mb-4 text-primary fw-bold" data-aos="fade-down" data-aos-duration="1000">
+    <i class="fas fa-graduation-cap"></i> Student Management Home
+  </h2>
+
+  <!-- Button: Students List -->
+  <div class="d-flex justify-content-center mb-4">
+    <a href="{% url 'bursor-student-list' %}" class="btn btn-primary btn-lg shadow-lg position-relative" style="width: 100%; max-width: 400px; border-radius: 50px;">
+      <div class="d-flex align-items-center justify-content-between">
+        <span><i class="fas fa-users me-2"></i> Students List</span>
+        <i class="fas fa-arrow-right arrow-animation"></i>
+      </div>
+    </a>
+  </div>
+
+  <!-- Button: Inactive Students List -->
+  <div class="d-flex justify-content-center mb-4">
+    <a href="{% url 'bursor-inactive-student-list' %}" class="btn btn-warning btn-lg shadow-lg position-relative" style="width: 100%; max-width: 400px; border-radius: 50px;">
+      <div class="d-flex align-items-center justify-content-between">
+        <span><i class="fas fa-user-slash me-2"></i> Inactive Students</span>
+        <i class="fas fa-arrow-right arrow-animation"></i>
+      </div>
+    </a>
+  </div>
+
+  <!-- Button: Alumni -->
+  <div class="d-flex justify-content-center">
+    <a href="{% url 'bursor-completed-students' %}" class="btn btn-success btn-lg shadow-lg position-relative" style="width: 100%; max-width: 400px; border-radius: 50px;">
+      <div class="d-flex align-items-center justify-content-between">
+        <span><i class="fas fa-user-graduate me-2"></i> Alumni</span>
+        <i class="fas fa-arrow-right arrow-animation"></i>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  // Initialize AOS animations
+  AOS.init();
+</script>
+<style>
+  /* Arrow Animation */
+  .arrow-animation {
+    animation: bounce 1.5s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(8px);
+    }
+  }
+
+  .btn-lg {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 15px 20px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #4e73df, #224abe);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: #365ed1;
+  }
+
+  .btn-warning {
+    background: linear-gradient(to right, #ffc107, #e0a800);
+    color: #fff;
+  }
+
+  .btn-warning:hover {
+    background: #d39e00;
+  }
+
+  .btn-success {
+    background: linear-gradient(to right, #28a745, #218838);
+    color: #fff;
+  }
+
+  .btn-success:hover {
+    background: #1e7e34;
+  }
+</style>
+{% endblock morejs %}

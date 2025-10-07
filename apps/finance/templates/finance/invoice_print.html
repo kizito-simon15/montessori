@@ -1,0 +1,177 @@
+{% load humanize static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<title>Ankara {{ invoice.invoice_number }}</title>
+
+<!-- ---------- PRINT & SCREEN STYLES ---------- -->
+<style>
+@font-face{font-family:'Inter';font-weight:400;
+  src:url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter-Regular.woff2") format("woff2")}
+@font-face{font-family:'Inter';font-weight:600;
+  src:url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter-SemiBold.woff2") format("woff2")}
+@font-face{font-family:'Inter';font-weight:700;
+  src:url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter-Bold.woff2") format("woff2")}
+
+@page { size:A4 portrait; margin:20mm 18mm 24mm }
+:root{ --blue:#1d8bff; --green:#16a34a; --carrot:#fb923c; --line:#d1d5db; --head:#e2e9ff; }
+
+body{margin:0;background:#ecf7ff;font:400 12.5px/1.55 'Inter',sans-serif;color:#111827}
+.wrap{max-width:800px;margin:auto;background:#fff;border:1px solid var(--line);
+      border-radius:22px;padding:34px 38px;box-shadow:0 8px 22px rgba(0,0,0,.08)}
+
+img.logo{height:92px;width:92px;border-radius:50%;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+h1{margin:0;color:var(--blue);font-size:1.9rem;font-weight:700}
+
+hr.color{height:4px;border:none;border-radius:2px;
+         background:linear-gradient(90deg,var(--blue)0%,#34c9ff 40%,var(--carrot)100%);
+         margin:26px 0}
+
+table{width:100%;border-collapse:collapse}
+th,td{padding:6px 8px;vertical-align:top}
+th{text-align:left;font-weight:600}
+.meta td{background:#f7f8fa}.meta th{width:26%}
+
+.receipts thead{background:var(--head);border-bottom:1px solid var(--line)}
+.receipts th{font-size:11px;font-weight:600}.receipts td{border-bottom:1px solid #e5e7eb}
+.num{text-align:right}
+
+.totals{width:100%;max-width:380px;margin:18px auto 0;border-collapse:separate;border-spacing:0 6px}
+.totals td{padding:4px 6px}.tlabel{width:60%}.tval{text-align:right}
+.totals tr:last-child td{border-top:2px solid #000;font-weight:700}
+
+.due-green{color:var(--green)}.due-amb{color:var(--carrot)}.due-red{color:#b91c1c}
+
+.sig{width:44%;display:inline-block;margin-top:65px;text-align:center}
+.sig .line{height:1px;background:#000;margin:44px 0 5px}
+
+.btn-print{position:fixed;right:18px;top:18px;background:linear-gradient(135deg,var(--green),var(--blue));
+           color:#fff;border:none;border-radius:999px;font:600 12px 'Inter';padding:7px 20px;cursor:pointer;
+           box-shadow:0 2px 7px rgba(0,0,0,.15)}
+@media print{
+  body{background:#fff;-webkit-print-color-adjust:exact}
+  .wrap{border:none;box-shadow:none;padding:0}
+  .btn-print{display:none}
+}
+</style>
+</head>
+
+<body>
+<button class="btn-print" onclick="window.print()">🖨️ Chapisha</button>
+
+<section class="wrap">
+  <!-- ==== KICHWA ==== -->
+  <div style="display:flex;gap:18px;align-items:center">
+    <img src="{% static 'images/logo.jpg' %}" class="logo" alt="logo">
+    <div>
+      <h1>Victory Pre&nbsp;&amp;&nbsp;Primary School</h1>
+      <p style="font-size:11.2px;margin:4px 0">📞 0757 613 972  •  S.L.P 52, Biharamulo — Kagera</p>
+      <p style="font-size:11.2px;margin:0">🌐 www.victory.ac.tz</p>
+    </div>
+  </div>
+  <hr class="color">
+
+  <!-- ==== META ==== -->
+  <table class="meta">
+    <tr><th>Namba ya Ankara:</th><td>{{ invoice.invoice_number }}</td>
+        <th>Tarehe ya Kutolewa:</th><td>{{ invoice.created_at|date:"d F Y" }}</td></tr>
+
+    <tr><th>Tarehe ya Mwisho (Due):</th><td>{{ invoice.due_date|date:"d F Y" }}</td>
+        <th>Hali:</th>
+        <td>{% if invoice.status == 'closed' %}
+              <span class="due-green">IMEKAMILIKA ✅</span>
+            {% elif invoice.status == 'active' %}
+              <span class="due-amb">INAENDELEA</span>
+            {% else %}
+              {{ invoice.status|upper }}
+            {% endif %}
+        </td></tr>
+
+    <tr><th>Mwaka:</th><td>{{ invoice.session }}</td>
+        <th>Muhula:</th>
+        <td>{% with n=invoice.installment.name|lower %}
+              {% if n in "first 1" %}muhula wa kwanza
+              {% elif n in "second 2" %}muhula wa pili
+              {% elif n in "third 3" %}muhula wa tatu
+              {% elif n in "fourth 4" %}muhula wa nne
+              {% else %}{{ invoice.installment }}{% endif %}
+            {% endwith %}
+        </td></tr>
+
+    <tr><th>Mwanafunzi:</th>
+        <td>{{ invoice.student.firstname }} {{ invoice.student.surname }}</td>
+        <th>Darasa:</th><td>{{ invoice.class_for }}</td></tr>
+
+    <tr><th>Namba ya Usajili:</th><td>{{ invoice.student.registration_number }}</td>
+        <td colspan="2"></td></tr>
+  </table>
+
+  <!-- ==== RISITI ==== -->
+  {% if invoice.receipts.exists %}
+  <h3>🧾 Malipo Yaliyopokelewa</h3>
+  <table class="receipts">
+    <thead>
+      <tr><th>#</th><th>📅 Tarehe</th><th class="num">💰 Kiasi TZS</th>
+          <th>💳 Njia</th><th>🔖 Ref</th></tr>
+    </thead>
+    <tbody>
+    {% for r in invoice.receipts.all %}
+      <tr>
+        <td>{{ r.receipt_number }}</td>
+        <td>{{ r.date_paid|date:"d M Y" }}</td>
+        <td class="num">{{ r.amount_paid|floatformat:2|intcomma }}</td>
+        <td>{{ r.get_payment_method_display }}</td>
+        <td>{{ r.transaction_reference|default:"—" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <!-- ==== TOTALS ==== -->
+  <table class="totals">
+    <tr><td class="tlabel">Jumla Ndogo</td>
+        <td class="tval">{{ invoice.invoice_amount|floatformat:2|intcomma }}</td></tr>
+    <tr><td class="tlabel">Salio la Awali</td>
+        <td class="tval">{{ invoice.previous_balance|floatformat:2|intcomma }}</td></tr>
+    <tr><td class="tlabel">Jumla Imelipwa</td>
+        <td class="tval">{{ invoice.amount_paid|floatformat:2|intcomma }}</td></tr>
+    {% with bal=invoice.overall_balance %}
+    <tr>
+      <td class="tlabel">Deni Baki</td>
+      <td class="tval {% if bal <= 0 %}due-green{% elif bal < 10000 %}due-amb{% else %}due-red{% endif %}">
+        {{ bal|floatformat:2|intcomma }}
+      </td>
+    </tr>{% endwith %}
+  </table>
+
+  <!-- ==== PAYMENT OPTIONS ==== -->
+  <div style="margin-top:90px;font-size:11.3px">
+    <p><strong>Njia za malipo (Benki):</strong></p>
+    <ul style="margin:4px 0 0 18px">
+      <li>
+        <span style="background:#0f6fc6;display:inline-block;width:12px;height:12px;border-radius:2px"></span>
+        <strong>NMB</strong> – Victory Pre & Primary School – A/C 01-23456789
+      </li>
+      <li>
+        <span style="background:#2bb673;display:inline-block;width:12px;height:12px;border-radius:2px"></span>
+        <strong>CRDB</strong> – Victory Pre & Primary School – A/C 02-98765432
+      </li>
+    </ul>
+    <p style="margin-top:6px">Tafadhali taja namba ya ankara kwenye kila malipo. Asante!</p>
+  </div>
+
+  <!-- ==== SIGNATURES ==== -->
+  <div style="margin-top:70px">
+    <div class="sig"><div class="line"></div>Sahihi ya Mzazi / Mlezi</div>
+    <div class="sig" style="float:right"><div class="line"></div>Sahihi ya Mhasibu</div>
+  </div>
+
+  <footer style="margin-top:60px;text-align:center;font-size:10.5px">
+    Imetolewa {{ now|date:"d F Y • H:i" }} — Mfumo wa Shule ya Victory
+  </footer>
+
+</section>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{# ================== processedproduct_form.html ================== #}
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--secondary:#d97706;--bg:#f1f5f9;--danger:#dc2626;--radius:25px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);
+      overflow:hidden;opacity:0;transform:translateY(20px);transition:.5s;}
+.card-header{background:#fff;padding:.6rem 1rem;border-bottom:1px solid #e5e7eb;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--primary);}
+.card-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:.75rem;}
+.form-label{font-weight:600;margin-bottom:.25rem;font-size:.9rem;color:#374151;}
+.form-control,.form-select{border:1px solid #d1d5db;border-radius:var(--radius);
+  padding:.5rem 1rem;font-size:.9rem;width:100%;background:#f9fafb;}
+.form-control:focus,.form-select:focus{border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(30,58,138,.15);outline:none;}
+.text-danger{color:var(--danger);font-size:.8rem;margin-top:.25rem;}
+.btn{border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;font-size:.8rem;
+     cursor:pointer;transition:background .15s,transform .15s;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--secondary);transform:translateY(-2px);}
+.btn-secondary{background:#6b7280;color:#fff;}
+@media(max-width:640px){.card{border-radius:10px;}}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const card=document.querySelector('.card');
+  if(card){setTimeout(()=>{card.style.opacity='1';card.style.transform='translateY(0)';},80);}
+});
+</script>
+
+<div class="card">
+  <div class="card-header">
+    <h2>{% if form.instance.pk %}✏️ Edit Processed Product{% else %}➕ Add Processed Product{% endif %}</h2>
+  </div>
+
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="text-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post">{% csrf_token %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.75rem;">
+        <div>
+          <label class="form-label" for="id_name">Product Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}<div class="text-danger">{{ form.name.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="id_source_product">Source Raw Product</label>
+          {{ form.source_product }}
+          {% if form.source_product.errors %}<div class="text-danger">{{ form.source_product.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="id_unit">Unit (e.g. kg, L)</label>
+          {{ form.unit }}
+          {% if form.unit.errors %}<div class="text-danger">{{ form.unit.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem;">
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+        <a href="{% url 'processedproduct_list' %}" class="btn btn-secondary">❌ Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

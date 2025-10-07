@@ -1,0 +1,133 @@
+<!-- apps/disprine/templates/disprine/discipline_issue_detail.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .container-custom {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    .header-custom {
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+        animation: slideInFromTop 1s ease-in-out;
+    }
+
+    @keyframes slideInFromTop {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(0); }
+    }
+
+    .card-custom {
+        margin-bottom: 20px;
+        border-radius: 8px;
+        animation: slideIn 1s ease-in-out;
+    }
+
+    @keyframes slideIn {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(0); }
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: #ffffff;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .card-body {
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .btn-action {
+        background-color: #28a745;
+        color: #ffffff;
+        margin-top: 10px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-action:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+    }
+
+    .btn-back {
+        margin-top: 20px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background-color: #6c757d;
+        transform: scale(1.05);
+    }
+
+    .actions-list {
+        margin-top: 15px;
+    }
+
+    .action-item {
+        padding: 10px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="container container-custom mt-5">
+    <div class="header-custom">
+        <h2>Discipline Issues for {{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</h2>
+    </div>
+
+    {% if issues %}
+        {% for issue in issues %}
+            <div class="card card-custom">
+                <div class="card-header">
+                    Issue #{{ forloop.counter }} - Reported on {{ issue.date_reported }}
+                </div>
+                <div class="card-body">
+                    <h5>Description</h5>
+                    <p>{{ issue.issue_description }}</p>
+                    {% if issue.issue_file %}
+                        <p>Attachment: <a href="{{ issue.issue_file.url }}" target="_blank">Download</a></p>
+                    {% endif %}
+
+                    <h5>Actions Taken</h5>
+                    {% if issue.actions.exists %}
+                        <ul class="actions-list">
+                            {% for action in issue.actions.all %}
+                                <li class="action-item">{{ action.action_description }} - taken on {{ action.date_taken }} by {{ action.action_taker }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No actions taken yet.</p>
+                    {% endif %}
+
+                    <a href="{% url 'action_create' issue.id %}" class="btn btn-action">Take Action</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning mt-4" role="alert">
+            No discipline issues found for this student.
+        </div>
+    {% endif %}
+
+    <a href="{% url 'discipline_issue_list' %}" class="btn btn-secondary btn-back">Back to List</a>
+</div>
+{% endblock %}

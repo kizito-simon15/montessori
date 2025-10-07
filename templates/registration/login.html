@@ -1,0 +1,562 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login • Maria Montessori School</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --brand:#2563eb;       /* indigo-600 */
+      --brand-2:#22d3ee;     /* cyan-400 */
+      --ink:#0f172a;         /* slate-900 */
+      --muted:#64748b;       /* slate-500 */
+      --ring:0 10px 40px rgba(37,99,235,.25);
+      --shadow:0 30px 80px rgba(2,6,23,.18);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color: var(--ink);
+      margin:0;
+      background: radial-gradient(1100px 600px at -10% -10%, rgba(34,211,238,.25), transparent 60%),
+                  radial-gradient(900px 500px at 110% 0%, rgba(37,99,235,.20), transparent 60%),
+                  linear-gradient(180deg, #0b1020 0%, #0b1020 100%);
+      overflow-x:hidden;
+    }
+    .page{
+      min-height:100dvh;
+      display:grid; place-items:center;
+      padding:clamp(16px,3vw,32px);
+    }
+
+    /* Center card like the video */
+    .auth-card{
+      width:min(460px, 100%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(16px) saturate(130%);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .auth-head{
+      display:flex; align-items:center; gap:12px;
+      padding:16px 18px;
+      background: linear-gradient(90deg, rgba(37,99,235,.85), rgba(34,211,238,.85));
+      color:#fff;
+    }
+    .auth-head img{ width:48px; height:48px; border-radius:12px; object-fit:cover; border:2px solid rgba(255,255,255,.7) }
+    .auth-head .title{ font-weight:800; letter-spacing:.3px }
+    .auth-body{ background:#ffffff; padding: clamp(18px,3.6vw,28px) }
+
+    .subtle{ color: var(--muted) }
+
+    /* Inputs with icons (floating style) */
+    .form-floating> .form-control{ padding-left: 2.75rem }
+    .input-icon{
+      position:absolute; left:.85rem; top:50%; transform: translateY(-50%);
+      font-size:1.05rem; color: var(--brand);
+      pointer-events: none;
+    }
+
+    .btn-brand{
+      --bg: linear-gradient(90deg, var(--brand), var(--brand-2));
+      --bg-hover: linear-gradient(90deg, #1e40af, #06b6d4);
+      background: var(--bg); border:0; color:#fff; font-weight:800;
+      border-radius: 999px; padding:.9rem 1.1rem; box-shadow: var(--ring);
+    }
+    .btn-brand:hover{ background: var(--bg-hover); color:#fff; transform: translateY(-1px) }
+    .btn-brand[disabled]{ opacity:.75 }
+
+    .helper{ display:flex; justify-content:space-between; align-items:center; gap:12px }
+
+    /* Toasts */
+    .toast-container{ position:fixed; right:16px; top:16px; z-index:1080 }
+
+    /* Small credit text like in demos */
+    .credit{ color:#cbd5e1; text-align:center; margin-top:14px; font-size:.85rem }
+
+    /* Dark mode preference */
+    @media (prefers-color-scheme: dark){ :root{ color-scheme:dark light } }
+  </style>
+  <style>
+    :root{
+      --brand:#2563eb;       /* indigo-600 */
+      --brand-2:#22d3ee;     /* cyan-400 */
+      --ink:#0f172a;         /* slate-900 */
+      --muted:#64748b;       /* slate-500 */
+      --ring:0 10px 40px rgba(37,99,235,.25);
+      --shadow:0 30px 80px rgba(2,6,23,.18);
+      --radius:22px;
+      --ease-1:cubic-bezier(.22,1,.36,1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color: var(--ink);
+      margin:0;
+      background: radial-gradient(1100px 600px at -10% -10%, rgba(34,211,238,.25), transparent 60%),
+                  radial-gradient(900px 500px at 110% 0%, rgba(37,99,235,.20), transparent 60%),
+                  linear-gradient(180deg, #0b1020 0%, #0b1020 100%);
+      overflow-x:hidden;
+    }
+    .page{
+      min-height:100dvh;
+      display:grid; place-items:center;
+      padding:clamp(16px,3vw,32px);
+    }
+
+    /* Center card like the video */
+    .auth-card{
+      width:min(460px, 100%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(16px) saturate(130%);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .auth-head{
+      display:flex; align-items:center; gap:12px;
+      padding:16px 18px;
+      background: linear-gradient(90deg, rgba(37,99,235,.85), rgba(34,211,238,.85));
+      color:#fff;
+    }
+    .auth-head img{ width:48px; height:48px; border-radius:12px; object-fit:cover; border:2px solid rgba(255,255,255,.7) }
+    .auth-head .title{ font-weight:800; letter-spacing:.3px }
+    .auth-body{ background:#ffffff; padding: clamp(18px,3.6vw,28px) }
+
+    .subtle{ color: var(--muted) }
+
+    /* Inputs with icons (floating style) */
+    .form-floating> .form-control{ padding-left: 2.75rem }
+    .input-icon{
+      position:absolute; left:.85rem; top:50%; transform: translateY(-50%);
+      font-size:1.05rem; color: var(--brand);
+      pointer-events: none;
+    }
+
+    .btn-brand{
+      --bg: linear-gradient(90deg, var(--brand), var(--brand-2));
+      --bg-hover: linear-gradient(90deg, #1e40af, #06b6d4);
+      background: var(--bg); border:0; color:#fff; font-weight:800;
+      border-radius: 999px; padding:.9rem 1.1rem; box-shadow: var(--ring);
+    }
+    .btn-brand:hover{ background: var(--bg-hover); color:#fff; transform: translateY(-1px) }
+    .btn-brand[disabled]{ opacity:.75 }
+
+    .helper{ display:flex; justify-content:space-between; align-items:center; gap:12px }
+
+    /* Toasts */
+    .toast-container{ position:fixed; right:16px; top:16px; z-index:1080 }
+
+    /* Small credit text like in demos */
+    .credit{ color:#cbd5e1; text-align:center; margin-top:14px; font-size:.85rem }
+
+    /* Dark mode preference */
+    @media (prefers-color-scheme: dark){ :root{ color-scheme:dark light } }
+
+    /* ===== Motion: slide-in on load (like the video) ===== */
+    /* Enable motion only when JS present so no-flash for no-JS */
+    html.js .auth-card{ opacity:0; transform: translateY(42px) scale(.985); filter: blur(10px) }
+    html.js .auth-head{ opacity:0; transform: translateY(-12px) }
+
+    html.js body.play .auth-card{ animation: slideReveal .85s var(--ease-1) .08s both }
+    html.js body.play .auth-head{ animation: slideDown .6s var(--ease-1) .02s both }
+
+    /* Staggered children */
+    .reveal{ opacity:0; transform: translateY(14px); filter: blur(6px) }
+    html.js body.play .reveal{ animation: fadeUp .6s var(--ease-1) var(--d, .12s) both }
+
+    @keyframes slideReveal{
+      from{ opacity:0; transform: translateY(42px) scale(.985); filter: blur(10px) }
+      to{ opacity:1; transform: translateY(0) scale(1); filter: blur(0) }
+    }
+    @keyframes slideDown{
+      from{ opacity:0; transform: translateY(-12px) }
+      to{ opacity:1; transform: translateY(0) }
+    }
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(14px); filter: blur(6px) }
+      to{ opacity:1; transform: translateY(0); filter: blur(0) }
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      html.js .auth-card, html.js .auth-head, .reveal{ opacity:1 !important; transform:none !important; filter:none !important; animation:none !important }
+    }
+  </style>
+
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    /* Intro typing overlay */
+    .intro{ position:fixed; inset:0; display:grid; place-items:center; z-index:1200;
+      background: radial-gradient(1100px 600px at -10% -10%, rgba(34,211,238,.25), transparent 60%),
+                  radial-gradient(900px 500px at 110% 0%, rgba(37,99,235,.20), transparent 60%),
+                  linear-gradient(180deg, #0b1020 0%, #0b1020 100%); }
+    .typewrap{ display:inline-block; text-align:center; font-family: Raleway, Inter, system-ui; font-weight:800; letter-spacing:.5px; line-height:1.1 }
+    .intro-logo{ width:72px; height:72px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,.7); box-shadow: var(--shadow); display:block; margin:0 auto 12px; background:#fff }
+
+    /* Main line (gradient typing) */
+    .line-main{ display:inline-block }
+    .type-text{ display:inline-block; background: linear-gradient(90deg, #22d3ee, #2563eb, #f97316, #22d3ee);
+      background-size:200% 200%; -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation: shimmer 2.8s linear infinite alternate; font-size: clamp(1.9rem, 6.2vw, 3.2rem); }
+
+    /* Underline that grows after main text */
+    .underline{ height:3px; width:0; background: var(--brand); margin:10px auto 10px; border-radius:999px; opacity:.95 }
+    .underline.grow{ animation: growUnderline .45s cubic-bezier(.22,1,.36,1) both }
+
+    /* Sub line (blue, smaller, typing) */
+    .line-sub{ display:block }
+    .sub-text{ color: var(--brand); font-weight:800; font-size: clamp(1rem, 3.2vw, 1.35rem); letter-spacing:.3px }
+
+    .type-caret{ width:2px; height:1em; display:inline-block; background:#e2e8f0; vertical-align:-.18em; margin-left:4px; animation: caretBlink 1s steps(1) infinite; border-radius:1px }
+
+    /* Logo shake (shek shek) */
+    .intro-logo.shake{ animation: shake 0.9s ease-in-out infinite }
+
+    .intro.exit{ animation: introOut .6s cubic-bezier(.22,1,.36,1) both }
+    @keyframes shimmer{ 0%{ background-position:0% 50% } 100%{ background-position:100% 50% } }
+    @keyframes caretBlink{ 50%{ opacity:0 } }
+    @keyframes introOut{ to{ opacity:0; transform: translateY(-12px) } }
+    @keyframes growUnderline{ from{ width:0 } to{ width:100% } }
+    @keyframes shake{
+      0%,100%{ transform: translateX(0) rotate(0) }
+      10%{ transform: translateX(-1.6px) rotate(-1deg) }
+      20%{ transform: translateX(1.6px) rotate(1deg) }
+      30%{ transform: translateX(-1.4px) rotate(-.8deg) }
+      40%{ transform: translateX(1.4px) rotate(.8deg) }
+      50%{ transform: translateX(-1px) rotate(-.6deg) }
+      60%{ transform: translateX(1px) rotate(.6deg) }
+      70%{ transform: translateX(-1px) rotate(-.6deg) }
+      80%{ transform: translateX(1px) rotate(.6deg) }
+      90%{ transform: translateX(.6px) rotate(.3deg) }
+    }
+
+    @media (prefers-reduced-motion: reduce){ .type-caret{ animation:none } .intro.exit{ animation:none; opacity:0 } .intro-logo.shake{ animation:none } }
+  </style>
+
+  <style>
+    /* Modern color theme overrides (login card) */
+    :root{
+      --brand:#7C3AED;      /* Violet-600 */
+      --brand-2:#06B6D4;    /* Cyan-500 */
+      --ring:0 10px 40px rgba(124,58,237,.28);
+    }
+    .auth-head{ background: linear-gradient(90deg, var(--brand), var(--brand-2)) !important; }
+    .input-icon{ color: var(--brand) !important; }
+    .btn-brand{
+      --bg: linear-gradient(90deg, var(--brand), var(--brand-2));
+      --bg-hover: linear-gradient(90deg, #6D28D9, #0891B2);
+    }
+    .form-control:focus{
+      border-color: var(--brand);
+      box-shadow: 0 0 0 .2rem rgba(124,58,237,.25);
+    }
+    .helper a{ color: var(--brand) !important; }
+    .helper a:hover{ color: var(--brand-2) !important; }
+    /* Optional: a slightly brighter glass for modern feel */
+    .auth-card{ background: linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.62)) !important; border:1px solid rgba(124,58,237,.10) }
+  </style>
+</head>
+<body>
+  <!-- Intro typing overlay: shows first, then fades and triggers login slide -->
+  <section class="intro" id="intro" aria-label="Intro typing">
+    <div class="typewrap">
+      <img class="intro-logo" src="{% static 'img/logo-jpg.png' %}" alt="Maria Montessori School Logo" />
+      <div class="line-main" id="lineMain">
+        <span class="type-text" id="typeTarget"></span><span class="type-caret" id="caret"></span>
+        <div class="underline" id="typeUnderline"></div>
+      </div>
+      <div class="line-sub" id="lineSub">
+        <span class="sub-text" id="typeSub"></span><span class="type-caret" id="subCaret"></span>
+      </div>
+    </div>
+  </section>
+
+  <main class="page">
+
+    <!-- Django messages as Bootstrap toasts -->
+    {% if messages %}
+    <div class="toast-container">
+      {% for message in messages %}
+      <div class="toast align-items-center text-bg-{{ message.tags|default:'primary' }} show border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">{{ message }}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="auth-card">
+      <!-- Head: logo + name (brand swapped as requested) -->
+      <div class="auth-head">
+        <img src="{% static 'img/logo-jpg.png' %}" alt="Maria Montessori School Logo" />
+        <div>
+          <div class="title">Maria Montessori School</div>
+          <small class="opacity-75">Parent &amp; Student Portal</small>
+        </div>
+        <div class="ms-auto d-none d-sm-block">
+          <a href="{% url 'index' %}" class="text-white text-decoration-none fw-semibold me-3"><i class="bi bi-house-door"></i> Home</a>
+          <a href="#" onclick="history.back()" class="text-white text-decoration-none fw-semibold"><i class="bi bi-arrow-left"></i> Back</a>
+        </div>
+      </div>
+
+      <!-- Body: form -->
+      <div class="auth-body">
+        <!-- add reveal classes with delays -->
+        <h2 class="h4 fw-bold mb-1 reveal" style="--d:.12s">Welcome back</h2>
+        <p class="subtle mb-4 reveal" style="--d:.18s">Sign in to view results, attendance, announcements &amp; invoices.</p>
+
+        <!-- Global form errors -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <div>
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'custom_login' %}" novalidate id="loginForm" class="needs-validation" autocomplete="off">
+          {% csrf_token %}
+
+          <!-- Username -->
+          <div class="position-relative mb-3 reveal" style="--d:.24s">
+            <i class="bi bi-person input-icon"></i>
+            <div class="form-floating">
+              <input
+                type="text"
+                class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                id="id_username"
+                name="username"
+                placeholder="Username"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+                inputmode="text"
+                required
+                value="{{ form.username.value|default_if_none:'' }}"
+              />
+              <label for="id_username">Username</label>
+              {% if form.username.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.username.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+              </div>
+              {% else %}
+              <div class="invalid-feedback">Please enter your username.</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="position-relative mb-2 reveal" style="--d:.30s">
+            <i class="bi bi-shield-lock input-icon"></i>
+            <div class="form-floating">
+              <input
+                type="password"
+                class="form-control {% if form.password.errors %}is-invalid{% endif %}"
+                id="id_password"
+                name="password"
+                placeholder="Password"
+                autocomplete="current-password"
+                required
+                aria-describedby="capsNote"
+              />
+              <label for="id_password">Password</label>
+              {% if form.password.errors %}
+              <div class="invalid-feedback">
+                {% for error in form.password.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+              </div>
+              {% else %}
+              <div class="invalid-feedback">Your password is required.</div>
+              {% endif %}
+            </div>
+            <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 px-2" id="togglePwd" aria-label="Show password" aria-pressed="false">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          <div id="capsNote" class="form-text text-danger d-none"><i class="bi bi-exclamation-triangle"></i> Caps Lock is ON.</div>
+
+          <!-- Helper row -->
+          <div class="d-flex justify-content-between align-items-center mb-3 reveal" style="--d:.36s">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="remember" name="remember">
+              <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+            <a href="{% url 'password_reset' %}" class="text-decoration-none fw-semibold" style="color:var(--brand)">Forgot password?</a>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid mb-3 reveal" style="--d:.42s">
+            <button class="btn btn-brand" id="submitBtn" type="submit">
+              <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+              <span>Login</span>
+            </button>
+          </div>
+
+          <!-- Secondary links like in the demo footer -->
+          <div class="text-center reveal" style="--d:.5s">
+            <a class="btn btn-outline-secondary rounded-pill me-2 mb-2" href="tel:+255752544403"><i class="bi bi-telephone me-1"></i> Admissions</a>
+            <a class="btn btn-outline-secondary rounded-pill mb-2" href="mailto:mariamontessori1970@gmail.com"><i class="bi bi-envelope me-1"></i> Office</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="credit">© {{ now|date:"Y" }} Maria Montessori School • All rights reserved</div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    // Password visibility toggle
+    (function(){
+      const btn = document.getElementById('togglePwd');
+      const input = document.getElementById('id_password');
+      btn?.addEventListener('click', () => {
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+        btn.querySelector('i')?.classList.toggle('bi-eye');
+        btn.querySelector('i')?.classList.toggle('bi-eye-slash');
+      });
+    })();
+
+    // Caps Lock detection
+    (function(){
+      const pwd = document.getElementById('id_password');
+      const note = document.getElementById('capsNote');
+      function toggleNote(e){
+        const isCaps = e.getModifierState && e.getModifierState('CapsLock');
+        note?.classList.toggle('d-none', !isCaps);
+      }
+      pwd?.addEventListener('keyup', toggleNote);
+      pwd?.addEventListener('keydown', toggleNote);
+    })();
+
+    // Client-side validation + spinner
+    (function(){
+      const form = document.getElementById('loginForm');
+      const btn  = document.getElementById('submitBtn');
+      form?.addEventListener('submit', function(e){
+        if(!form.checkValidity()){
+          e.preventDefault();
+          e.stopPropagation();
+        }else{
+          btn?.setAttribute('disabled','disabled');
+          btn?.querySelector('.spinner-border')?.classList.remove('d-none');
+        }
+        form.classList.add('was-validated');
+      }, false);
+    })();
+  </script>
+  <script>
+    // Intro sequence v3 (simultaneous typing):
+    // 1) Type MAIN and SUB at the same time
+    // 2) Underline grows
+    // 3) SUB deletes letter-by-letter
+    // 4) Type motto line → pause → logo shake → slide-in login
+    document.addEventListener('DOMContentLoaded', function(){
+      const mainText = 'Maria Montessori School';
+      const subText  = 'Pre & Primary School';
+      const motto    = 'Aim for the best, persit and reach higher P.O.BOX 1323 IRINGA';
+
+      const mainEl   = document.getElementById('typeTarget');
+      const mainCaret= document.getElementById('caret');
+      const subEl    = document.getElementById('typeSub');
+      const subCaret = document.getElementById('subCaret');
+      const underline= document.getElementById('typeUnderline');
+      const intro    = document.getElementById('intro');
+      const logo     = document.querySelector('.intro-logo');
+      const reduce   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function startLogin(){
+        if(logo) logo.classList.remove('shake');
+        document.body.classList.add('play');
+        if(intro){ intro.classList.add('exit'); intro.addEventListener('animationend', ()=> intro.remove(), {once:true}); }
+      }
+
+      function typeString(el, str, speed, done){
+        let i = 0; el.textContent = '';
+        (function type(){
+          if(i < str.length){ el.textContent += str.charAt(i++); setTimeout(type, speed); }
+          else{ done && done(); }
+        })();
+      }
+
+      function typeTogether(mainEl, mainStr, subEl, subStr, speed, done){
+        let i=0, j=0; mainEl.textContent=''; subEl.textContent='';
+        (function step(){
+          let progressed=false;
+          if(i < mainStr.length){ mainEl.textContent += mainStr.charAt(i++); progressed=true; }
+          if(j < subStr.length){ subEl.textContent  += subStr.charAt(j++); progressed=true; }
+          if(progressed){ setTimeout(step, speed); }
+          else{ done && done(); }
+        })();
+      }
+
+      function deleteString(el, speed, done){
+        (function del(){
+          const s = el.textContent;
+          if(s.length > 0){ el.textContent = s.slice(0, -1); setTimeout(del, speed); }
+          else{ done && done(); }
+        })();
+      }
+
+      if(reduce){
+        mainEl.textContent = mainText;
+        subEl.textContent  = subText;
+        underline.classList.add('grow');
+        setTimeout(function(){
+          if(logo) logo.classList.add('shake');
+          deleteString(subEl, 20, function(){
+            typeString(subEl, motto, 30, function(){ setTimeout(startLogin, 1200); });
+          });
+        }, 400);
+        return;
+      }
+
+      // Show both carets initially
+      mainCaret.style.opacity = '1';
+      subCaret.style.opacity  = '1';
+
+      // Step 1: type both lines at the same time
+      typeTogether(mainEl, mainText, subEl, subText, 60, function(){
+        // Step 2: underline grows after both finish
+        underline.classList.add('grow');
+        underline.addEventListener('animationend', function onUnder(){
+          underline.removeEventListener('animationend', onUnder);
+          // Step 3: delete SUB to make room for motto
+          if(logo) logo.classList.add('shake');
+          deleteString(subEl, 35, function(){
+            // Hide sub caret while typing motto, keep main caret off
+            subCaret.style.opacity = '1';
+            mainCaret.style.opacity= '0';
+            // Step 4: type motto on the sub line area
+            typeString(subEl, motto, 45, function(){
+              setTimeout(startLogin, 2000);
+            });
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>

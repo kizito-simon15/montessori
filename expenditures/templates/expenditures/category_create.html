@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% load static widget_tweaks %}
+
+{% block title %}
+Create Category
+{% endblock title %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    :root {
+        --primary-color: #e67e22; /* Carrot color */
+    }
+
+    html, body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #fce4ec, #f8bbd0, #f48fb1);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        min-height: 100vh;
+        margin:0;
+        padding:0;
+        color:#333;
+        transition:background-color 0.5s, color 0.5s;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position:0% 50%; }
+        50% { background-position:100% 50%; }
+        100% { background-position:0% 50%; }
+    }
+
+    [data-theme="dark"] {
+        color:#fff;
+    }
+
+    .page-header {
+        text-align: center;
+        padding:40px 20px;
+        position:relative;
+        margin-bottom:30px;
+    }
+
+    .page-header h1 {
+        font-weight:600;
+        color:#ff4081;
+        font-size:2rem;
+        display:inline-flex;
+        align-items:center;
+        gap:0.5rem;
+        animation: fadeInDown 0.8s ease forwards;
+        opacity:0;
+        transform:translateY(-20px);
+    }
+
+    h1::before {
+        content:"📁";
+    }
+
+    @keyframes fadeInDown {
+        to { opacity:1; transform:translateY(0); }
+    }
+
+    .top-actions {
+        position:absolute;
+        top:20px;
+        right:20px;
+        display:flex;
+        align-items:center;
+        gap:15px;
+        z-index:1000;
+    }
+
+    .top-actions a, .top-actions div {
+        cursor:pointer;
+        font-size:1.5em;
+        color:var(--primary-color);
+        transition:transform 0.3s,color 0.3s;
+        font-weight:600;
+        text-decoration:none;
+    }
+
+    .top-actions a:hover, .top-actions div:hover {
+        transform:scale(1.1);
+        color:#d35400;
+    }
+
+    [data-theme="dark"] .top-actions a, [data-theme="dark"] .top-actions div {
+        color:#ffcc00;
+    }
+
+    [data-theme="dark"] .top-actions a:hover, [data-theme="dark"] .top-actions div:hover {
+        color:#ffc107;
+    }
+
+    .form-section {
+        width:100%;
+        max-width:500px;
+        margin:0 auto;
+        padding:40px 20px;
+        background:#fff;
+        border-radius:20px;
+        box-shadow:0 2px 15px rgba(0,0,0,0.05);
+        animation: slideIn 0.8s ease forwards;
+        opacity:0;
+        transform:translateX(-50px);
+    }
+
+    [data-theme="dark"] .form-section {
+        background:#2c2c2c;
+    }
+
+    @keyframes slideIn {
+        to {
+            opacity:1;
+            transform:translateX(0);
+        }
+    }
+
+    .form-group {
+        margin-bottom:25px;
+        position:relative;
+        animation: slideUp 0.8s ease forwards;
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    .form-group:nth-child(1) {
+        animation-delay:0.3s;
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+
+    .form-label {
+        font-weight:bold;
+        margin-bottom:10px;
+        display:block;
+        font-size:1rem;
+        color:inherit;
+    }
+
+    .form-label::before {
+        content:"💡 ";
+    }
+
+    input.form-control {
+        background:#f9f9f9;
+        color:#333;
+        width:100%;
+        padding:15px;
+        border:2px solid #ddd;
+        border-radius:10px;
+        font-size:1rem;
+        transition:border-color 0.3s, box-shadow 0.3s;
+    }
+
+    [data-theme="dark"] input.form-control {
+        background:#444;
+        color:#fff;
+        border-color:#555;
+    }
+
+    input.form-control:focus {
+        border-color:#80cbc4;
+        outline:none;
+        box-shadow:0 0 8px rgba(128,203,196,0.3);
+    }
+
+    .submit-btn {
+        background: var(--primary-color);
+        color:#fff;
+        border:none;
+        border-radius:50px;
+        font-weight:600;
+        padding:12px 24px;
+        font-size:0.9rem;
+        transition: background 0.3s, transform 0.3s;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:0.5rem;
+        margin-top:10px;
+    }
+
+    .submit-btn:hover {
+        background:#d35400;
+        transform:translateY(-2px);
+        box-shadow:0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .submit-btn i {
+        font-size:1rem;
+    }
+
+    .errorlist {
+        color:#dc3545;
+        margin-top:5px;
+        font-size:0.9rem;
+        list-style:none;
+        padding:0;
+    }
+
+    .errorlist li::before {
+        content:"⚠ ";
+        margin-right:5px;
+    }
+
+    @media(max-width:600px) {
+        .page-header h1 {
+            font-size:1.5rem;
+        }
+        input.form-control {
+            font-size:0.95rem;
+        }
+        .submit-btn {
+            font-size:0.85rem;
+            padding:10px 20px;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h1>Create Category</h1>
+    <div class="top-actions">
+        <!-- Link back to categories list -->
+        <a href="{% url 'category_list' %}" title="Back to Categories">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <a href="{% url 'select_link' %}" title="Return to Dashboard">
+            <i class="fas fa-home"></i>
+        </a>
+        <div class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fas fa-sun"></i>
+        </div>
+    </div>
+</div>
+
+<div class="form-section" id="formSection">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-group">
+            <label for="id_name" class="form-label">Category Name</label>
+            {{ form.name.errors }}
+            {{ form.name|add_class:"form-control" }}
+            {% if form.name.help_text %}
+            <small class="form-text text-muted">{{ form.name.help_text }}</small>
+            {% endif %}
+        </div>
+        <button type="submit" class="submit-btn">
+            <i class="fas fa-plus"></i> Create
+        </button>
+    </form>
+</div>
+
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+
+    function toggleTheme() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        htmlElement.setAttribute('data-theme', newTheme);
+        themeToggle.innerHTML = newTheme === 'dark' 
+            ? '<i class="fas fa-moon"></i>' 
+            : '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', newTheme);
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        htmlElement.setAttribute('data-theme', savedTheme);
+        themeToggle.innerHTML = savedTheme === 'dark'
+            ? '<i class="fas fa-moon"></i>'
+            : '<i class="fas fa-sun"></i>';
+    }
+</script>
+{% endblock %}

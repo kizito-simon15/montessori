@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Subject Clusters - St. John Paul II Secondary School
+{% endblock title %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #00b7eb;
+        --secondary: #5856d6;
+        --success: #34c759;
+        --danger: #ff3b30;
+        --warning: #ff9500;
+        --info: #5ac8fa;
+        --light: #f2f2f7;
+        --dark: #1c2526;
+        --background: #e6f7ff;
+        --section-bg: #ffffff;
+        --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-family);
+        color: #000000;
+        background: var(--background);
+        padding: 0;
+        margin: 0;
+    }
+
+    .dark-mode {
+        background: var(--dark);
+        color: #ffffff;
+    }
+
+    .dark-mode .dashboard-header,
+    .dark-mode .shadow-card {
+        background: #2c2c2e;
+    }
+
+    .dark-mode .dashboard-section-title {
+        color: var(--primary);
+    }
+
+    .dark-mode .list-group-item {
+        background: #3a3a3c;
+        color: #ffffff;
+    }
+
+    .dark-mode .text-muted {
+        color: #d1d5db;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary), #0095c7);
+        color: #ffffff;
+        text-align: center;
+        padding: 1rem;
+        margin: 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-header h1 {
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .dashboard-header .lead {
+        font-size: 0.9rem;
+        margin: 0.3rem 0 0;
+    }
+
+    .dashboard-section-title {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-emoji {
+        font-size: 1.3rem;
+    }
+
+    .shadow-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(15px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeIn 0.8s ease forwards;
+    }
+
+    .shadow-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .chart-container img {
+        max-width: 100%;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .chart-container img:hover {
+        transform: scale(1.02);
+    }
+
+    .list-group-item {
+        background: var(--section-bg);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        padding: 0.8rem;
+        transition: transform 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+    }
+
+    .col-md-3, .col-md-12 {
+        padding: 0 0.5rem;
+        box-sizing: border-box;
+    }
+
+    .col-md-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    .col-md-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .col-md-3, .col-md-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .dashboard-section-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>📊 Subject Performance Clusters</h1>
+    <p class="lead mb-0">
+        St. John Paul II Secondary School
+    </p>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if message %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="shadow-card">
+                <p class="text-muted">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="shadow-card">
+                <h3 class="dashboard-section-title"><span class="section-emoji">📈</span> Subject Clusters</h3>
+                {% if cluster_chart %}
+                    <div class="chart-container">
+                        <img src="data:image/png;base64,{{ cluster_chart }}" alt="Subject Performance Clusters">
+                    </div>
+                {% else %}
+                    <p class="text-muted">No clustering data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <h3 class="dashboard-section-title"><span class="section-emoji">📋</span> Subject Clusters and Recommendations</h3>
+    {% for cluster, subjects in cluster_labels|items %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="shadow-card">
+                    <h5>{{ cluster }} Performing Subjects</h5>
+                    {% for subject in subjects %}
+                        <div class="list-group-item" style="border-left: 3px solid {% if cluster == 'Low' %}var(--danger){% elif cluster == 'Medium' %}var(--warning){% else %}var(--success){% endif %};">
+                            <strong>{{ subject }}</strong>
+                        </div>
+                    {% endfor %}
+                    <p class="text-muted">{{ intervention_recommendations.cluster }}</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,1276 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Header Section with Logo -->
+    <div class="header-section">
+        <div class="logo-container">
+            <img src="{% static 'images/logo.jpg' %}" alt="School Logo" class="school-logo">
+        </div>
+        <h1>THE CATHOLIC DIOCESE OF KAHAMA</h1>
+        <h2>ST. JOHN PAUL II KAHAMA SECONDARY SCHOOL</h2>
+        <h3>FOM ZILIZOJAZWA KWA DARASA: {{ student_class.name }}</h3>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="filter-section">
+        <form id="filter-form" class="form-inline" method="GET">
+            <div class="form-group">
+                <label for="session">Session</label>
+                <select id="session" name="session" class="form-control">
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>{{ session.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="term">Term</label>
+                <select id="term" name="term" class="form-control">
+                    {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>{{ term.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="exam">Exam</label>
+                <select id="exam" name="exam" class="form-control">
+                    {% for exam in exams %}
+                        <option value="{{ exam.id }}" {% if exam.id == current_exam_type.id %}selected{% endif %}>{{ exam.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-filter">Filter</button>
+        </form>
+    </div>
+
+    <!-- Search Form -->
+    <form method="GET" class="search-form">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" value="{{ request.GET.q|default_if_none:'' }}" placeholder="Search by name or registration number">
+            <button type="submit" class="btn btn-search">Search</button>
+        </div>
+    </form>
+
+    <!-- Black-and-White Print Toggle -->
+    <div class="print-toggle-section">
+        <label for="bw-print-toggle">
+            <input type="checkbox" id="bw-print-toggle" onchange="toggleBWPrint(this)">
+            Black-and-White Printing
+        </label>
+    </div>
+
+    <!-- Key Section -->
+    <div class="key-section">
+        <p class="key-title">UFUNGUO:</p>
+        <p class="text-success">Fom Zilizokamilika: ✔</p>
+        <p class="text-danger">Fom Ambazo Hazijakamilika: ❌</p>
+        <p class="text-info">Jumla ya Fom Zilizokamilika: {{ completed_forms_count }}</p>
+    </div>
+
+    {% if no_forms %}
+        <h4 class="text-center text-danger">No result cards have been created in this session, term, and exam type</h4>
+    {% else %}
+    <!-- Form Status Table -->
+    <table class="table table-bordered status-table">
+        <thead>
+            <tr>
+                <th>S/N</th>
+                <th>Jina la Mwanafunzi</th>
+                <th>Maendeleo ya Fom</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student_info in students_with_forms %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ student_info.firstname }} {{ student_info.middle_name }} {{ student_info.surname }}</td>
+                <td>
+                    {% with last_info=student_info.alevelstudentinfos_set.last %}
+                        {% if last_info and last_info.head_comments %}
+                            <span class="text-success">✔</span>
+                        {% else %}
+                            <span class="text-danger">❌</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Student Result Cards -->
+    {% for student_result in student_results %}
+    <div class="student-info" id="student-{{ student_result.student.id }}">
+        <div class="student-header">
+            <div class="logo-container">
+                <img src="{% static 'images/logo.jpg' %}" alt="School Logo" class="school-logo">
+            </div>
+            <div class="school-details">
+                <h1>THE CATHOLIC DIOCESE OF KAHAMA</h1>
+                <h2>ST. JOHN PAUL II KAHAMA SECONDARY SCHOOL</h2>
+            </div>
+        </div>
+        <div class="student-details">
+            <h3>TAARIFA YA MAENDELEO YA TAALUMA NA TABIA</h3>
+            <h4>DARASA: {{ student_class.name }} | MHULA: {{ current_term.name }} | MWAKA: {{ current_session.name }} | MTIHANI: {{ current_exam_type.name }}</h4>
+            <h5>Jina la Mwanafunzi: {{ student_result.student.firstname }} {{ student_result.student.middle_name }} {{ student_result.student.surname }}</h5>
+            <h5>Registration Number: {{ student_result.student.registration_number }}</h5>
+        </div>
+        <table class="table table-bordered academic-table">
+            <thead class="academic-table-header">
+                <tr>
+                    <th>SOMO</th>
+                    <th>JARIBIO</th>
+                    <th>MTIHANI</th>
+                    <th>WASTANI</th>
+                    <th>DARAJA</th>
+                    <th>MAONI</th>
+                    <th>DIVISION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in student_result.results %}
+                <tr>
+                    <td>{{ result.subject }}</td>
+                    <td>{{ result.test_score|default:"-" }}</td>
+                    <td>{{ result.exam_score|default:"-" }}</td>
+                    <td>{{ result.average|floatformat:"2" }}</td>
+                    <td>{{ result.calculate_grade }}</td>
+                    <td>{{ result.calculate_comments }}</td>
+                    <td>{{ result.division }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No results available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="text-center">
+            JUMLA YA ALAMA ALIZOPATA <span class="highlight">{{ student_result.total_average|floatformat:"2"|default:"-" }}</span> KATI YA ALAMA
+            <span class="highlight">{{ student_result.overall_total_marks|floatformat:"2"|default:"-" }}</span> | WASTANI
+            <span class="highlight">{{ student_result.overall_average|floatformat:"2"|default:"-" }}</span> | DARAJA
+            <span class="highlight">{{ student_result.overall_grade }}</span> | NAFASI YAKE DARASANI
+            <span class="position-highlight">{{ student_result.position|default:"-" }}</span> KATI YA WANAFUNZI <span class="highlight">{{ total_active_students }}</span> | DIVISION
+            <span class="highlight">{{ student_result.division }}</span>
+        </p>
+        {% for student_info in students_with_forms %}
+            {% if student_info.id == student_result.student.id %}
+                {% with last_info=student_info.alevelstudentinfos_set.last %}
+                {% if last_info %}
+                <div class="behavior-section">
+                    <p class="behavior-title">TABIA YAKE KWA UJUMLA</p>
+                    <div class="behavior-table-wrapper">
+                        <div class="behavior-table">
+                            <div class="behavior-row behavior-header">
+                                <div class="behavior-cell">Kigezo</div>
+                                <div class="behavior-cell">Daraja</div>
+                            </div>
+                            <div class="behavior-row">
+                                <div class="behavior-cell">Discipline</div>
+                                <div class="behavior-cell">{{ last_info.disprine }}</div>
+                            </div>
+                            <div class="behavior-row">
+                                <div class="behavior-cell">Sports</div>
+                                <div class="behavior-cell">{{ last_info.sports }}</div>
+                            </div>
+                            <div class="behavior-row">
+                                <div class="behavior-cell">Care of Property</div>
+                                <div class="behavior-cell">{{ last_info.care_of_property }}</div>
+                            </div>
+                            <div class="behavior-row">
+                                <div class="behavior-cell">Collaborations</div>
+                                <div class="behavior-cell">{{ last_info.collaborations }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p>
+                        Shule Imefungwa Tarehe: <span class="highlight">{{ last_info.date_of_closing|default:"-" }}</span> |
+                        Itafunguliwa Tarehe: <span class="highlight">{{ last_info.date_of_opening|default:"-" }}</span>
+                    </p>
+                </div>
+                <p class="comment-title">MAONI YA MKUU WA SHULE:</p>
+                <div class="head-comment-box">
+                    <div class="head-comment-placeholder">{{ last_info.head_comments|default:"" }}</div>
+                </div>
+                <div class="signature-section">
+                    <div class="signature-item manual-signature">
+                        <strong>MUHURI WA SHULE:</strong><br>
+                        <div class="signature-placeholder"></div>
+                    </div>
+                </div>
+                <p class="comment-title">MAONI YA MZAZI:</p>
+                <div class="parent-comment-box">
+                    <div class="parent-comment-placeholder"></div>
+                </div>
+                {% endif %}
+                {% endwith %}
+                <div class="print-individual">
+                    <button class="btn btn-print-individual" onclick="printForm('student-{{ student_result.student.id }}')">Print This Form</button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Print All Button -->
+    <div class="print-section">
+        <button class="btn btn-print" onclick="printAllForms()">Print All Forms</button>
+    </div>
+</div>
+
+<!-- Additional CSS -->
+<style>
+    :root {
+        --primary-teal: #319795;
+        --secondary-teal: #2c7a7b;
+        --deep-sky-blue: #00b5d1;
+        --light-gray: #f8fafc;
+        --mid-gray: #edf2f7;
+        --dark-gray: #d1d5db;
+        --success-green: #2f855a;
+        --danger-red: #c53030;
+        --info-blue: #3182ce;
+        --hover-blue: #bee3f8;
+        --text-dark: #2d3748;
+        --text-mid: #4a5568;
+        --text-light: #718096;
+        --behavior-bg: #fefcbf;
+        --behavior-hover: #fef08a;
+        --position-bg: #e6fffa;
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--light-gray), #e6fffa);
+        font-family: 'Inter', 'Poppins', 'Roboto', sans-serif;
+        color: var(--text-dark);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .container {
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        padding: 15px;
+        background: transparent;
+    }
+
+    .print-toggle-section {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .print-toggle-section label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-mid);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .print-toggle-section input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, rgba(49, 151, 149, 0.1), rgba(0, 181, 209, 0.1));
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo-container {
+        margin-bottom: 10px;
+    }
+
+    .school-logo {
+        width: 50px;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        border: 2px solid var(--primary-teal);
+    }
+
+    .header-section h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-teal);
+        text-transform: uppercase;
+        margin: 3px 0;
+        letter-spacing: 0.8px;
+    }
+
+    .header-section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--deep-sky-blue);
+        text-transform: uppercase;
+        margin: 3px 0;
+    }
+
+    .header-section h3 {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-light);
+        margin: 3px 0;
+    }
+
+    .filter-section {
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-inline {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-mid);
+        margin-bottom: 3px;
+    }
+
+    .form-control, .form-select {
+        width: 200px;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid var(--dark-gray);
+        font-size: 0.9rem;
+        background: #f7fafc;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--deep-sky-blue);
+        box-shadow: 0 2px 8px rgba(0, 181, 209, 0.2);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--deep-sky-blue);
+        box-shadow: 0 2px 8px rgba(0, 181, 209, 0.3);
+        outline: none;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal));
+        color: white;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .search-form {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .input-group {
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-form .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 8px 0 0 8px;
+        background: #f7fafc;
+        font-size: 0.9rem;
+    }
+
+    .btn-search {
+        background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 0 8px 8px 0;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .key-section {
+        background: linear-gradient(135deg, rgba(49, 151, 149, 0.05), rgba(0, 181, 209, 0.05));
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .key-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-teal);
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .key-section p {
+        margin: 5px 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .text-success {
+        color: var(--success-green) !important;
+    }
+
+    .text-danger {
+        color: var(--danger-red) !important;
+    }
+
+    .text-info {
+        color: var(--info-blue) !important;
+    }
+
+    .status-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .status-table thead {
+        background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .status-table th {
+        padding: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        border-bottom: 1px solid var(--dark-gray);
+    }
+
+    .status-table td {
+        padding: 8px;
+        border-bottom: 1px solid var(--dark-gray);
+        color: var(--text-dark);
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .status-table th:nth-child(1), .status-table td:nth-child(1) { width: 15%; }
+    .status-table th:nth-child(2), .status-table td:nth-child(2) { width: 65%; }
+    .status-table th:nth-child(3), .status-table td:nth-child(3) { width: 20%; }
+
+    .status-table tr:nth-child(even) {
+        background-color: var(--mid-gray) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .status-table tr:hover {
+        background-color: var(--hover-blue) !important;
+        transition: background-color 0.3s ease;
+    }
+
+    .student-info {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        page-break-inside: avoid;
+        border: 1px solid var(--dark-gray);
+    }
+
+    .student-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .school-details {
+        text-align: center;
+        flex: 1;
+    }
+
+    .school-details h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-teal);
+        text-transform: uppercase;
+        margin: 3px 0;
+    }
+
+    .school-details h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--deep-sky-blue);
+        text-transform: uppercase;
+        margin: 3px 0;
+    }
+
+    .student-details h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: center;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .student-details h4, .student-details h5 {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-mid);
+        text-align: center;
+        margin: 5px 0;
+    }
+
+    .student-details h4 span, .student-details h5 span {
+        color: var(--deep-sky-blue);
+        font-weight: 600;
+    }
+
+    .text-center {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        margin: 10px 0;
+    }
+
+    .highlight {
+        color: var(--success-green);
+        font-weight: 600;
+    }
+
+    .position-highlight {
+        display: inline-block;
+        background-color: var(--position-bg);
+        color: var(--primary-teal);
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 8px;
+        border: 2px solid var(--primary-teal);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .academic-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 15px;
+    }
+
+    .academic-table-header {
+        background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .academic-table-header tr {
+        background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .academic-table-header th {
+        padding: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        border-bottom: 1px solid var(--dark-gray);
+        background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .academic-table td {
+        padding: 8px;
+        border-bottom: 1px solid var(--dark-gray);
+        color: var(--text-dark);
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .academic-table th:nth-child(1), .academic-table td:nth-child(1) { width: 20%; }
+    .academic-table th:nth-child(2), .academic-table td:nth-child(2) { width: 15%; }
+    .academic-table th:nth-child(3), .academic-table td:nth-child(3) { width: 15%; }
+    .academic-table th:nth-child(4), .academic-table td:nth-child(4) { width: 10%; }
+    .academic-table th:nth-child(5), .academic-table td:nth-child(5) { width: 10%; }
+    .academic-table th:nth-child(6), .academic-table td:nth-child(6) { width: 20%; }
+    .academic-table th:nth-child(7), .academic-table td:nth-child(7) { width: 10%; }
+
+    .academic-table tr:nth-child(even) {
+        background-color: #e6fffa !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .academic-table tr:hover {
+        background-color: var(--hover-blue) !important;
+        transition: background-color 0.3s ease;
+    }
+
+    .behavior-section {
+        margin: 15px 0;
+    }
+
+    .behavior-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-teal);
+        text-align: center;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .behavior-table-wrapper {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .behavior-table {
+        display: flex;
+        flex-direction: column;
+        background: var(--behavior-bg);
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 2px dashed var(--primary-teal);
+    }
+
+    .behavior-row {
+        display: flex;
+        border-bottom: 1px dashed var(--dark-gray);
+        transition: background-color 0.3s ease;
+    }
+
+    .behavior-row:hover {
+        background-color: var(--behavior-hover) !important;
+    }
+
+    .behavior-header {
+        background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)) !important;
+        color: white !important;
+    }
+
+    .behavior-cell {
+        flex: 1;
+        padding: 10px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: center;
+        border-right: 1px dashed var(--dark-gray);
+        border-radius: 8px;
+        margin: 2px;
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .behavior-cell:last-child {
+        border-right: none;
+    }
+
+    .behavior-row:nth-child(even) .behavior-cell {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .behavior-section p {
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        margin: 8px 0;
+    }
+
+    .behavior-section p span {
+        color: var(--deep-sky-blue);
+        font-weight: 600;
+    }
+
+    .signature-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .signature-item {
+        text-align: center;
+    }
+
+    .manual-signature .signature-placeholder {
+        width: 150px;
+        height: 40px;
+        border-bottom: 1px solid #000;
+        margin-top: 8px;
+    }
+
+    .comment-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-teal);
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .head-comment-box {
+        margin: 15px 0;
+        text-align: center;
+    }
+
+    .head-comment-placeholder {
+        width: 100%;
+        max-width: 650px;
+        min-height: 100px;
+        border: 2px dashed var(--dark-gray);
+        background: #f7fafc;
+        margin: 0 auto;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        padding: 10px;
+        text-align: left;
+        white-space: pre-wrap;
+    }
+
+    .parent-comment-box {
+        margin: 15px 0;
+        text-align: center;
+    }
+
+    .parent-comment-placeholder {
+        width: 100%;
+        max-width: 650px;
+        height: 100px;
+        border: 2px dashed var(--dark-gray);
+        background: #f7fafc;
+        margin: 0 auto;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        font-style: italic;
+    }
+
+    .print-section, .print-individual {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .btn-print, .btn-print-individual {
+        background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-print:hover, .btn-print-individual:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background: none !important;
+            font-size: 9pt !important;
+            line-height: 1.2 !important;
+        }
+
+        .container {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 190mm !important;
+        }
+
+        .filter-section, .search-form, .print-section, .print-individual, .print-toggle-section {
+            display: none !important;
+        }
+
+        .header-section, .key-section, .student-info {
+            page-break-inside: avoid;
+        }
+
+        .header-section {
+            padding: 10mm !important;
+            margin-bottom: 5mm !important;
+        }
+
+        .school-logo {
+            width: 30mm !important;
+            height: auto !important;
+        }
+
+        .header-section h1 {
+            font-size: 12pt !important;
+            margin: 2mm 0 !important;
+        }
+
+        .header-section h2 {
+            font-size: 10pt !important;
+            margin: 2mm 0 !important;
+        }
+
+        .header-section h3 {
+            font-size: 9pt !important;
+            margin: 2mm 0 !important;
+        }
+
+        .student-header {
+            margin-bottom: 5mm !important;
+        }
+
+        .student-details h3 {
+            font-size: 10pt !important;
+            margin-bottom: 3mm !important;
+        }
+
+        .student-details h4, .student-details h5 {
+            font-size: 8pt !important;
+            margin: 2mm 0 !important;
+        }
+
+        .text-center {
+            font-size: 8pt !important;
+            margin: 3mm 0 !important;
+        }
+
+        .position-highlight {
+            background-color: var(--position-bg) !important;
+            color: var(--primary-teal) !important;
+            border: 0.5mm solid var(--primary-teal) !important;
+            padding: 2mm 4mm !important;
+            border-radius: 4mm !important;
+        }
+
+        .status-table, .academic-table {
+            box-shadow: none !important;
+            border: 0.5mm solid #000 !important;
+            width: 100% !important;
+        }
+
+        .status-table thead {
+            background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)) !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .academic-table-header {
+            background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0) !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .academic-table-header tr {
+            background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .academic-table-header th {
+            background: linear-gradient(135deg, var(--deep-sky-blue), #0987a0) !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .status-table th, .status-table td,
+        .academic-table th, .academic-table td {
+            border: 0.3mm solid #000 !important;
+            padding: 2mm !important;
+            font-size: 8pt !important;
+        }
+
+        .status-table tr:nth-child(even),
+        .academic-table tr:nth-child(even) {
+            background-color: #e6fffa !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .behavior-table {
+            box-shadow: none !important;
+            border: 0.5mm dashed #000 !important;
+            background: var(--behavior-bg) !important;
+        }
+
+        .behavior-row {
+            border-bottom: 0.3mm dashed #000 !important;
+        }
+
+        .behavior-cell {
+            border-right: 0.3mm dashed #000 !important;
+            padding: 2mm !important;
+            font-size: 8pt !important;
+            border-radius: 4mm !important;
+            margin: 1mm !important;
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .behavior-cell:last-child {
+            border-right: none !important;
+        }
+
+        .behavior-row:nth-child(even) .behavior-cell {
+            background: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .behavior-header {
+            background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)) !important;
+            color: white !important;
+        }
+
+        .behavior-section {
+            margin: 3mm 0 !important;
+        }
+
+        .behavior-title {
+            font-size: 9pt !important;
+            margin-bottom: 3mm !important;
+        }
+
+        .behavior-section p {
+            font-size: 8pt !important;
+            margin: 2mm 0 !important;
+        }
+
+        .signature-section {
+            margin: 5mm 0 !important;
+        }
+
+        .manual-signature .signature-placeholder {
+            width: 40mm !important;
+            height: 10mm !important;
+        }
+
+        .comment-title {
+            font-size: 9pt !important;
+            margin: 3mm 0 !important;
+        }
+
+        .head-comment-box, .parent-comment-box {
+            margin: 3mm 0 !important;
+        }
+
+        .head-comment-placeholder, .parent-comment-placeholder {
+            width: 100% !important;
+            max-width: 170mm !important;
+            min-height: 25mm !important;
+            border: 0.5mm dashed #000 !important;
+            background: transparent !important;
+            border-radius: 3mm !important;
+            font-size: 8pt !important;
+            padding: 3mm !important;
+        }
+
+        body.bw-print {
+            background: none !important;
+            color: #000 !important;
+        }
+
+        body.bw-print .container,
+        body.bw-print .header-section,
+        body.bw-print .key-section,
+        body.bw-print .status-table,
+        body.bw-print .student-info,
+        body.bw-print .academic-table,
+        body.bw-print .behavior-table,
+        body.bw-print .behavior-cell,
+        body.bw-print .head-comment-placeholder,
+        body.bw-print .parent-comment-placeholder,
+        body.bw-print .position-highlight {
+            background: none !important;
+            background-color: transparent !important;
+            color: #000 !important;
+            border-color: #000 !important;
+        }
+
+        body.bw-print .status-table thead,
+        body.bw-print .academic-table-header,
+        body.bw-print .academic-table-header tr,
+        body.bw-print .academic-table-header th,
+        body.bw-print .behavior-header,
+        body.bw-print .status-table tr:nth-child(even),
+        body.bw-print .academic-table tr:nth-child(even),
+        body.bw-print .behavior-row:nth-child(even) .behavior-cell {
+            background: none !important;
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+
+        body.bw-print .text-success,
+        body.bw-print .text-danger,
+        body.bw-print .text-info,
+        body.bw-print .highlight,
+        body.bw-print .header-section h1,
+        body.bw-print .header-section h2,
+        body.bw-print .header-section h3,
+        body.bw-print .school-details h1,
+        body.bw-print .header-section h2 {
+            color: #000 !important;
+        }
+
+        body.bw-print .student-details h3,
+        body.bw-print .student-details h4,
+        body.bw-print .student-details h5,
+        body.bw-print .student-details h4 span,
+        body.bw-print .student-details h5 span,
+        body.bw-print .behavior-title,
+        body.bw-print .behavior-section p,
+        body.bw-print .behavior-section p span,
+        body.bw-print .comment-title,
+        body.bw-print .position-highlight {
+            color: #000 !important;
+        }
+
+        body.bw-print .school-logo {
+            filter: grayscale(100%) !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        .header-section h1 {
+            font-size: 1.25rem;
+        }
+
+        .header-section h2 {
+            font-size: 1.1rem;
+        }
+
+        .header-section h3 {
+            font-size: 0.9rem;
+        }
+
+        .school-logo {
+            width: 40px;
+        }
+
+        .form-control, .form-select {
+            width: 150px;
+        }
+
+        .student-header {
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-table th, .status-table td,
+        .academic-table th, .academic-table td {
+            padding: 6px;
+            font-size: 0.75rem;
+        }
+
+        .behavior-cell {
+            padding: 6px;
+            font-size: 0.75rem;
+        }
+
+        .signature-section {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .head-comment-placeholder, .parent-comment-placeholder {
+            min-height: 80px;
+        }
+
+        .position-highlight {
+            padding: 3px 6px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 5px;
+        }
+
+        .header-section h1 {
+            font-size: 1rem;
+        }
+
+        .header-section h2 {
+            font-size: 0.9rem;
+        }
+
+        .header-section h3 {
+            font-size: 0.75rem;
+        }
+
+        .school-logo {
+            width: 30px;
+        }
+
+        .form-control, .form-select {
+            width: 120px;
+        }
+
+        .status-table th, .status-table td,
+        .academic-table th, .academic-table td {
+            padding: 4px;
+            font-size: 0.65rem;
+        }
+
+        .behavior-cell {
+            padding: 4px;
+            font-size: 0.65rem;
+        }
+
+        .head-comment-placeholder, .parent-comment-placeholder {
+            min-height: 60px;
+        }
+
+        .position-highlight {
+            padding: 2px 4px;
+        }
+    }
+</style>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        window.toggleBWPrint = function(checkbox) {
+            if (checkbox.checked) {
+                document.body.classList.add('bw-print');
+            } else {
+                document.body.classList.remove('bw-print');
+            }
+        };
+
+        window.printForm = function(studentId) {
+            console.log('Printing form for student ID:', studentId);
+            const studentForms = document.querySelectorAll('.student-info');
+            const originalStyles = new Map();
+            studentForms.forEach(form => {
+                originalStyles.set(form, form.style.display || 'block');
+                form.style.display = 'none';
+            });
+
+            const formToPrint = document.getElementById(studentId);
+            if (formToPrint) {
+                formToPrint.style.display = 'block';
+            } else {
+                console.error('Form to print not found:', studentId);
+                return;
+            }
+
+            const elementsToHide = document.querySelectorAll('.filter-section, .search-form, .print-section, .print-individual, .print-toggle-section');
+            const hiddenElements = new Map();
+            elementsToHide.forEach(element => {
+                hiddenElements.set(element, element.style.display || 'block');
+                element.style.display = 'none';
+            });
+
+            console.log('Triggering print...');
+            window.print();
+
+            studentForms.forEach(form => {
+                form.style.display = originalStyles.get(form);
+            });
+            elementsToHide.forEach(element => {
+                element.style.display = hiddenElements.get(element);
+            });
+
+            console.log('Print completed, visibility restored.');
+        };
+
+        window.printAllForms = function() {
+            console.log('Printing all forms...');
+            const elementsToHide = document.querySelectorAll('.filter-section, .search-form, .print-section, .print-individual, .print-toggle-section');
+            const hiddenElements = new Map();
+            elementsToHide.forEach(element => {
+                hiddenElements.set(element, element.style.display || 'block');
+                element.style.display = 'none';
+            });
+
+            const studentForms = document.querySelectorAll('.student-info');
+            const originalStyles = new Map();
+            studentForms.forEach(form => {
+                originalStyles.set(form, form.style.display || 'block');
+                form.style.display = 'block';
+            });
+
+            console.log('Triggering print for all forms...');
+            window.print();
+
+            studentForms.forEach(form => {
+                form.style.display = originalStyles.get(form);
+            });
+            elementsToHide.forEach(element => {
+                element.style.display = hiddenElements.get(element);
+            });
+
+            console.log('Print all forms completed, visibility restored.');
+        };
+    });
+</script>
+{% endblock content %}

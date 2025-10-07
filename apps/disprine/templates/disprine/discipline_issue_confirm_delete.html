@@ -1,0 +1,13 @@
+<!-- apps/disprine/templates/disprine/discipline_issue_confirm_delete.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mt-4 mb-4">Confirm Delete</h2>
+<p>Are you sure you want to delete this discipline issue?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'discipline_issue_detail' issue.student.id %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

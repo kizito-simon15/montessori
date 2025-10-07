@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="alert alert-success" role="alert">
+                <h1 class="alert-heading">Students Deleted Successfully!</h1>
+                <p class="mb-0">The students have been successfully deleted.</p>
+            </div>
+            <a href="{% url 'delete_students' %}" class="btn btn-success">Go Back</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

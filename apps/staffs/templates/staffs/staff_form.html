@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static form_tags %}
+
+{% block content %}
+<!-- ───────────────────────────── JS HELPERS ───────────────────────────── -->
+<script>
+// Everything lives in one DOMContentLoaded to avoid polluting global scope
+document.addEventListener("DOMContentLoaded", () => {
+  /* tiny debounce util -------------------------------------------------- */
+  const debounce = (fn, ms = 300) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+
+  /* auto‑calculate contract_end_date ------------------------------------ */
+  const dur   = document.getElementById("id_contract_duration"),
+        start = document.getElementById("id_contract_start_date"),
+        end   = document.getElementById("id_contract_end_date");
+  const calcEnd = () => {
+    if (!dur?.value || !start?.value) { end.value = ""; return; }
+    const d = new Date(start.value);     if (isNaN(d)) { end.value=""; return; }
+    const n = parseInt(dur.value.match(/\d+/)); if (isNaN(n)) { end.value=""; return; }
+    ( /year/i.test(dur.value) ? d.setFullYear : d.setMonth )
+      .call(d, /year/i.test(dur.value) ? d.getFullYear() + n : d.getMonth() + n);
+    end.value = d.toISOString().split("T")[0];
+  };
+  [dur, start].forEach(el => el?.addEventListener("input", debounce(calcEnd)));
+
+  /* live validators (Tanzanian mobile + basic email) -------------------- */
+  const mob  = document.getElementById("id_mobile_number"),
+        mail = document.getElementById("id_email");
+  const vMob  = () => mob?.classList.toggle("is-invalid", mob.value && !/^\+255\d{9}$/.test(mob.value));
+  const vMail = () => mail?.classList.toggle("is-invalid", mail.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail.value));
+  mob?.addEventListener("input", debounce(vMob));
+  mail?.addEventListener("input", debounce(vMail));
+
+  /* collapsible field‑sets --------------------------------------------- */
+  document.querySelectorAll(".vs-fieldset").forEach((fs,i)=>{
+    const lg   = fs.querySelector("legend"),
+          body = fs.querySelector(".fieldset-content");
+    if(localStorage.getItem(`sf${i}`)==="1"){ body.style.display="none"; lg.classList.add("collapsed"); }
+    lg.onclick = ()=>{
+      const hide = body.style.display !== "none";
+      body.style.display = hide ? "none" : "grid";
+      lg.classList.toggle("collapsed", hide);
+      localStorage.setItem(`sf${i}`, hide?"1":"0");
+    };
+  });
+
+  /* HELSB rate field toggle --------------------------------------------- */
+  const chk = document.getElementById("id_has_helsb"),
+        grp = document.getElementById("id_helsb_rate")?.closest(".form-group");
+  const toggleRate = () => grp && (grp.style.display = chk?.checked ? "" : "none");
+  chk?.addEventListener("change", toggleRate);
+  toggleRate();
+
+  /* fade‑in card -------------------------------------------------------- */
+  const card = document.querySelector(".card");
+  setTimeout(()=>{ card.style.opacity="1"; card.style.transform="translateY(0)"; }, 80);
+});
+</script>
+
+<!-- ───────────────────────────── INLINE CSS ───────────────────────────── -->
+<style>
+:root{
+  --blue: #007aff; --bg: #f2f2f7; --card:#fff; --shadow:0 4px 12px rgba(0,0,0,.06);
+  --danger:#ff3b30;
+}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",sans-serif;}
+
+/* card container */
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);width:clamp(280px,94vw,1200px);margin:0 auto 1rem;overflow:hidden;opacity:0;transform:translateY(24px);transition:.45s;}
+@media(max-width:768px){.card{width:100vw;border-radius:0;box-shadow:none}}
+.card-header{padding:1rem 1.4rem;border-bottom:1px solid #e5e5ea;display:flex;align-items:center;gap:.6rem}
+.card-header h2{margin:0;font-size:1.25rem;font-weight:600}
+.card-body{padding:1.4rem 1.6rem 2rem;display:grid;gap:1.4rem}
+
+/* collapsible group */
+.vs-fieldset{border:none;border-radius:12px;background:var(--bg)}
+.vs-fieldset legend{cursor:pointer;font-size:.9rem;font-weight:600;color:#3c3c43;padding:.8rem 1.2rem;display:flex;align-items:center;gap:.45rem}
+.vs-fieldset legend::after{content:"▾";margin-left:auto;transition:.2s;color:#3c3c4399}
+.vs-fieldset legend.collapsed::after{transform:rotate(-90deg)}
+.fieldset-content{padding:1rem 1.2rem;display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+@media(max-width:600px){.fieldset-content{grid-template-columns:1fr}}
+
+/* form controls */
+.form-group{display:flex;flex-direction:column;gap:.35rem}
+.form-label{font-size:.78rem;font-weight:500;color:#636366}
+.input-group{display:flex;align-items:center}
+.input-group-text{padding-inline:0;background:transparent;border:none;font-size:.9rem;color:#6d6d72}
+.form-control,.form-select{flex:1;height:36px;border:none;border-bottom:1px solid #d1d1d6;background:transparent;padding:0 .25rem;font-size:.9rem}
+.form-control:focus,.form-select:focus{outline:none;border-bottom-color:var(--blue)}
+.form-select{appearance:none;background:url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236d6d72' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right .25rem center;padding-right:1.2rem}
+.is-invalid{border-bottom-color:var(--danger)!important}
+.text-danger{color:var(--danger);font-size:.75rem;margin-top:.2rem}
+
+/* buttons */
+.btn{border:none;border-radius:22px;font-weight:600;font-size:.92rem;padding:.6rem 1.4rem;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{filter:brightness(.92)}
+.btn-secondary{background:#8e8e93;color:#fff}.btn-secondary:hover{filter:brightness(.9)}
+</style>
+
+<!-- ───────────────────────────── MARK‑UP ───────────────────────────── -->
+<div class="card">
+  <div class="card-header">
+    <h2>{% if form.instance.pk %}✏️ Edit Staff{% else %}➕ Add Staff{% endif %}</h2>
+  </div>
+
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="text-danger mb-2">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      {# 1 ▸ PERSONAL ---------------------------------------------------- #}
+      <fieldset class="vs-fieldset">
+        <legend>🧑 Personal</legend>
+        <div class="fieldset-content">
+          {% for f in "current_status,firstname,middle_name,surname,gender,date_of_birth"|split:"," %}
+            {% with field=form|getfield:f %}
+              <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-group"><span class="input-group-text">👤</span>{{ field|add_class:"form-control" }}</div>
+                {% if field.errors %}<div class="text-danger">{{ field.errors.0 }}</div>{% endif %}
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      {# 2 ▸ EMPLOYMENT -------------------------------------------------- #}
+      <fieldset class="vs-fieldset">
+        <legend>💼 Employment</legend>
+        <div class="fieldset-content">
+          {% for f in "date_of_admission,staff_category,job_title,department,salary,special_allowance,contract_duration,contract_start_date,contract_end_date"|split:"," %}
+            {% with field=form|getfield:f %}
+              <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-group"><span class="input-group-text">💼</span>{{ field|add_class:"form-control" }}</div>
+                {% if field.errors %}<div class="text-danger">{{ field.errors.0 }}</div>{% endif %}
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      {# 3 ▸ CONTACT ----------------------------------------------------- #}
+      <fieldset class="vs-fieldset">
+        <legend>📞 Contact</legend>
+        <div class="fieldset-content">
+          {% for f in "mobile_number,email,address,emergency_contact_name,emergency_contact_number,guarantor"|split:"," %}
+            {% with field=form|getfield:f %}
+              <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-group"><span class="input-group-text">📞</span>{{ field|add_class:"form-control" }}</div>
+                {% if field.errors %}<div class="text-danger">{{ field.errors.0 }}</div>{% endif %}
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      {# 4 ▸ FINANCIAL --------------------------------------------------- #}
+      <fieldset class="vs-fieldset">
+        <legend>🏦 Financial</legend>
+        <div class="fieldset-content">
+          {% for f in "bank_name,bank_account_number,bank_branch,nida_id,tin_number"|split:"," %}
+            {% with field=form|getfield:f %}
+              <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-group"><span class="input-group-text">🏦</span>{{ field|add_class:"form-control" }}</div>
+                {% if field.errors %}<div class="text-danger">{{ field.errors.0 }}</div>{% endif %}
+              </div>
+            {% endwith %}
+          {% endfor %}
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.has_helsb.id_for_label }}">{{ form.has_helsb.label }}</label>
+            {{ form.has_helsb }}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.helsb_rate.id_for_label }}">{{ form.helsb_rate.label }}</label>
+            <div class="input-group"><span class="input-group-text">%</span>{{ form.helsb_rate|add_class:"form-control" }}</div>
+          </div>
+        </div>
+      </fieldset>
+
+      {# 5 ▸ ADDITIONAL --------------------------------------------------- #}
+      <fieldset class="vs-fieldset">
+        <legend class="collapsed">🗂️ Additional</legend>
+        <div class="fieldset-content" style="display:none">
+          {% for f in "registration_number,passport_photo,others"|split:"," %}
+            {% with field=form|getfield:f %}
+              <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-group"><span class="input-group-text">🗂️</span>{{ field|add_class:"form-control" }}</div>
+                {% if field.errors %}<div class="text-danger">{{ field.errors.0 }}</div>{% endif %}
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <div class="text-end mt-2">
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+        <a href="{% url 'staff-list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

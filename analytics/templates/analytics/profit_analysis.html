@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4" style="color: #007bff; font-weight: bold;">
+        <i class="fas fa-chart-line"></i> Profit and Expenses Analysis for {{ current_session }}
+    </h1>
+
+    <div class="row g-4">
+        <!-- Profit Section -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0"><i class="fas fa-coins"></i> Profit Distribution</h4>
+                </div>
+                <div class="card-body text-center">
+                    <img src="data:image/png;base64,{{ profit_pie_chart }}" alt="Profit Pie Chart" class="img-fluid rounded shadow">
+                </div>
+                <div class="card-footer bg-light">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-receipt"></i> <strong>Total from Receipts</strong>
+                            <span class="badge bg-success">TZS {{ total_receipts|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-tshirt"></i> <strong>Total from Uniforms</strong>
+                            <span class="badge bg-info">TZS {{ total_uniforms|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-wallet"></i> <strong>Overall Total Income</strong>
+                            <span class="badge bg-primary">TZS {{ overall_total_income|floatformat:2 }}</span>
+                        </li>
+                    </ul>
+                    <p class="mt-3 text-center" style="font-size: 1.1rem;">
+                        <i class="fas fa-comment-alt"></i> {{ profit_comments }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expenses Section -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-header bg-danger text-white text-center py-3">
+                    <h4 class="mb-0"><i class="fas fa-chart-pie"></i> Expenses Distribution</h4>
+                </div>
+                <div class="card-body text-center">
+                    <img src="data:image/png;base64,{{ expenses_pie_chart }}" alt="Expenses Pie Chart" class="img-fluid rounded shadow">
+                </div>
+                <div class="card-footer bg-light">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-user-tie"></i> <strong>Total Salaries</strong>
+                            <span class="badge bg-danger">TZS {{ total_salaries|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-tools"></i> <strong>Total Expenditures</strong>
+                            <span class="badge bg-warning">TZS {{ total_expenditures|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-money-check-alt"></i> <strong>Overall Total Expenses</strong>
+                            <span class="badge bg-dark">TZS {{ overall_total_expenses|floatformat:2 }}</span>
+                        </li>
+                    </ul>
+                    <p class="mt-3 text-center" style="font-size: 1.1rem;">
+                        <i class="fas fa-comment-dots"></i> {{ expenses_comments }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remaining Balance Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-header bg-secondary text-white text-center py-3">
+                    <h4 class="mb-0"><i class="fas fa-balance-scale"></i> Remaining Balance Analysis</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-center" style="color: {% if remaining_balance > 0 %}#28a745{% elif remaining_balance < 0 %}#dc3545{% else %}#6c757d{% endif %}; font-size: 1.5rem; font-weight: bold;">
+                        <i class="fas fa-wallet"></i> Remaining Balance: TZS {{ remaining_balance|floatformat:2 }}
+                    </p>
+                    <p style="text-align: justify; font-size: 1.1rem;">
+                        <i class="fas fa-lightbulb"></i> {{ balance_comments }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linear Regression Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg rounded-3">
+                <div class="card-header bg-info text-white text-center py-3">
+                    <h4 class="mb-0"><i class="fas fa-chart-line"></i> Balance Trends Over Academic Sessions</h4>
+                </div>
+                <div class="card-body text-center">
+                    <img src="data:image/png;base64,{{ regression_graph }}" alt="Regression Graph" class="img-fluid rounded shadow">
+                </div>
+                <div class="card-footer bg-light">
+                    <p class="text-center" style="font-size: 1.1rem;">
+                        <i class="fas fa-lightbulb"></i> {{ regression_comments }}
+                    </p>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Predicted Profit for Next Session
+                            <span class="badge bg-success">TZS {{ predicted_profit|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Predicted Expenses for Next Session
+                            <span class="badge bg-danger">TZS {{ predicted_expenses|floatformat:2 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Predicted Balance for Next Session
+                            <span class="badge bg-primary">TZS {{ predicted_balance|floatformat:2 }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+    body {
+        background-color: #f9fbfd;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .list-group-item {
+        background-color: #f9fafb;
+        border: none;
+        font-size: 1.1rem;
+    }
+
+    .list-group-item:hover {
+        background-color: #eef1f4;
+    }
+
+    .badge {
+        font-size: 1.1rem;
+        padding: 0.5em 1em;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .card-header {
+        font-size: 1.4rem;
+    }
+</style>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock %}

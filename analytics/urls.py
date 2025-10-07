@@ -1,0 +1,36 @@
+from django.urls import path
+from .views import (
+    analytics_home,
+    academic_analysis,
+    finance_analysis,
+    class_performance_view,
+    subject_trends_view,
+    student_trends_view,
+    subject_clustering_view,
+    salary_distribution_view,
+    profit_analysis_view,
+    expenditure_analysis_view,
+    comprehensive_analytics_view,
+    student_comparison_view,
+    subject_intervention_view,
+    financial_forecast_view,
+    performance_overview_view,
+)
+
+urlpatterns = [
+    path('analytics/', analytics_home, name='analytics-home'),
+    path('analytics/academic/', academic_analysis, name='academic_analysis'),
+    path('analytics/finance/', finance_analysis, name='finance_analysis'),
+    path('analytics/performance-trends/', class_performance_view, name='performance_trends'),
+    path('analytics/subject-trends/', subject_trends_view, name='subject_trends'),
+    path('analytics/student-trends/', student_trends_view, name='student_trends'),
+    path('analytics/subject-clusters/', subject_clustering_view, name='subject_clusters'),
+    path('analytics/finance/salary-distribution/', salary_distribution_view, name='salary_distribution'),
+    path('analytics/finance/expenditure-analysis/', expenditure_analysis_view, name='expenditure_analysis'),
+    path('analytics/finance/profit-analysis/', profit_analysis_view, name='profit_analysis'),
+    path('analytics/comprehensive/', comprehensive_analytics_view, name='comprehensive_analytics'),
+    path('analytics/student-comparison/<int:class_id>/', student_comparison_view, name='student_comparison'),
+    path('analytics/subject-intervention/', subject_intervention_view, name='subject_intervention'),
+    path('analytics/finance/financial-forecast/', financial_forecast_view, name='financial_forecast'),
+    path('analytics/performance-overview/', performance_overview_view, name='performance_overview'),
+]

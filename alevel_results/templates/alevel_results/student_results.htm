@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    A-Level Student Information - {{ student }}
+{% endblock title %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="header-section">
+    <h3 class="single-line-text">
+        <span class="emoji">👩‍🎓</span> A-Level Student Information
+    </h3>
+    <p class="text-center text-muted">
+        <i class="fas fa-user me-1"></i> {{ student }}
+    </p>
+</div>
+
+<!-- Form Section -->
+<form method="POST" class="form-section">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- Session, Term, Exam -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label for="{{ form.session.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-calendar-alt me-1"></i> Session
+            </label>
+            {{ form.session|add_class:"form-control shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.session.errors }}</small>
+        </div>
+        <div class="col-md-4">
+            <label for="{{ form.term.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-layer-group me-1"></i> Term
+            </label>
+            {{ form.term|add_class:"form-control shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.term.errors }}</small>
+        </div>
+        <div class="col-md-4">
+            <label for="{{ form.exam.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-clipboard-list me-1"></i> Exam
+            </label>
+            {{ form.exam|add_class:"form-control shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.exam.errors }}</small>
+        </div>
+    </div>
+
+    <!-- Discipline, Sports, Care of Property, Collaborations -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <label for="{{ form.disprine.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-balance-scale me-1"></i> Discipline
+            </label>
+            {{ form.disprine|add_class:"form-select shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.disprine.errors }}</small>
+        </div>
+        <div class="col-md-3">
+            <label for="{{ form.sports.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-futbol me-1"></i> Sports
+            </label>
+            {{ form.sports|add_class:"form-select shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.sports.errors }}</small>
+        </div>
+        <div class="col-md-3">
+            <label for="{{ form.care_of_property.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-home me-1"></i> Care of Property
+            </label>
+            {{ form.care_of_property|add_class:"form-select shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.care_of_property.errors }}</small>
+        </div>
+        <div class="col-md-3">
+            <label for="{{ form.collaborations.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-users-cog me-1"></i> Collaborations
+            </label>
+            {{ form.collaborations|add_class:"form-select shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.collaborations.errors }}</small>
+        </div>
+    </div>
+
+    <!-- Dates -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label for="{{ form.date_of_closing.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-calendar-times me-1"></i> Date of Closing
+            </label>
+            {{ form.date_of_closing|add_class:"form-control shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.date_of_closing.errors }}</small>
+        </div>
+        <div class="col-md-6">
+            <label for="{{ form.date_of_opening.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-calendar-check me-1"></i> Date of Opening
+            </label>
+            {{ form.date_of_opening|add_class:"form-control shadow-sm rounded-pill" }}
+            <small class="text-danger">{{ form.date_of_opening.errors }}</small>
+        </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label for="{{ form.teacher_comments.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-chalkboard-teacher me-1"></i> Teacher Comments
+            </label>
+            {{ form.teacher_comments|add_class:"form-control shadow-sm" }}
+            <small class="text-danger">{{ form.teacher_comments.errors }}</small>
+        </div>
+        <div class="col-md-6">
+            <label for="{{ form.head_comments.id_for_label }}" class="form-label fw-semibold text-secondary">
+                <i class="fas fa-user-tie me-1"></i> Head Comments
+            </label>
+            {{ form.head_comments|add_class:"form-control shadow-sm" }}
+            <small class="text-danger">{{ form.head_comments.errors }}</small>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success create-button">
+            <i class="fas fa-save me-1"></i> Save
+        </button>
+        <a href="{% url 'alevel_results:form_status' class_id=student.current_class.id %}" class="btn btn-secondary cancel-button">
+            <i class="fas fa-arrow-left me-1"></i> Back to Form Status
+        </a>
+    </div>
+</form>
+
+<!-- Additional CSS -->
+<style>
+    :root {
+        --carrot: #ff6f61;
+        --carrot-dark: #e65a50;
+        --gradient-start: #f3f4f6;
+        --gradient-end: #d1d5db;
+    }
+
+    body {
+        background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .dark-mode body {
+        background: linear-gradient(180deg, #2b2b2b, #1e1e1e);
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .single-line-text {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--carrot);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+        font-size: 1rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dark-mode .text-muted {
+        color: #a0a0a0 !important;
+    }
+
+    .form-section {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .form-label {
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #4a4a4a;
+        margin-bottom: 0.5rem;
+    }
+
+    .dark-mode .form-label {
+        color: #d1d1d1;
+    }
+
+    .form-control, .form-select {
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        border: 1px solid #ced4da;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        outline: none;
+    }
+
+    .create-button, .cancel-button {
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin: 0 0.5rem;
+    }
+
+    .create-button {
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+    }
+
+    .create-button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .cancel-button {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white;
+    }
+
+    .cancel-button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #5a6268, #545b62);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .single-line-text {
+            font-size: 1.25rem;
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+        }
+
+        .form-label {
+            font-size: 1rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .create-button, .cancel-button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+    }
+</style>
+{% endblock content %}

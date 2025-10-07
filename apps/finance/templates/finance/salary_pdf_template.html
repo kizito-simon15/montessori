@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Invoices</title>
+    <style>
+        /* Define your CSS styles here */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid lightblue;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: teal;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Salary Invoices</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Staff</th>
+                <th>Month</th>
+                <th>Gross Salary</th>
+                <th>Deductions</th>
+                <th>Net Salary</th>
+                <th>Issued Date</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.staff }}</td>
+                <td>{{ invoice.month }}</td>
+                <td>{{ invoice.gross_salary }}</td>
+                <td>{{ invoice.deductions }}</td>
+                <td>{{ invoice.net_salary }}</td>
+                <td>{{ invoice.issued_date }}</td>
+                <td>{{ invoice.remarks }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

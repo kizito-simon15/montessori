@@ -1,0 +1,12 @@
+<!-- expenditures/expenditure_invoice_form.html -->
+
+{% extends 'bursor/bursor_base.html' %} <!-- Extend from your base template -->
+
+{% block content %}
+  <h2>Create Expenditure Invoice</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }} <!-- Render form fields as paragraphs -->
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}

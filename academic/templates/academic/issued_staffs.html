@@ -1,0 +1,222 @@
+{% extends "academic/academic_base.html" %}
+
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issued Books</title>
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Custom Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            padding: 15px;
+            letter-spacing: 0.1em;
+            border-bottom: 2px solid #dee2e6;
+            text-align: center;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.02);
+        }
+
+        .table tbody td {
+            padding: 20px;
+            color: #495057;
+            border-top: 1px solid #dee2e6;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .green-tick {
+            color: green;
+            font-size: 1.5rem;
+        }
+
+        @media print {
+            .btn, .button-group {
+                display: none;
+            }
+
+            body {
+                background-color: white;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+
+            .table {
+                box-shadow: none;
+            }
+
+            .table thead th, .table tbody td {
+                border: 1px solid #dee2e6 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="button-group">
+            <a href="javascript:history.back()" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+        <h1 class="text-center mb-4">Issued Books to {{ staff_name }}</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th rowspan="2">Serial Number</th>
+                    <th rowspan="2">Staff Name</th>
+                    <th rowspan="2">Issued Book</th>
+                    <th rowspan="2">Book Number</th>
+                    <th rowspan="2">Book Author</th>
+                    <th rowspan="2">Book Category</th>
+                    <th rowspan="2">Date Issued</th>
+                    <th rowspan="2">Date to Return</th>
+                    <th colspan="2" class="text-center">Actions</th>
+                </tr>
+                <tr>
+                    <th>Delete</th>
+                    <th>Returned?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issued_book in issued_books %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ issued_book.staff }}</td>
+                    <td>{{ issued_book.book.book_name }}</td>
+                    <td>{{ issued_book.book_number }}/{{ issued_book.book.quantity }}</td>
+                    <td>{{ issued_book.book.author }}</td>
+                    <td>{{ issued_book.book.category }}</td>
+                    <td>{{ issued_book.date_issued }}</td>
+                    <td>{{ issued_book.expiry_date }}</td>
+                    <td>
+                        <a href="{% url 'academic_delete_issued_staff' issued_book.id %}" class="btn btn-success">Delete</a>
+                    </td>
+                    <td>
+                        {% if issued_book.returned %}
+                            <span class="green-tick">&#10004;</span>
+                        {% else %}
+                            <a href="{% url 'academic_mark_staff_returned' issued_book.id %}" class="btn btn-warning">Returned</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <!-- FontAwesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+</body>
+</html>
+
+{% endblock content %}

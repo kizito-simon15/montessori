@@ -1,0 +1,39 @@
+<div class="filter-form" style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 600px; margin: 20px auto;">
+    <select id="session" name="session" style="padding: 12px; border: 1px solid #ccc; border-radius: 25px; font-size: 16px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        {% for session in sessions %}
+        <option value="{{ session.id }}" {% if session == current_session %}selected{% endif %}>{{ session.name }}</option>
+        {% endfor %}
+    </select>
+    <select id="term" name="term" style="padding: 12px; border: 1px solid #ccc; border-radius: 25px; font-size: 16px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        {% for term in terms %}
+        <option value="{{ term.id }}" {% if term == current_term %}selected{% endif %}>{{ term.name }}</option>
+        {% endfor %}
+    </select>
+    <select id="exam" name="exam" style="padding: 12px; border: 1px solid #ccc; border-radius: 25px; font-size: 16px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        {% for exam in exams %}
+        <option value="{{ exam.id }}" {% if exam == current_exam %}selected{% endif %}>{{ exam.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<script>
+    document.querySelectorAll('.filter-form select').forEach(select => {
+        select.addEventListener('change', () => {
+            document.getElementById('filter-form').submit();
+        });
+    });
+</script>
+
+<style>
+    .filter-form select:focus {
+        border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .filter-form select {
+            font-size: 14px;
+            padding: 10px;
+        }
+    }
+</style>

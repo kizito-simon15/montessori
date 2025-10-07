@@ -1,0 +1,255 @@
+{% extends 'secretary/base_secretary.html' %}
+
+{% block title %}Staff{% endblock title %}
+
+{% block content %}
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <!-- Select dropdown for occupations -->
+  <div class="form-group">
+    <label for="occupationSelect" style="color: teal;">Select Occupation:</label>
+    <select id="occupationSelect" class="form-control" style="background-color: teal; color: white;">
+      <option value="">All</option>
+      <option value="teacher">Teacher</option>
+      <option value="administrator">Administrator</option>
+      <option value="support_staff">Support Staff</option>
+    </select>
+  </div>
+
+  <!-- Filter button -->
+  <button onclick="filterStaff()" class="btn btn-primary">Filter</button>
+
+  <!-- Search field -->
+  <div class="form-group mt-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+  </div>
+
+  <!-- Summary table for total male, female, and all staff -->
+  <div class="table-responsive mt-4">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-teal">
+        <tr>
+          <th scope="col">Total Male Staff</th>
+          <th scope="col">Total Female Staff</th>
+          <th scope="col">Total Staff</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="maleCount">0</td>
+          <td id="femaleCount">0</td>
+          <td id="totalCount">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <div class="table-responsive">
+    <table id="stafftable" class="table table-bordered table-hover table-striped">
+      <thead class="table-success">
+        <tr>
+          <th>S/N</th>
+          <th>Fullname <span onclick="sortTable(1, 'string', 'asc')" class="sort-arrow">&#9650;</span><span onclick="sortTable(1, 'string', 'desc')" class="sort-arrow">&#9660;</span></th>
+          <th>Gender <span onclick="sortTable(2, 'gender', 'asc')" class="sort-arrow">&#9650;</span><span onclick="sortTable(2, 'gender', 'desc')" class="sort-arrow">&#9660;</span></th>
+          <th>Mobile Phone Number</th>
+          <th>Occupation</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for staff in object_list %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ staff.firstname }} {{ staff.middle_name }} {{ staff.surname }}</td>
+            <td>{{ staff.get_gender_display }}</td>
+            <td>{{ staff.mobile_number }}</td>
+            <td>{{ staff.occupation }}</td>
+            <td>
+              {% if staff.get_current_status_display == "Active" %}
+                <span class="badge badge-success">Active</span>
+              {% else %}
+                <span class="badge badge-danger">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  // Function to update the summary table
+  function updateSummary() {
+    const rows = document.getElementById("stafftable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    let maleCount = 0;
+    let femaleCount = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].style.display !== "none") {
+        const gender = rows[i].getElementsByTagName("td")[2].innerText.toLowerCase();
+        if (gender === "male") {
+          maleCount++;
+        } else if (gender === "female") {
+          femaleCount++;
+        }
+      }
+    }
+
+    document.getElementById("maleCount").innerText = maleCount;
+    document.getElementById("femaleCount").innerText = femaleCount;
+    document.getElementById("totalCount").innerText = maleCount + femaleCount;
+  }
+
+  // Function to filter staff based on selected occupation
+  function filterStaff() {
+    const selectedOccupation = document.getElementById("occupationSelect").value;
+    const rows = document.getElementById("stafftable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (let i = 0; i < rows.length; i++) {
+      const occupation = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
+      if (selectedOccupation === "" || selectedOccupation === occupation) {
+        rows[i].style.display = "";
+      } else {
+        rows[i].style.display = "none";
+      }
+    }
+    updateSummary();
+    resetSerialNumbers();
+  }
+
+  // Function to reset serial numbers after filtering
+  function resetSerialNumbers() {
+    const visibleRows = document.querySelectorAll("#stafftable tbody tr:not([style*='display: none'])");
+    for (let i = 0; i < visibleRows.length; i++) {
+      visibleRows[i].getElementsByTagName("td")[0].innerText = i + 1;
+    }
+  }
+
+  // Function to filter staff based on search input
+  document.getElementById("searchInput").addEventListener("keyup", function() {
+    const filter = this.value.toUpperCase();
+    const rows = document.getElementById("stafftable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (let i = 0; i < rows.length; i++) {
+      const cells = rows[i].getElementsByTagName("td");
+      let found = false;
+      for (let j = 0; j < cells.length; j++) {
+        const textValue = cells[j].textContent || cells[j].innerText;
+        if (textValue.toUpperCase().indexOf(filter) > -1) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        rows[i].style.display = "";
+      } else {
+        rows[i].style.display = "none";
+      }
+    }
+    updateSummary();
+    resetSerialNumbers();
+  });
+
+  // Initial update of the summary table and serial numbers on page load
+  document.addEventListener("DOMContentLoaded", function() {
+    updateSummary();
+    resetSerialNumbers();
+  });
+
+  // Make rows clickable
+  document.addEventListener("DOMContentLoaded", function() {
+    const rows = document.querySelectorAll(".clickable-row");
+    rows.forEach(row => {
+      row.addEventListener("click", () => {
+        window.location.href = row.getAttribute("data-href");
+      });
+    });
+  });
+
+  // Function to sort the table
+  function sortTable(columnIndex, type, order) {
+    const table = document.getElementById("stafftable");
+    const rows = Array.from(table.rows).slice(1); // Exclude header row
+
+    rows.sort((a, b) => {
+      let cellA = a.cells[columnIndex].innerText.trim();
+      let cellB = b.cells[columnIndex].innerText.trim();
+
+      if (type === 'string') {
+        if (order === 'asc') {
+          return cellA.localeCompare(cellB);
+        } else {
+          return cellB.localeCompare(cellA);
+        }
+      } else if (type === 'gender') {
+        if (order === 'asc') {
+          return cellA.localeCompare(cellB);
+        } else {
+          return cellB.localeCompare(cellA);
+        }
+      }
+
+      if (order === 'asc') {
+        return cellA > cellB ? 1 : cellA < cellB ? -1 : 0;
+      } else {
+        return cellA < cellB ? 1 : cellA > cellB ? -1 : 0;
+      }
+    });
+
+    rows.forEach(row => table.appendChild(row));
+    resetSerialNumbers();
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-NkU32VZyLgnbxVuSw/5CCg9zp4xA0mxZiuDAi9g4SM/LuIbr99HyrCP4KiLlXg+T"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+    integrity="sha384-5T5l20F6jpxmo3SiRUt7KA6uP6q/eFN6wxrbykcIcSVuW0eECCqxWOjNnlpmDYBp"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // Initialize AOS
+  AOS.init();
+</script>
+
+<!-- Add this CSS for animations -->
+<style>
+  /* Define animations for table rows */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Apply animation to table rows */
+  #stafftable tbody tr {
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  /* Additional styling */
+  .thead-teal {
+    background-color: teal;
+    color: white;
+  }
+
+  .clickable-row {
+    cursor: pointer;
+  }
+
+  .clickable-row:hover {
+    background-color: #f1f1f1;
+  }
+
+  .sort-arrow {
+    cursor: pointer;
+    padding-left: 5px;
+  }
+</style>
+{% endblock morejs %}

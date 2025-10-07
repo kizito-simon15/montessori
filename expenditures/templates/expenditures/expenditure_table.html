@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Expenditure Table
+{% endblock title %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600,700&display=swap');
+
+    :root {
+        --primary-color: #e67e22; /* Carrot color */
+    }
+
+    html, body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #e1f5fe, #b3e5fc, #81d4fa);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        min-height: 100vh;
+        margin:0;
+        padding:0;
+        color:#333;
+        transition:background-color 0.5s, color 0.5s;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position:0% 50%; }
+        50% { background-position:100% 50%; }
+        100% { background-position:0% 50%; }
+    }
+
+    [data-theme="dark"] {
+        color:#fff;
+    }
+
+    .container {
+        max-width:1200px !important;
+    }
+
+    .page-header {
+        text-align:center;
+        padding:40px 20px;
+        position:relative;
+        margin-bottom:30px;
+    }
+
+    .page-header h2 {
+        font-weight:600;
+        color:#ff4081;
+        font-size:1.8rem;
+        display:inline-flex;
+        align-items:center;
+        gap:0.5rem;
+        animation: fadeInDown 0.8s ease forwards;
+        opacity:0;
+        transform:translateY(-20px);
+    }
+
+    h2::before {
+        content:"💸";
+    }
+
+    @keyframes fadeInDown {
+        to { opacity:1; transform:translateY(0); }
+    }
+
+    .top-actions {
+        position:absolute;
+        top:20px;
+        right:20px;
+        display:flex;
+        align-items:center;
+        gap:15px;
+        z-index:1000;
+    }
+
+    .top-actions a, .top-actions div {
+        cursor:pointer;
+        font-size:1.5em;
+        color:var(--primary-color);
+        transition:transform 0.3s,color 0.3s;
+        font-weight:600;
+        text-decoration:none;
+    }
+
+    .top-actions a:hover, .top-actions div:hover {
+        transform:scale(1.1);
+        color:#d35400;
+    }
+
+    [data-theme="dark"] .top-actions a, [data-theme="dark"] .top-actions div {
+        color:#ffcc00;
+    }
+
+    [data-theme="dark"] .top-actions a:hover, [data-theme="dark"] .top-actions div:hover {
+        color:#ffc107;
+    }
+
+    .table {
+        border-collapse: separate;
+        border-spacing:0;
+        width:100%;
+        background:#fff;
+        border-radius:20px;
+        overflow:hidden;
+        box-shadow:0 2px 15px rgba(0,0,0,0.05);
+        animation: fadeInCard 0.8s ease forwards;
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    @keyframes fadeInCard {
+        to {
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+
+    [data-theme="dark"] .table {
+        background:#2c2c2c;
+        color:#fff;
+    }
+
+    thead tr {
+        background: var(--primary-color);
+        color:#fff;
+        text-transform:uppercase;
+        font-weight:600;
+    }
+
+    [data-theme="dark"] thead tr {
+        background:#3a3a3a;
+    }
+
+    th, td {
+        padding:15px;
+        font-size:0.95rem;
+        border:none;
+        transition:background 0.3s;
+    }
+
+    tbody tr {
+        border-bottom:1px solid #ddd;
+        transition:background 0.3s;
+    }
+
+    [data-theme="dark"] tbody tr {
+        border-bottom:1px solid #555;
+    }
+
+    tbody tr:hover {
+        background:rgba(0,0,0,0.05);
+    }
+
+    [data-theme="dark"] tbody tr:hover {
+        background:rgba(255,255,255,0.1);
+    }
+
+    .attachment-link {
+        color:var(--primary-color);
+        font-weight:600;
+        text-decoration:none;
+        transition:color 0.3s;
+    }
+
+    .attachment-link:hover {
+        color:#d35400;
+        text-decoration:underline;
+    }
+
+    @media(max-width:600px) {
+        .page-header h2 {
+            font-size:1.4rem;
+        }
+        th, td {
+            font-size:0.85rem;
+            padding:10px;
+        }
+    }
+</style>
+
+<div class="container my-5">
+    <div class="page-header">
+        <h2>Expenditure Table</h2>
+        <div class="top-actions">
+            <!-- Back to Category List -->
+            <a href="{% url 'category_list' %}" title="Back to Categories">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <!-- Home/dash link -->
+            <a href="{% url 'select_link' %}" title="Return to Dashboard">
+                <i class="fas fa-home"></i>
+            </a>
+            <!-- Theme toggle -->
+            <div class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-sun"></i>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Amount</th>
+                <th>Quantity</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Attachment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in expenditure_rows %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ row.amount }}</td>
+                <td>{{ row.quantity }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.description }}</td>
+                <td>
+                    {% if row.attachment %}
+                        {% with ext=row.attachment.name|lower %}
+                            {% if ext.endswith:".jpg" or ext.endswith:".jpeg" or ext.endswith:".png" %}
+                                <a href="{{ row.attachment.url }}" class="attachment-link" target="_blank">View Image</a>
+                            {% elif ext.endswith:".pdf" %}
+                                <a href="{{ row.attachment.url }}" class="attachment-link" target="_blank">View PDF</a>
+                            {% elif ext.endswith:".doc" or ext.endswith:".docx" %}
+                                <a href="{{ row.attachment.url }}" class="attachment-link" target="_blank">View Document</a>
+                            {% else %}
+                                <a href="{{ row.attachment.url }}" class="attachment-link" target="_blank">Download Attachment</a>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+
+    function toggleTheme() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        htmlElement.setAttribute('data-theme', newTheme);
+        themeToggle.innerHTML = newTheme === 'dark' 
+            ? '<i class="fas fa-moon"></i>' 
+            : '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', newTheme);
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        htmlElement.setAttribute('data-theme', savedTheme);
+        themeToggle.innerHTML = savedTheme === 'dark'
+            ? '<i class="fas fa-moon"></i>'
+            : '<i class="fas fa-sun"></i>';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="mb-4">Property Detail</h1>
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">Name: {{ property.name }}</p>
+                    <p class="card-text">Quantity: {{ property.quantity }}</p>
+                    <p class="card-text">Description: {{ property.description }}</p>
+                    <!-- Back button -->
+                    <a href="{% url 'academic_property_list' %}" class="btn btn-primary mt-3">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

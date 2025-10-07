@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Archived Students and Staff{% endblock title %}
+
+{% block breadcrumb %}
+<div class="d-flex justify-content-between mb-3">
+    <a class="btn btn-outline-primary rounded-pill" href="{% url 'student-create' %}"><i class="fas fa-plus"></i> New Student</a>
+    <a class="btn btn-outline-primary rounded-pill" href="{% url 'student-upload' %}"><i class="fas fa-upload"></i> Upload Students</a>
+    <a class="btn btn-outline-primary rounded-pill" href="{% url 'staff-create' %}"><i class="fas fa-plus"></i> New Staff</a>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mb-5" data-aos="fade-up" data-aos-duration="1000">
+    <h2 class="text-center text-primary mb-4 fw-bold">Archived Students and Staff</h2>
+
+    <!-- Dropdown menu to select archived records -->
+    <div class="dropdown mb-4">
+        <button class="btn btn-info dropdown-toggle rounded-pill" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-archive"></i> Select Archived Record
+        </button>
+        <div class="dropdown-menu shadow" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#" onclick="showTable('studentTable')">Archived Students</a>
+            <a class="dropdown-item" href="#" onclick="showTable('staffTable')">Archived Staff</a>
+        </div>
+    </div>
+
+    <!-- Archived Students Table -->
+    <div id="studentTable" style="display: none;">
+        <div class="form-group mb-3">
+            <label for="classSelect" class="fw-semibold text-teal">Select Class:</label>
+            <select id="classSelect" class="form-control rounded-pill" style="background-color: teal; color: white;">
+                <option value="">All</option>
+                {% for student_class in student_classes %}
+                    <option value="{{ student_class.name }}">{{ student_class.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button onclick="filterStudents()" class="btn btn-outline-primary rounded-pill">Filter</button>
+
+        <div class="form-group mt-3">
+            <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search...">
+        </div>
+
+        <div class="table-responsive mt-4">
+            <table id="studenttable" class="table table-bordered table-hover table-striped shadow-sm">
+                <thead class="thead-teal">
+                    <tr class="text-center">
+                        <th>S/N</th>
+                        <th>Registration Number</th>
+                        <th>Full Name</th>
+                        <th>Current Class</th>
+                        <th>Gender</th>
+                        <th>Father's Mobile</th>
+                        <th>Mother's Mobile</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr class='clickable-row' data-href="{% url 'student-detail' student.id %}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ student.registration_number }}</td>
+                            <td>{{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</td>
+                            <td>{{ student.current_class }}</td>
+                            <td>{{ student.get_gender_display }}</td>
+                            <td>{{ student.father_mobile_number }}</td>
+                            <td>{{ student.mother_mobile_number }}</td>
+                            <td>
+                                {% if student.current_status == "active" %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Archived Staff Table -->
+    <div id="staffTable" style="display: none;">
+        <div class="form-group mb-3">
+            <label for="occupationSelect" class="fw-semibold text-teal">Select Occupation:</label>
+            <select id="occupationSelect" class="form-control rounded-pill" style="background-color: teal; color: white;">
+                <option value="">All</option>
+                <option value="teacher">Teacher</option>
+                <option value="administrator">Administrator</option>
+                <option value="support_staff">Support Staff</option>
+            </select>
+        </div>
+
+        <button onclick="filterStaff()" class="btn btn-outline-primary rounded-pill">Filter</button>
+
+        <div class="form-group mt-3">
+            <input type="text" id="searchStaffInput" class="form-control rounded-pill" placeholder="Search...">
+        </div>
+
+        <div class="table-responsive mt-4">
+            <table id="stafftable" class="table table-bordered table-hover table-striped shadow-sm">
+                <thead class="table-success">
+                    <tr class="text-center">
+                        <th>S/N</th>
+                        <th>Full Name</th>
+                        <th>Gender</th>
+                        <th>Mobile Phone Number</th>
+                        <th>Occupation</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in staff_list %}
+                        <tr class='clickable-row' data-href="{% url 'staff-detail' staff.id %}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ staff.firstname }} {{ staff.middle_name }} {{ staff.surname }}</td>
+                            <td>{{ staff.get_gender_display }}</td>
+                            <td>{{ staff.mobile_number }}</td>
+                            <td>{{ staff.occupation }}</td>
+                            <td>
+                                {% if staff.current_status == "active" %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 900px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .thead-teal {
+        background-color: #5ac8fa;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1faff;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .btn-outline-primary {
+        border-color: #007aff;
+        color: #007aff;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #007aff;
+        color: #ffffff;
+    }
+
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .clickable-row:hover {
+        background-color: #e8f4ff;
+    }
+
+    .sort-arrow {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+</style>
+
+<script>
+    function showTable(tableId) {
+        document.getElementById("studentTable").style.display = "none";
+        document.getElementById("staffTable").style.display = "none";
+        document.getElementById(tableId).style.display = "block";
+    }
+
+    function updateStudentSummary() {
+        const rows = document.getElementById("studenttable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        let maleCount = 0;
+        let femaleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].style.display !== "none") {
+                const gender = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
+                if (gender === "male") {
+                    maleCount++;
+                } else if (gender === "female") {
+                    femaleCount++;
+                }
+            }
+        }
+
+        document.getElementById("maleCount").innerText = maleCount;
+        document.getElementById("femaleCount").innerText = femaleCount;
+        document.getElementById("totalCount").innerText = maleCount + femaleCount;
+    }
+
+    function filterStudents() {
+        const selectedClass = document.getElementById("classSelect").value;
+        const rows = document.getElementById("studenttable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+            const currentClass = rows[i].getElementsByTagName("td")[3].innerText;
+            if (selectedClass === "" || selectedClass === currentClass) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        updateStudentSummary();
+        resetStudentSerialNumbers();
+    }
+
+    function resetStudentSerialNumbers() {
+        const visibleRows = document.querySelectorAll("#studenttable tbody tr:not([style*='display: none'])");
+        for (let i = 0; i < visibleRows.length; i++) {
+            visibleRows[i].getElementsByTagName("td")[0].innerText = i + 1;
+        }
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+        const filter = this.value.toUpperCase();
+        const rows = document.getElementById("studenttable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName("td");
+            let found = false;
+            for (let j = 0; j < cells.length; j++) {
+                const textValue = cells[j].textContent || cells[j].innerText;
+                if (textValue.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        updateStudentSummary();
+        resetStudentSerialNumbers();
+    });
+
+    function updateStaffSummary() {
+        const rows = document.getElementById("stafftable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        let maleCount = 0;
+        let femaleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].style.display !== "none") {
+                const gender = rows[i].getElementsByTagName("td")[2].innerText.toLowerCase();
+                if (gender === "male") {
+                    maleCount++;
+                } else if (gender === "female") {
+                    femaleCount++;
+                }
+            }
+        }
+
+        document.getElementById("maleStaffCount").innerText = maleCount;
+        document.getElementById("femaleStaffCount").innerText = femaleCount;
+        document.getElementById("totalStaffCount").innerText = maleCount + femaleCount;
+    }
+
+    function filterStaff() {
+        const selectedOccupation = document.getElementById("occupationSelect").value;
+        const rows = document.getElementById("stafftable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+            const occupation = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
+            if (selectedOccupation === "" || selectedOccupation === occupation) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        updateStaffSummary();
+        resetStaffSerialNumbers();
+    }
+
+    function resetStaffSerialNumbers() {
+        const visibleRows = document.querySelectorAll("#stafftable tbody tr:not([style*='display: none'])");
+        for (let i = 0; i < visibleRows.length; i++) {
+            visibleRows[i].getElementsByTagName("td")[0].innerText = i + 1;
+        }
+    }
+
+    document.getElementById("searchStaffInput").addEventListener("keyup", function() {
+        const filter = this.value.toUpperCase();
+        const rows = document.getElementById("stafftable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName("td");
+            let found = false;
+            for (let j = 0; j < cells.length; j++) {
+                const textValue = cells[j].textContent || cells[j].innerText;
+                if (textValue.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+        updateStaffSummary();
+        resetStaffSerialNumbers();
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        updateStudentSummary();
+        resetStudentSerialNumbers();
+        updateStaffSummary();
+        resetStaffSerialNumbers();
+
+        const studentRows = document.querySelectorAll("#studenttable .clickable-row");
+        studentRows.forEach(row => {
+            row.addEventListener("click", () => {
+                window.location.href = row.getAttribute("data-href");
+            });
+        });
+
+        const staffRows = document.querySelectorAll("#stafftable .clickable-row");
+        staffRows.forEach(row => {
+            row.addEventListener("click", () => {
+                window.location.href = row.getAttribute("data-href");
+            });
+        });
+    });
+</script>
+<script src="{% static 'js/animations/animations.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+{% endblock %}

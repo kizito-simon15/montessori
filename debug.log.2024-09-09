@@ -1,0 +1,912 @@
+INFO 2024-09-13 15:50:44,500 Watching for file changes with StatReloader
+INFO 2024-09-13 15:55:36,750 "GET / HTTP/1.1" 302 0
+INFO 2024-09-13 15:55:36,775 "GET /accounts/custom_login/?next=/ HTTP/1.1" 200 10115
+INFO 2024-09-13 15:55:36,906 "GET /static/plugins/toastr/toastr.min.css HTTP/1.1" 200 6454
+INFO 2024-09-13 15:55:36,907 "GET /static/dist/img/Lovepik_com-450006636-Vector%20High%20School%20Building.png HTTP/1.1" 200 170222
+INFO 2024-09-13 15:55:36,909 "GET /static/plugins/fontawesome-free/css/all.min.css HTTP/1.1" 200 58578
+INFO 2024-09-13 15:55:36,913 "GET /static/plugins/overlayScrollbars/css/OverlayScrollbars.min.css HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,912 "GET /static/dist/css/login-page.css HTTP/1.1" 200 8610
+INFO 2024-09-13 15:55:36,913 "GET /static/dist/css/adminlte.min.css HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,913 "GET /static/plugins/jquery/jquery.min.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,939 "GET /static/dist/js/adminlte.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,942 "GET /static/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,947 "GET /static/dist/js/jquery.formset.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,947 "GET /static/plugins/bootstrap/js/bootstrap.bundle.min.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,948 "GET /static/plugins/toastr/toastr.min.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:36,955 "GET /static/dist/js/demo.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:38,158 "GET /static/plugins/fontawesome-free/webfonts/fa-solid-900.woff2 HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:38,171 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-13 15:55:42,297 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-13 15:55:42,348 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-13 15:55:42,434 "GET /static/plugins/Datatables/datatables.min.css HTTP/1.1" 200 25780
+INFO 2024-09-13 15:55:42,441 "GET /static/plugins/Datatables/datatables.min.js HTTP/1.1" 304 0
+INFO 2024-09-13 15:55:43,341 "GET /static/plugins/fontawesome-free/webfonts/fa-regular-400.woff2 HTTP/1.1" 200 13584
+INFO 2024-09-13 15:55:43,352 "GET /media/profile_pics/lake.png HTTP/1.1" 200 211327
+WARNING 2024-09-13 15:55:43,606 Not Found: /favicon.ico
+INFO 2024-09-13 15:55:49,717 "GET /finance/select-link/ HTTP/1.1" 200 24552
+INFO 2024-09-13 15:55:56,207 "GET /accounts/login/ HTTP/1.1" 200 10115
+WARNING 2024-09-13 15:55:56,351 Not Found: /favicon.ico
+INFO 2024-09-13 15:56:35,495 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-13 15:56:35,537 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24926
+INFO 2024-09-13 15:57:01,368 "POST /bursor/dashboard/bursor/mark-attendance/ HTTP/1.1" 302 0
+INFO 2024-09-13 15:57:01,393 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24645
+INFO 2024-09-13 15:57:13,275 "GET /bursor/bursor/comments/ HTTP/1.1" 200 21191
+WARNING 2024-09-13 15:57:13,857 Not Found: /favicon.ico
+INFO 2024-09-13 15:57:31,854 "GET /bursor/bursor_view_available_books/ HTTP/1.1" 200 18380
+WARNING 2024-09-13 15:57:32,509 Not Found: /favicon.ico
+INFO 2024-09-13 15:57:36,729 "GET /bursor/bursor_stationery_list/ HTTP/1.1" 200 17718
+WARNING 2024-09-13 15:57:38,388 Not Found: /favicon.ico
+INFO 2024-09-13 16:00:37,803 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 27397
+INFO 2024-09-13 16:01:06,806 "GET /bursor/bursor/list/ HTTP/1.1" 200 20355
+WARNING 2024-09-13 16:01:06,869 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-13 16:01:07,362 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-13 16:01:12,863 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-13 16:01:12,921 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-13 16:01:16,574 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-13 16:01:16,605 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-13 16:01:18,730 "GET /student/list HTTP/1.1" 200 30067
+WARNING 2024-09-13 16:01:18,772 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-13 16:01:19,229 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-13 16:01:21,591 "GET /student/create/ HTTP/1.1" 200 26946
+INFO 2024-09-13 16:03:06,117 "POST /student/create/ HTTP/1.1" 302 0
+INFO 2024-09-13 16:03:06,139 "GET /student/list HTTP/1.1" 200 30662
+WARNING 2024-09-13 16:03:06,236 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-13 16:03:06,983 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-13 16:03:20,678 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-13 16:03:20,730 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-13 16:03:29,375 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-13 16:03:29,407 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-13 16:03:35,560 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-13 16:03:40,343 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-13 16:03:40,369 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24499
+INFO 2024-09-13 16:03:42,644 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 28040
+INFO 2024-09-13 16:10:08,513 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:10:09,715 Watching for file changes with StatReloader
+INFO 2024-09-13 16:10:13,042 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:10:13,975 Watching for file changes with StatReloader
+INFO 2024-09-13 16:10:19,315 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:10:20,337 Watching for file changes with StatReloader
+INFO 2024-09-13 16:10:30,001 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:10:30,885 Watching for file changes with StatReloader
+INFO 2024-09-13 16:10:35,002 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:10:35,724 Watching for file changes with StatReloader
+INFO 2024-09-13 16:10:54,736 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:10:55,703 Watching for file changes with StatReloader
+INFO 2024-09-13 16:11:19,834 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:11:20,787 Watching for file changes with StatReloader
+INFO 2024-09-13 16:11:26,157 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:11:27,093 Watching for file changes with StatReloader
+INFO 2024-09-13 16:13:25,638 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 18550
+INFO 2024-09-13 16:13:44,260 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 200 18686
+INFO 2024-09-13 16:15:06,964 Watching for file changes with StatReloader
+INFO 2024-09-13 16:15:13,259 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 18550
+WARNING 2024-09-13 16:15:13,733 Not Found: /favicon.ico
+INFO 2024-09-13 16:15:21,850 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 200 18686
+WARNING 2024-09-13 16:15:22,193 Not Found: /favicon.ico
+INFO 2024-09-13 16:20:09,603 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:20:10,872 Watching for file changes with StatReloader
+INFO 2024-09-13 16:20:24,715 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:20:25,726 Watching for file changes with StatReloader
+INFO 2024-09-13 16:20:35,249 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:20:36,250 Watching for file changes with StatReloader
+INFO 2024-09-13 16:24:52,576 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:24:53,564 Watching for file changes with StatReloader
+INFO 2024-09-13 16:25:01,834 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 19453
+WARNING 2024-09-13 16:25:02,679 Not Found: /favicon.ico
+INFO 2024-09-13 16:25:18,462 "GET /bursor/bursor-send-sms-form/?name=&current_class=1 HTTP/1.1" 200 19004
+INFO 2024-09-13 16:25:45,646 "GET /bursor/bursor-send-sms-form/?name=&current_class=3 HTTP/1.1" 200 18548
+INFO 2024-09-13 16:25:52,867 "GET /bursor/bursor-send-sms-form/?name=iuaIUAIU&current_class=3 HTTP/1.1" 200 18116
+INFO 2024-09-13 16:28:37,931 "GET /bursor/bursor-send-sms-form/?name=iuaIUAIU&current_class=3 HTTP/1.1" 200 18193
+WARNING 2024-09-13 16:28:38,332 Not Found: /favicon.ico
+INFO 2024-09-13 16:32:55,881 "GET /bursor/bursor-send-sms-form/?name=iuaIUAIU&current_class=3 HTTP/1.1" 200 18774
+INFO 2024-09-13 16:33:03,264 "GET /bursor/bursor-send-sms-form/?name=iuaIUAIU&current_class=5 HTTP/1.1" 200 18774
+INFO 2024-09-13 16:33:12,794 "GET /bursor/bursor-send-sms-form/?name=&current_class= HTTP/1.1" 200 20186
+WARNING 2024-09-13 16:33:13,497 Not Found: /favicon.ico
+INFO 2024-09-13 16:33:18,236 "GET /bursor/bursor-send-sms-form/?name=&current_class=3 HTTP/1.1" 200 19231
+INFO 2024-09-13 16:33:23,385 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 20186
+INFO 2024-09-13 16:33:27,428 "GET /bursor/bursor-send-sms-form/?name=&current_class=3 HTTP/1.1" 200 19231
+INFO 2024-09-13 16:40:29,137 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:40:30,374 Watching for file changes with StatReloader
+INFO 2024-09-13 16:40:35,675 /home/josephdragon/Videos/element_zone/bursor/views.py changed, reloading.
+INFO 2024-09-13 16:40:36,437 Watching for file changes with StatReloader
+INFO 2024-09-13 16:56:50,421 "GET /bursor/bursor-send-sms-form/?name=&current_class=3 HTTP/1.1" 200 23767
+INFO 2024-09-13 16:58:14,305 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 302 0
+INFO 2024-09-13 16:58:14,332 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 23928
+WARNING 2024-09-13 16:58:14,935 Not Found: /favicon.ico
+INFO 2024-09-13 16:59:48,882 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26397
+INFO 2024-09-13 17:01:01,153 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26488
+INFO 2024-09-13 17:02:17,173 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 302 0
+INFO 2024-09-13 17:02:17,204 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26649
+INFO 2024-09-13 17:03:54,335 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26488
+INFO 2024-09-13 17:03:56,835 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26488
+INFO 2024-09-13 17:04:15,551 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 302 0
+INFO 2024-09-13 17:04:15,581 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26625
+WARNING 2024-09-13 17:04:16,049 Not Found: /favicon.ico
+INFO 2024-09-13 17:04:31,538 "GET /bursor/bursor-sms-history/ HTTP/1.1" 200 22052
+INFO 2024-09-14 18:57:36,466 Watching for file changes with StatReloader
+INFO 2024-09-14 18:58:08,605 Watching for file changes with StatReloader
+INFO 2024-09-14 18:58:19,388 Watching for file changes with StatReloader
+INFO 2024-09-14 18:58:30,825 Watching for file changes with StatReloader
+INFO 2024-09-14 18:59:06,384 "GET / HTTP/1.1" 302 0
+INFO 2024-09-14 18:59:06,629 "GET /accounts/custom_login/?next=/ HTTP/1.1" 200 10115
+INFO 2024-09-14 18:59:06,737 "GET /static/plugins/toastr/toastr.min.css HTTP/1.1" 200 6454
+INFO 2024-09-14 18:59:06,742 "GET /static/dist/css/login-page.css HTTP/1.1" 200 8610
+INFO 2024-09-14 18:59:06,742 "GET /static/plugins/overlayScrollbars/css/OverlayScrollbars.min.css HTTP/1.1" 200 19724
+INFO 2024-09-14 18:59:06,753 "GET /static/plugins/toastr/toastr.min.js HTTP/1.1" 200 5251
+INFO 2024-09-14 18:59:06,755 "GET /static/dist/js/jquery.formset.js HTTP/1.1" 200 13632
+INFO 2024-09-14 18:59:06,759 "GET /static/plugins/fontawesome-free/css/all.min.css HTTP/1.1" 200 58578
+INFO 2024-09-14 18:59:06,763 "GET /static/plugins/jquery/jquery.min.js HTTP/1.1" 200 88145
+INFO 2024-09-14 18:59:06,765 "GET /static/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js HTTP/1.1" 200 42383
+INFO 2024-09-14 18:59:06,765 "GET /static/plugins/bootstrap/js/bootstrap.bundle.min.js HTTP/1.1" 200 80698
+INFO 2024-09-14 18:59:06,768 "GET /static/dist/css/adminlte.min.css HTTP/1.1" 200 686707
+INFO 2024-09-14 18:59:06,770 "GET /static/dist/js/adminlte.js HTTP/1.1" 200 57530
+INFO 2024-09-14 18:59:06,789 "GET /static/dist/js/demo.js HTTP/1.1" 200 12616
+INFO 2024-09-14 18:59:08,229 "GET /static/dist/img/Lovepik_com-450006636-Vector%20High%20School%20Building.png HTTP/1.1" 200 170222
+INFO 2024-09-14 18:59:08,701 "GET /static/plugins/fontawesome-free/webfonts/fa-solid-900.woff2 HTTP/1.1" 200 79444
+INFO 2024-09-14 18:59:08,741 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-14 18:59:13,496 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-14 18:59:13,579 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-14 18:59:13,667 "GET /static/plugins/Datatables/datatables.min.css HTTP/1.1" 200 25780
+INFO 2024-09-14 18:59:13,704 "GET /static/plugins/Datatables/datatables.min.js HTTP/1.1" 200 2042446
+INFO 2024-09-14 18:59:14,418 "GET /media/profile_pics/lake.png HTTP/1.1" 200 211327
+INFO 2024-09-14 18:59:14,508 "GET /static/plugins/fontawesome-free/webfonts/fa-regular-400.woff2 HTTP/1.1" 200 13584
+WARNING 2024-09-14 18:59:15,130 Not Found: /favicon.ico
+INFO 2024-09-14 18:59:37,353 "GET /student/list HTTP/1.1" 200 30516
+WARNING 2024-09-14 18:59:37,419 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-14 18:59:37,733 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-14 18:59:39,125 "GET /staff/list/ HTTP/1.1" 200 28120
+WARNING 2024-09-14 18:59:39,465 Not Found: /favicon.ico
+INFO 2024-09-14 18:59:40,498 "GET /sms/send-sms-form/ HTTP/1.1" 200 35274
+INFO 2024-09-14 18:59:42,427 "GET /sms/sms-history/ HTTP/1.1" 200 30868
+INFO 2024-09-14 18:59:44,092 "GET /sms/send-sms-form/ HTTP/1.1" 200 35274
+INFO 2024-09-14 19:00:06,470 "GET /sms/send-sms-form/ HTTP/1.1" 200 35274
+INFO 2024-09-14 19:00:11,460 "GET /goto-admin/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:00:11,511 "GET /admin/ HTTP/1.1" 200 10044
+INFO 2024-09-14 19:00:11,605 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2024-09-14 19:00:11,606 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2024-09-14 19:00:11,607 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2024-09-14 19:00:11,613 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2024-09-14 19:00:11,616 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2024-09-14 19:00:11,616 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2024-09-14 19:00:11,617 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2024-09-14 19:00:11,663 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2024-09-14 19:00:11,663 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2024-09-14 19:00:24,804 "GET /student/list HTTP/1.1" 200 30516
+WARNING 2024-09-14 19:00:24,863 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-14 19:00:25,156 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-14 19:00:27,760 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-14 19:00:27,836 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-14 19:00:58,073 "POST /accounts/custom_login/ HTTP/1.1" 200 10268
+INFO 2024-09-14 19:01:04,123 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:01:04,161 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-14 19:01:19,186 "GET /accounts/list_users/ HTTP/1.1" 200 33933
+WARNING 2024-09-14 19:01:19,822 Not Found: /favicon.ico
+INFO 2024-09-14 19:01:25,560 "GET /accounts/delete_bursor_user/14/ HTTP/1.1" 200 21912
+INFO 2024-09-14 19:01:27,318 "POST /accounts/delete_bursor_user/14/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:01:27,350 "GET /accounts/list_users/ HTTP/1.1" 200 31550
+WARNING 2024-09-14 19:01:27,765 Not Found: /favicon.ico
+INFO 2024-09-14 19:01:29,172 "GET /accounts/select_user_type/ HTTP/1.1" 200 23483
+INFO 2024-09-14 19:01:30,870 "GET /accounts/create_bursor_user/ HTTP/1.1" 200 34692
+INFO 2024-09-14 19:01:51,789 "POST /accounts/create_bursor_user/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:01:51,822 "GET /accounts/select_user_type/ HTTP/1.1" 200 23654
+INFO 2024-09-14 19:02:00,643 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-14 19:02:00,693 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-14 19:02:04,996 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:02:05,075 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24926
+INFO 2024-09-14 19:02:08,358 "POST /bursor/dashboard/bursor/mark-attendance/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:02:08,382 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24645
+INFO 2024-09-14 19:02:15,302 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26488
+INFO 2024-09-14 19:02:42,234 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:02:42,265 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26625
+WARNING 2024-09-14 19:02:42,689 Not Found: /favicon.ico
+INFO 2024-09-14 19:03:27,027 "GET /bursor/bursor-sms-history/ HTTP/1.1" 200 23701
+INFO 2024-09-14 19:06:54,895 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-14 19:06:54,979 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-14 19:06:59,245 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:06:59,284 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-14 19:07:01,661 "GET /student/list HTTP/1.1" 200 30516
+WARNING 2024-09-14 19:07:01,754 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-14 19:07:02,033 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-14 19:07:16,517 "GET /accounts/login/ HTTP/1.1" 200 10115
+WARNING 2024-09-14 19:07:16,681 Not Found: /favicon.ico
+INFO 2024-09-14 19:07:20,922 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:07:20,951 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24499
+INFO 2024-09-14 19:07:24,116 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26488
+WARNING 2024-09-14 19:07:24,438 Not Found: /favicon.ico
+INFO 2024-09-14 19:07:30,551 "GET /bursor/bursor-sms-history/ HTTP/1.1" 200 23701
+INFO 2024-09-14 19:07:33,738 "GET /bursor/bursor-check-balance/ HTTP/1.1" 200 12381
+INFO 2024-09-14 19:07:37,499 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26488
+INFO 2024-09-14 19:07:55,222 "POST /bursor/bursor-send-sms-form/ HTTP/1.1" 302 0
+INFO 2024-09-14 19:07:55,252 "GET /bursor/bursor-send-sms-form/ HTTP/1.1" 200 26625
+WARNING 2024-09-14 19:07:55,700 Not Found: /favicon.ico
+INFO 2024-09-14 19:08:08,779 "GET /bursor/bursor-sms-history/ HTTP/1.1" 200 26629
+INFO 2024-09-14 19:08:19,643 "GET /bursor/bursor-check-balance/ HTTP/1.1" 200 12381
+INFO 2024-09-14 19:10:42,681 "GET /bursor/bursor-check-balance/ HTTP/1.1" 200 12381
+INFO 2024-09-14 19:13:16,024 "GET /bursor/bursor-check-balance/ HTTP/1.1" 200 12381
+INFO 2024-09-14 19:17:41,036 "GET /bursor/bursor-check-balance/ HTTP/1.1" 200 12381
+INFO 2024-09-14 19:45:51,076 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24499
+INFO 2024-09-14 19:46:00,187 "GET /bursor/bursor/details/ HTTP/1.1" 200 16297
+INFO 2024-09-14 19:46:00,240 "GET /media/staffs/passports/user-solid.svg HTTP/1.1" 200 410
+INFO 2024-09-14 19:46:02,600 "GET /bursor/bursor/details/ HTTP/1.1" 200 16297
+INFO 2024-09-14 19:46:04,610 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24499
+INFO 2024-09-14 19:46:06,678 "GET /bursor/bursor/details/ HTTP/1.1" 200 16297
+INFO 2024-09-14 19:46:08,438 "GET /bursor/bursor/dashboard/ HTTP/1.1" 200 24499
+INFO 2024-09-14 20:14:19,186 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-14 20:14:19,244 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+WARNING 2024-09-14 20:14:19,336 Not Found: /favicon.ico
+INFO 2024-09-14 20:14:23,440 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-14 20:14:23,481 "GET / HTTP/1.1" 200 32933
+WARNING 2024-09-14 20:14:24,524 Not Found: /favicon.ico
+INFO 2024-09-15 11:04:07,672 Watching for file changes with StatReloader
+INFO 2024-09-15 11:04:58,227 "GET / HTTP/1.1" 302 0
+INFO 2024-09-15 11:04:58,241 "GET /accounts/custom_login/?next=/ HTTP/1.1" 200 10115
+INFO 2024-09-15 11:04:58,354 "GET /static/dist/img/Lovepik_com-450006636-Vector%20High%20School%20Building.png HTTP/1.1" 200 170222
+INFO 2024-09-15 11:04:59,052 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+INFO 2024-09-15 11:05:04,231 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-15 11:05:04,266 "GET / HTTP/1.1" 200 32933
+INFO 2024-09-15 11:05:04,841 "GET /media/profile_pics/lake.png HTTP/1.1" 304 0
+WARNING 2024-09-15 11:05:05,203 Not Found: /favicon.ico
+INFO 2024-09-15 11:05:12,348 "GET /analytics/analitics/home/ HTTP/1.1" 200 21188
+INFO 2024-09-15 11:05:14,674 "GET /analytics/academic/ HTTP/1.1" 200 116267
+INFO 2024-09-15 11:24:50,718 "GET /analytics/academic/ HTTP/1.1" 200 111577
+WARNING 2024-09-15 11:24:51,222 Not Found: /favicon.ico
+INFO 2024-09-15 11:24:53,496 "GET /student/list HTTP/1.1" 200 25830
+WARNING 2024-09-15 11:24:53,533 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:24:53,818 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:24:56,028 "GET /staff/list/ HTTP/1.1" 200 23434
+INFO 2024-09-15 11:24:59,113 "GET /event/ HTTP/1.1" 200 16173
+WARNING 2024-09-15 11:24:59,148 "GET /static/css/aos.css HTTP/1.1" 404 1792
+WARNING 2024-09-15 11:24:59,155 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:24:59,396 Not Found: /favicon.ico
+INFO 2024-09-15 11:25:03,430 "GET /student/list HTTP/1.1" 200 25830
+WARNING 2024-09-15 11:25:03,463 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:25:03,719 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:25:05,895 "GET /result/single/class/list HTTP/1.1" 200 16351
+WARNING 2024-09-15 11:25:06,144 Not Found: /favicon.ico
+INFO 2024-09-15 11:25:08,764 "GET /event/ HTTP/1.1" 200 16173
+WARNING 2024-09-15 11:25:08,792 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:25:08,798 "GET /static/css/aos.css HTTP/1.1" 404 1792
+INFO 2024-09-15 11:25:16,926 "GET /finance/select-link/ HTTP/1.1" 200 19862
+WARNING 2024-09-15 11:25:17,189 Not Found: /favicon.ico
+INFO 2024-09-15 11:27:00,962 "GET /library/view_available_books/ HTTP/1.1" 200 21620
+WARNING 2024-09-15 11:27:01,335 Not Found: /favicon.ico
+INFO 2024-09-15 11:28:33,936 "GET /library/view_available_books/ HTTP/1.1" 200 21646
+WARNING 2024-09-15 11:28:34,290 Not Found: /favicon.ico
+INFO 2024-09-15 11:28:36,404 "GET /student/list HTTP/1.1" 200 25856
+WARNING 2024-09-15 11:28:36,442 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:28:36,659 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:28:38,064 "GET /staff/list/ HTTP/1.1" 200 23460
+INFO 2024-09-15 11:28:41,063 "GET /staff/list/ HTTP/1.1" 200 23460
+INFO 2024-09-15 11:32:01,863 "GET /staff/list/ HTTP/1.1" 200 22470
+WARNING 2024-09-15 11:32:02,580 Not Found: /favicon.ico
+INFO 2024-09-15 11:32:08,878 "GET /student/list HTTP/1.1" 200 23743
+INFO 2024-09-15 11:32:15,345 "GET /event/ HTTP/1.1" 200 20698
+WARNING 2024-09-15 11:32:15,380 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:32:15,382 "GET /static/css/aos.css HTTP/1.1" 404 1792
+INFO 2024-09-15 11:34:04,289 "GET /event/ HTTP/1.1" 200 21887
+WARNING 2024-09-15 11:34:04,313 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:34:04,320 "GET /static/css/aos.css HTTP/1.1" 404 1792
+INFO 2024-09-15 11:41:54,175 "GET /event/ HTTP/1.1" 200 14029
+WARNING 2024-09-15 11:41:54,198 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:41:54,202 "GET /static/css/aos.css HTTP/1.1" 404 1792
+WARNING 2024-09-15 11:41:54,743 Not Found: /favicon.ico
+INFO 2024-09-15 11:41:59,775 "GET /event/ HTTP/1.1" 200 14029
+WARNING 2024-09-15 11:41:59,793 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:41:59,797 "GET /static/css/aos.css HTTP/1.1" 404 1792
+INFO 2024-09-15 11:45:31,887 "GET /event/ HTTP/1.1" 200 16196
+WARNING 2024-09-15 11:45:31,920 "GET /static/css/aos.css HTTP/1.1" 404 1792
+WARNING 2024-09-15 11:45:31,926 "GET /static/js/aos.js HTTP/1.1" 404 1786
+INFO 2024-09-15 11:45:34,146 "GET /student/list HTTP/1.1" 200 25848
+WARNING 2024-09-15 11:45:34,191 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:45:34,415 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:45:36,553 "GET /staff/list/ HTTP/1.1" 200 23452
+INFO 2024-09-15 11:45:39,679 "GET /sms/send-sms-form/ HTTP/1.1" 200 30607
+WARNING 2024-09-15 11:45:40,066 Not Found: /favicon.ico
+INFO 2024-09-15 11:45:52,046 "GET /accounts/select_user_type/ HTTP/1.1" 200 18816
+INFO 2024-09-15 11:45:57,486 "GET /attendance/selecting-class/ HTTP/1.1" 200 16835
+WARNING 2024-09-15 11:45:57,749 Not Found: /favicon.ico
+INFO 2024-09-15 11:46:08,511 "GET /student/list HTTP/1.1" 200 25848
+WARNING 2024-09-15 11:46:08,538 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:46:08,791 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:46:27,598 "GET /analytics/analitics/home/ HTTP/1.1" 200 16521
+INFO 2024-09-15 11:47:15,833 "GET /analytics/analitics/home/ HTTP/1.1" 200 21187
+WARNING 2024-09-15 11:47:16,206 Not Found: /favicon.ico
+INFO 2024-09-15 11:47:20,797 "GET /session/list/ HTTP/1.1" 200 22441
+WARNING 2024-09-15 11:47:21,040 Not Found: /favicon.ico
+INFO 2024-09-15 11:47:23,527 "GET /student/list HTTP/1.1" 200 30515
+WARNING 2024-09-15 11:47:23,561 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:47:23,752 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:47:24,939 "GET /staff/list/ HTTP/1.1" 200 28119
+INFO 2024-09-15 11:47:27,064 "GET /sms/send-sms-form/ HTTP/1.1" 200 35273
+INFO 2024-09-15 11:53:07,035 "GET /sms/send-sms-form/ HTTP/1.1" 200 37484
+WARNING 2024-09-15 11:53:07,635 Not Found: /favicon.ico
+INFO 2024-09-15 11:53:09,831 "GET /student/list HTTP/1.1" 200 32726
+WARNING 2024-09-15 11:53:09,861 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:53:10,091 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:53:11,621 "GET /staff/list/ HTTP/1.1" 200 30330
+INFO 2024-09-15 11:53:13,617 "GET /sms/send-sms-form/ HTTP/1.1" 200 37484
+WARNING 2024-09-15 11:53:13,920 Not Found: /favicon.ico
+INFO 2024-09-15 11:53:24,974 "GET /student/list HTTP/1.1" 200 32726
+WARNING 2024-09-15 11:53:25,001 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:53:25,280 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:53:27,116 "GET /staff/list/ HTTP/1.1" 200 30330
+WARNING 2024-09-15 11:53:27,542 Not Found: /favicon.ico
+INFO 2024-09-15 11:55:51,552 "GET /staff/list/ HTTP/1.1" 200 29807
+WARNING 2024-09-15 11:55:52,222 Not Found: /favicon.ico
+INFO 2024-09-15 11:55:55,105 "GET /student/list HTTP/1.1" 200 32203
+WARNING 2024-09-15 11:55:55,153 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:55:55,357 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:55:57,150 "GET /staff/list/ HTTP/1.1" 200 29807
+INFO 2024-09-15 11:55:59,137 "GET /sms/send-sms-form/ HTTP/1.1" 200 36961
+INFO 2024-09-15 11:56:03,947 "GET /attendance/select-class/ HTTP/1.1" 200 23342
+INFO 2024-09-15 11:56:05,930 "GET /sms/sms-history/ HTTP/1.1" 200 37132
+INFO 2024-09-15 11:56:14,502 "GET /parents/all/parents/comments HTTP/1.1" 200 35355
+INFO 2024-09-15 11:56:20,209 "GET /student/list HTTP/1.1" 200 32203
+WARNING 2024-09-15 11:56:20,234 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:56:20,512 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:56:21,758 "GET /student/list HTTP/1.1" 200 32203
+WARNING 2024-09-15 11:56:21,786 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:56:21,967 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:56:22,686 "GET /student/list HTTP/1.1" 200 32203
+WARNING 2024-09-15 11:56:22,712 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:56:23,539 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:56:26,598 "GET /staff/staff-attendace-report/ HTTP/1.1" 200 26731
+INFO 2024-09-15 11:56:29,557 "GET /parents/all/parents/comments HTTP/1.1" 200 35355
+INFO 2024-09-15 11:56:34,695 "GET /attendance/selecting-class/ HTTP/1.1" 200 23189
+INFO 2024-09-15 11:56:36,589 "GET /staff/list/ HTTP/1.1" 200 29807
+INFO 2024-09-15 11:56:38,407 "GET /student/list HTTP/1.1" 200 32203
+WARNING 2024-09-15 11:56:38,441 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:56:38,629 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:56:41,705 "GET /dashboard/ HTTP/1.1" 200 35132
+INFO 2024-09-15 11:56:48,922 "GET /dashboard/ HTTP/1.1" 200 35132
+INFO 2024-09-15 11:56:51,283 "GET /dashboard/ HTTP/1.1" 200 35132
+INFO 2024-09-15 11:56:58,533 "GET /accounts/login/ HTTP/1.1" 200 10115
+INFO 2024-09-15 11:56:58,551 "GET /static/dist/img/Lovepik_com-450006636-Vector%20High%20School%20Building.png HTTP/1.1" 200 170222
+INFO 2024-09-15 11:56:58,566 "GET /static/registration/abstract-solid-shining-yellow-gradient-studio-wall-room-background.jpg HTTP/1.1" 200 4782141
+WARNING 2024-09-15 11:56:58,662 Not Found: /favicon.ico
+INFO 2024-09-15 11:57:02,778 "POST /accounts/custom_login/ HTTP/1.1" 302 0
+INFO 2024-09-15 11:57:02,806 "GET / HTTP/1.1" 200 34620
+INFO 2024-09-15 11:57:05,111 "GET /staff/list/ HTTP/1.1" 200 29807
+INFO 2024-09-15 11:57:06,612 "GET /sms/send-sms-form/ HTTP/1.1" 200 36961
+INFO 2024-09-15 11:57:08,184 "GET /sms/sms-history/ HTTP/1.1" 200 37132
+INFO 2024-09-15 11:57:09,846 "GET /event/create/ HTTP/1.1" 200 26681
+WARNING 2024-09-15 11:57:09,879 "GET /static/js/aos.js HTTP/1.1" 404 1786
+WARNING 2024-09-15 11:57:09,888 "GET /static/css/aos.css HTTP/1.1" 404 1792
+INFO 2024-09-15 11:57:11,731 "GET /event/ HTTP/1.1" 200 22550
+WARNING 2024-09-15 11:57:11,776 "GET /static/css/aos.css HTTP/1.1" 404 1792
+WARNING 2024-09-15 11:57:11,778 "GET /static/js/aos.js HTTP/1.1" 404 1786
+INFO 2024-09-15 11:57:20,966 "GET /updations/move-students/ HTTP/1.1" 200 22258
+INFO 2024-09-15 11:57:27,000 "GET /student/list HTTP/1.1" 200 32203
+WARNING 2024-09-15 11:57:27,034 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:57:27,228 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:57:29,319 "GET /staff/list/ HTTP/1.1" 200 29807
+WARNING 2024-09-15 11:57:29,635 Not Found: /favicon.ico
+INFO 2024-09-15 11:57:31,071 "GET /sms/send-sms-form/ HTTP/1.1" 200 36961
+INFO 2024-09-15 11:58:45,643 "GET /sms/send-sms-form/ HTTP/1.1" 200 37496
+WARNING 2024-09-15 11:58:46,017 Not Found: /favicon.ico
+INFO 2024-09-15 11:58:47,794 "GET /student/list HTTP/1.1" 200 32738
+WARNING 2024-09-15 11:58:47,826 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 11:58:48,057 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 11:58:49,279 "GET /staff/list/ HTTP/1.1" 200 30342
+INFO 2024-09-15 11:58:51,750 "GET /sms/send-sms-form/ HTTP/1.1" 200 37496
+INFO 2024-09-15 11:58:57,140 "GET /accounts/select_user_type/ HTTP/1.1" 200 25705
+INFO 2024-09-15 11:59:59,040 "GET /accounts/select_user_type/ HTTP/1.1" 200 25705
+WARNING 2024-09-15 11:59:59,489 Not Found: /favicon.ico
+INFO 2024-09-15 12:01:36,033 "GET /accounts/select_user_type/ HTTP/1.1" 200 25966
+WARNING 2024-09-15 12:01:36,315 Not Found: /favicon.ico
+WARNING 2024-09-15 12:01:37,944 Not Found: /favicon.ico
+INFO 2024-09-15 12:01:45,715 "GET /staff/list/ HTTP/1.1" 200 30603
+INFO 2024-09-15 12:01:47,780 "GET /student/list HTTP/1.1" 200 32999
+WARNING 2024-09-15 12:01:47,807 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:01:48,019 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:01:49,859 "GET /student/4/ HTTP/1.1" 200 26130
+INFO 2024-09-15 12:01:49,880 "GET /static/dist/img/avatar.png HTTP/1.1" 200 8543
+WARNING 2024-09-15 12:01:52,686 Not Found: /favicon.ico
+INFO 2024-09-15 12:01:56,831 "GET /student/4/ HTTP/1.1" 200 26130
+INFO 2024-09-15 12:03:47,932 "GET /student/list HTTP/1.1" 200 33346
+WARNING 2024-09-15 12:03:47,968 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:03:48,192 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:03:49,818 "GET /student/list HTTP/1.1" 200 33346
+WARNING 2024-09-15 12:03:49,842 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:03:50,099 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:03:51,401 Not Found: /favicon.ico
+INFO 2024-09-15 12:04:10,246 "GET /staff/list/ HTTP/1.1" 200 30950
+INFO 2024-09-15 12:04:12,686 "GET /student/list HTTP/1.1" 200 33346
+WARNING 2024-09-15 12:04:12,713 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:04:12,978 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:04:14,559 "GET /staff/list/ HTTP/1.1" 200 30950
+INFO 2024-09-15 12:04:16,357 "GET /sms/send-sms-form/ HTTP/1.1" 200 38104
+WARNING 2024-09-15 12:04:16,788 Not Found: /favicon.ico
+INFO 2024-09-15 12:04:19,382 "GET /staff/staff-attendace-report/ HTTP/1.1" 200 27874
+INFO 2024-09-15 12:04:32,125 "GET /analytics/analitics/home/ HTTP/1.1" 200 24018
+INFO 2024-09-15 12:04:35,642 "GET /analytics/academic/ HTTP/1.1" 200 119097
+INFO 2024-09-15 12:04:50,304 "GET /sms/sms-history/ HTTP/1.1" 200 38275
+INFO 2024-09-15 12:04:52,163 "GET /student/list HTTP/1.1" 200 33346
+WARNING 2024-09-15 12:04:52,194 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:04:52,537 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:04:54,216 "GET /sms/sms-history/ HTTP/1.1" 200 38275
+INFO 2024-09-15 12:04:56,517 "GET /student/list HTTP/1.1" 200 33346
+WARNING 2024-09-15 12:04:56,545 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:04:56,767 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:04:59,809 "GET /student/4/ HTTP/1.1" 200 26477
+WARNING 2024-09-15 12:05:00,060 Not Found: /favicon.ico
+INFO 2024-09-15 12:05:05,423 "GET /student/inactive-students/ HTTP/1.1" 200 36955
+WARNING 2024-09-15 12:05:05,450 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:05:05,691 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:05:13,146 "GET /student/create/ HTTP/1.1" 200 29776
+INFO 2024-09-15 12:05:17,779 "GET /sms/send-sms-form/ HTTP/1.1" 200 38104
+WARNING 2024-09-15 12:05:18,197 Not Found: /favicon.ico
+INFO 2024-09-15 12:05:20,393 "GET /sms/sms-history/ HTTP/1.1" 200 38275
+INFO 2024-09-15 12:05:22,942 "GET /staff/staff-attendace-report/ HTTP/1.1" 200 27874
+INFO 2024-09-15 12:05:26,075 "GET /staff/staff-attendace-report/ HTTP/1.1" 200 27874
+INFO 2024-09-15 12:05:28,932 "GET /analytics/analitics/home/ HTTP/1.1" 200 24018
+INFO 2024-09-15 12:06:36,736 "GET /analytics/analitics/home/ HTTP/1.1" 200 24041
+INFO 2024-09-15 12:06:39,088 "GET /staff/list/ HTTP/1.1" 200 30973
+INFO 2024-09-15 12:06:42,351 "GET /student/list HTTP/1.1" 200 33369
+WARNING 2024-09-15 12:06:42,411 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+WARNING 2024-09-15 12:06:42,658 "GET /static/js/animations/animations.js HTTP/1.1" 404 1840
+INFO 2024-09-15 12:06:44,142 "GET /staff/list/ HTTP/1.1" 200 30973
+INFO 2024-09-15 12:21:19,916 Watching for file changes with StatReloader
+INFO 2024-09-15 12:21:32,901 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:21:33,537 Watching for file changes with StatReloader
+INFO 2024-09-15 12:21:37,060 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:21:37,675 Watching for file changes with StatReloader
+INFO 2024-09-15 12:21:50,304 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:21:51,111 Watching for file changes with StatReloader
+INFO 2024-09-15 12:22:09,979 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:22:10,855 Watching for file changes with StatReloader
+INFO 2024-09-15 12:22:38,019 "GET /staff/list/ HTTP/1.1" 200 30973
+INFO 2024-09-15 12:22:51,412 "GET /analytics/analitics/home/ HTTP/1.1" 200 24041
+WARNING 2024-09-15 12:22:51,687 Not Found: /favicon.ico
+ERROR 2024-09-15 12:22:53,242 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 38, in academic_analysis
+    overall_average = session_results.aggregate(avg=models.Avg('overall_average'))['avg']
+NameError: name 'models' is not defined
+ERROR 2024-09-15 12:22:53,242 "GET /analytics/academic/ HTTP/1.1" 500 76385
+INFO 2024-09-15 12:23:15,857 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:23:16,600 Watching for file changes with StatReloader
+INFO 2024-09-15 12:23:22,466 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:23:23,038 Watching for file changes with StatReloader
+INFO 2024-09-15 12:23:27,728 "GET /analytics/academic/ HTTP/1.1" 200 22474
+INFO 2024-09-15 12:23:40,953 "GET /result/single/class/list HTTP/1.1" 200 23894
+INFO 2024-09-15 12:23:45,520 "POST /result/single/class/list HTTP/1.1" 302 0
+INFO 2024-09-15 12:23:45,540 "GET /result/single/class/result/3/ HTTP/1.1" 200 26592
+INFO 2024-09-15 12:23:48,769 "GET /result/single/class/list HTTP/1.1" 200 23894
+INFO 2024-09-15 12:23:57,480 "POST /result/single/class/list HTTP/1.1" 302 0
+INFO 2024-09-15 12:23:57,517 "GET /result/single/class/result/1/ HTTP/1.1" 200 28568
+INFO 2024-09-15 12:24:06,772 "GET /analytics/analitics/home/ HTTP/1.1" 200 24041
+ERROR 2024-09-15 12:24:09,094 Internal Server Error: /analytics/finance/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 113, in finance_analysis
+    raise ValueError("Category data not retrieved properly.")
+ValueError: Category data not retrieved properly.
+ERROR 2024-09-15 12:24:09,095 "GET /analytics/finance/ HTTP/1.1" 500 75745
+INFO 2024-09-15 12:24:14,451 "GET /analytics/academic/ HTTP/1.1" 200 22474
+INFO 2024-09-15 12:27:21,071 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:27:21,869 Watching for file changes with StatReloader
+ERROR 2024-09-15 12:27:29,586 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 87, in academic_analysis
+    return render(request, 'analytics/academic_analysis.html', {'class_graphs': class_graphs, 'ai_advice': ai_advice})
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 861, in do_for
+    nodelist_loop = parser.parse(
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 481, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 479, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 698, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: '[student_class]' from 'ai_advice[student_class]'
+ERROR 2024-09-15 12:27:29,588 "GET /analytics/academic/ HTTP/1.1" 500 252720
+WARNING 2024-09-15 12:27:29,631 Not Found: /favicon.ico
+ERROR 2024-09-15 12:29:28,013 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1034, in find_library
+    return parser.libraries[name]
+KeyError: 'custom_tags'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 87, in academic_analysis
+    return render(request, 'analytics/academic_analysis.html', {'class_graphs': class_graphs, 'ai_advice': ai_advice})
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1096, in load
+    lib = find_library(parser, name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1036, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'custom_tags' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+bootstrap5
+bootstrap_themes
+cache
+crispy_forms_field
+crispy_forms_filters
+crispy_forms_tags
+crispy_forms_utils
+custom_filter
+custom_filters
+humanize
+i18n
+l10n
+log
+rest_framework
+static
+tz
+widget_tweaks
+ERROR 2024-09-15 12:29:28,014 "GET /analytics/academic/ HTTP/1.1" 500 212778
+WARNING 2024-09-15 12:29:28,061 Not Found: /favicon.ico
+ERROR 2024-09-15 12:31:14,661 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1034, in find_library
+    return parser.libraries[name]
+KeyError: 'custom_tags'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 87, in academic_analysis
+    return render(request, 'analytics/academic_analysis.html', {'class_graphs': class_graphs, 'ai_advice': ai_advice})
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1096, in load
+    lib = find_library(parser, name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1036, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'custom_tags' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+bootstrap5
+bootstrap_themes
+cache
+crispy_forms_field
+crispy_forms_filters
+crispy_forms_tags
+crispy_forms_utils
+custom_filter
+custom_filters
+humanize
+i18n
+l10n
+log
+rest_framework
+static
+tz
+widget_tweaks
+ERROR 2024-09-15 12:31:14,662 "GET /analytics/academic/ HTTP/1.1" 500 212778
+WARNING 2024-09-15 12:31:14,695 Not Found: /favicon.ico
+ERROR 2024-09-15 12:31:18,935 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1034, in find_library
+    return parser.libraries[name]
+KeyError: 'custom_tags'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 87, in academic_analysis
+    return render(request, 'analytics/academic_analysis.html', {'class_graphs': class_graphs, 'ai_advice': ai_advice})
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1096, in load
+    lib = find_library(parser, name)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/template/defaulttags.py", line 1036, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'custom_tags' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+bootstrap5
+bootstrap_themes
+cache
+crispy_forms_field
+crispy_forms_filters
+crispy_forms_tags
+crispy_forms_utils
+custom_filter
+custom_filters
+humanize
+i18n
+l10n
+log
+rest_framework
+static
+tz
+widget_tweaks
+ERROR 2024-09-15 12:31:18,936 "GET /analytics/academic/ HTTP/1.1" 500 212778
+WARNING 2024-09-15 12:31:18,993 Not Found: /favicon.ico
+INFO 2024-09-15 12:32:24,052 Watching for file changes with StatReloader
+INFO 2024-09-15 12:32:30,831 "GET /analytics/academic/ HTTP/1.1" 200 64191
+WARNING 2024-09-15 12:32:31,255 Not Found: /favicon.ico
+INFO 2024-09-15 12:35:43,914 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:35:44,717 Watching for file changes with StatReloader
+INFO 2024-09-15 12:35:53,860 "GET /analytics/academic/ HTTP/1.1" 200 67463
+INFO 2024-09-15 12:35:57,094 "GET /analytics/academic/ HTTP/1.1" 200 67463
+INFO 2024-09-15 12:36:34,247 "GET /analytics/academic/ HTTP/1.1" 200 67462
+INFO 2024-09-15 12:39:21,468 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:39:22,379 Watching for file changes with StatReloader
+INFO 2024-09-15 12:39:52,268 "GET /analytics/academic/ HTTP/1.1" 200 70045
+INFO 2024-09-15 12:41:55,769 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:41:56,570 Watching for file changes with StatReloader
+INFO 2024-09-15 12:42:28,412 "GET /analytics/academic/ HTTP/1.1" 200 79483
+WARNING 2024-09-15 12:42:28,790 Not Found: /favicon.ico
+INFO 2024-09-15 12:48:51,925 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:48:52,749 Watching for file changes with StatReloader
+INFO 2024-09-15 12:49:13,617 "GET /analytics/academic/ HTTP/1.1" 200 79931
+WARNING 2024-09-15 12:49:14,259 Not Found: /favicon.ico
+INFO 2024-09-15 12:54:26,215 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:54:27,253 Watching for file changes with StatReloader
+ERROR 2024-09-15 12:54:46,343 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 86, in academic_analysis
+    class_graphs[graph_key] = graph
+NameError: name 'graph' is not defined
+ERROR 2024-09-15 12:54:46,345 "GET /analytics/academic/ HTTP/1.1" 500 83301
+WARNING 2024-09-15 12:54:46,405 Not Found: /favicon.ico
+INFO 2024-09-15 12:55:52,336 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 12:55:53,400 Watching for file changes with StatReloader
+INFO 2024-09-15 12:56:17,325 "GET /analytics/academic/ HTTP/1.1" 200 87016
+WARNING 2024-09-15 12:56:18,001 Not Found: /favicon.ico
+INFO 2024-09-15 13:17:07,062 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 13:17:07,949 Watching for file changes with StatReloader
+INFO 2024-09-15 13:17:30,972 "GET /analytics/academic/ HTTP/1.1" 200 87450
+WARNING 2024-09-15 13:17:31,432 Not Found: /favicon.ico
+INFO 2024-09-15 13:19:11,106 "GET /result/create/ HTTP/1.1" 200 35841
+WARNING 2024-09-15 13:19:11,473 Not Found: /favicon.ico
+INFO 2024-09-15 13:19:16,127 "POST /result/create/ HTTP/1.1" 200 38272
+INFO 2024-09-15 13:19:31,195 "POST /result/create/ HTTP/1.1" 200 43745
+WARNING 2024-09-15 13:19:31,454 Not Found: /favicon.ico
+INFO 2024-09-15 13:20:20,038 "POST /result/create/ HTTP/1.1" 302 0
+INFO 2024-09-15 13:20:20,055 "GET /result/create/ HTTP/1.1" 200 35983
+WARNING 2024-09-15 13:20:20,323 Not Found: /favicon.ico
+INFO 2024-09-15 13:20:32,117 "GET /analytics/analitics/home/ HTTP/1.1" 200 24041
+WARNING 2024-09-15 13:20:32,375 Not Found: /favicon.ico
+INFO 2024-09-15 13:20:34,394 "GET /analytics/academic/ HTTP/1.1" 200 87646
+WARNING 2024-09-15 13:20:34,663 Not Found: /favicon.ico
+INFO 2024-09-15 13:25:44,156 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 13:25:44,991 Watching for file changes with StatReloader
+INFO 2024-09-15 13:26:09,141 "GET /analytics/academic/ HTTP/1.1" 200 87646
+INFO 2024-09-15 13:27:12,374 "GET /analytics/academic/ HTTP/1.1" 200 87646
+INFO 2024-09-15 13:27:18,906 "GET /analytics/academic/ HTTP/1.1" 200 87646
+INFO 2024-09-15 13:42:19,304 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 13:42:20,133 Watching for file changes with StatReloader
+INFO 2024-09-15 13:43:08,231 "GET /analytics/academic/ HTTP/1.1" 200 23538
+WARNING 2024-09-15 13:43:08,849 Not Found: /favicon.ico
+INFO 2024-09-15 13:44:23,468 "GET /analytics/academic/ HTTP/1.1" 200 24249
+WARNING 2024-09-15 13:44:23,836 Not Found: /favicon.ico
+INFO 2024-09-15 13:50:54,590 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 13:50:55,314 Watching for file changes with StatReloader
+INFO 2024-09-15 13:51:02,579 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 13:51:03,372 Watching for file changes with StatReloader
+ERROR 2024-09-15 13:51:29,029 Internal Server Error: /analytics/academic/
+Traceback (most recent call last):
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/josephdragon/.local/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/josephdragon/Videos/element_zone/analytics/views.py", line 119, in academic_analysis
+    teacher = subject.teacher.name if subject.teacher else "Unknown"
+AttributeError: 'Subject' object has no attribute 'teacher'
+ERROR 2024-09-15 13:51:29,030 "GET /analytics/academic/ HTTP/1.1" 500 85553
+WARNING 2024-09-15 13:51:29,063 Not Found: /favicon.ico
+INFO 2024-09-15 13:53:47,440 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 13:53:48,458 Watching for file changes with StatReloader
+INFO 2024-09-15 13:55:07,487 "GET /analytics/academic/ HTTP/1.1" 200 27942
+WARNING 2024-09-15 13:55:08,178 Not Found: /favicon.ico
+INFO 2024-09-15 14:01:54,745 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:01:55,480 Watching for file changes with StatReloader
+INFO 2024-09-15 14:02:10,492 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:02:11,239 Watching for file changes with StatReloader
+INFO 2024-09-15 14:02:46,274 "GET /analytics/academic/ HTTP/1.1" 200 89904
+WARNING 2024-09-15 14:02:46,768 Not Found: /favicon.ico
+INFO 2024-09-15 14:06:16,393 "GET /analytics/academic/ HTTP/1.1" 200 91738
+INFO 2024-09-15 14:06:37,885 "GET /analytics/academic/ HTTP/1.1" 200 91738
+INFO 2024-09-15 14:09:52,327 "GET /analytics/academic/ HTTP/1.1" 200 91784
+INFO 2024-09-15 14:10:12,643 "GET /analytics/academic/ HTTP/1.1" 200 91784
+INFO 2024-09-15 14:15:17,885 "GET /analytics/academic/ HTTP/1.1" 200 92354
+WARNING 2024-09-15 14:15:18,428 Not Found: /favicon.ico
+INFO 2024-09-15 14:16:16,574 "GET /result/single/class/list HTTP/1.1" 200 23894
+WARNING 2024-09-15 14:16:16,925 Not Found: /favicon.ico
+INFO 2024-09-15 14:16:18,216 "POST /result/single/class/list HTTP/1.1" 302 0
+INFO 2024-09-15 14:16:18,278 "GET /result/single/class/result/1/ HTTP/1.1" 200 30165
+WARNING 2024-09-15 14:16:18,587 Not Found: /favicon.ico
+INFO 2024-09-15 14:16:35,585 "GET /analytics/analitics/home/ HTTP/1.1" 200 24041
+INFO 2024-09-15 14:16:39,494 "GET /analytics/academic/ HTTP/1.1" 200 92354
+INFO 2024-09-15 14:16:50,312 "GET /analytics/academic/ HTTP/1.1" 200 92354
+INFO 2024-09-15 14:20:41,349 "GET /analytics/academic/ HTTP/1.1" 200 92501
+INFO 2024-09-15 14:21:26,150 "GET /analytics/academic/ HTTP/1.1" 200 92354
+INFO 2024-09-15 14:28:26,795 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:28:27,886 Watching for file changes with StatReloader
+INFO 2024-09-15 14:28:40,909 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:28:41,619 Watching for file changes with StatReloader
+INFO 2024-09-15 14:30:30,030 "GET /analytics/academic/ HTTP/1.1" 200 91793
+INFO 2024-09-15 14:35:12,171 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:35:12,962 Watching for file changes with StatReloader
+INFO 2024-09-15 14:37:01,961 "GET /analytics/academic/ HTTP/1.1" 200 92199
+WARNING 2024-09-15 14:37:02,522 Not Found: /favicon.ico
+INFO 2024-09-15 14:40:26,380 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:40:27,229 Watching for file changes with StatReloader
+INFO 2024-09-15 14:46:15,571 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:46:16,315 Watching for file changes with StatReloader
+INFO 2024-09-15 14:48:31,595 "GET /analytics/academic/ HTTP/1.1" 200 91793
+WARNING 2024-09-15 14:48:32,443 Not Found: /favicon.ico
+INFO 2024-09-15 14:52:44,630 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:52:45,767 Watching for file changes with StatReloader
+INFO 2024-09-15 14:53:10,022 "GET /analytics/academic/ HTTP/1.1" 200 91821
+WARNING 2024-09-15 14:53:10,806 Not Found: /favicon.ico
+INFO 2024-09-15 14:59:08,387 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 14:59:09,278 Watching for file changes with StatReloader
+INFO 2024-09-15 14:59:14,566 "GET /analytics/academic/ HTTP/1.1" 200 91797
+WARNING 2024-09-15 14:59:15,401 Not Found: /favicon.ico
+INFO 2024-09-15 15:06:15,519 /home/josephdragon/Videos/element_zone/analytics/views.py changed, reloading.
+INFO 2024-09-15 15:06:16,474 Watching for file changes with StatReloader
+INFO 2024-09-15 15:06:22,168 "GET /analytics/academic/ HTTP/1.1" 200 91797
+WARNING 2024-09-15 15:06:22,740 Not Found: /favicon.ico
+INFO 2024-09-15 15:09:04,999 "GET /analytics/academic/ HTTP/1.1" 200 91915
+WARNING 2024-09-15 15:09:05,405 Not Found: /favicon.ico
+INFO 2024-09-15 15:17:35,371 "GET /analytics/academic/ HTTP/1.1" 200 91915
+WARNING 2024-09-15 15:17:35,955 Not Found: /favicon.ico
+INFO 2024-09-15 15:18:31,103 "GET /analytics/academic/ HTTP/1.1" 200 91915
+INFO 2024-09-15 15:18:33,739 "GET /sms/send-sms-form/ HTTP/1.1" 200 38127
+INFO 2024-09-15 15:18:39,341 "GET /finance/select-link/ HTTP/1.1" 200 27405

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "expenditures/partials/_kitchen_css.html" %}
+<div class="card">
+  <div class="card-header"><h2>🗑️ Delete Kitchen Purchase</h2></div>
+  <div class="card-body">
+    <p>Delete purchase of {{ object.quantity }} {{ object.product.unit }} {{ object.product.name }}?</p>
+    <form method="post">{% csrf_token %}
+      <button class="btn btn-danger">Yes, delete</button>
+      <a href="{% url 'kitchenpurchase_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

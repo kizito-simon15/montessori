@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Select Class{% endblock title %}
+
+{% block breadcrumb %}
+<a class="btn btn-outline-primary rounded-pill shadow-sm me-2" href="{% url 'student-create' %}"><i class="fas fa-plus"></i> New Student</a>
+<a class="btn btn-outline-success rounded-pill shadow-sm me-2" href="{% url 'student-upload' %}"><i class="fas fa-upload"></i> Upload Students</a>
+<a class="btn btn-outline-info rounded-pill shadow-sm" href="{% url 'staff-create' %}"><i class="fas fa-plus"></i> New Staff</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-4 p-4 bg-light shadow rounded" data-aos="fade-up" data-aos-duration="1000">
+  <h3 class="text-center text-primary mb-4">Select a Class for Alumni</h3>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="classSelect" class="fw-bold text-secondary mb-3 d-block">Available Classes:</label>
+      <div id="classSelect">
+        {% for student_class in classes %}
+          <div class="form-check mb-2">
+            <input class="form-check-input shadow-sm" type="radio" name="selected_class" id="class{{ forloop.counter }}" value="{{ student_class.name }}">
+            <label class="form-check-label ms-2" for="class{{ forloop.counter }}">
+              {{ student_class.name|upper }}
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary rounded-pill mt-4 px-4 py-2 shadow-sm"><i class="fas fa-check"></i> Proceed with Alumni</button>
+  </form>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script src="{% static 'js/animations/animations.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // Initialize AOS
+  AOS.init();
+</script>
+
+<style>
+  body {
+    background-color: #f0f8ff;
+  }
+
+  .form-check-label {
+    text-transform: uppercase;
+    font-weight: 500;
+    color: #007bff;
+    transition: color 0.3s;
+  }
+
+  .form-check-input:checked + .form-check-label {
+    color: #0056b3;
+  }
+
+  .form-check-input {
+    border: 2px solid #007bff;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .form-check-input:checked {
+    background-color: #007bff;
+    border-color: #0056b3;
+    transform: scale(1.1);
+  }
+
+  .btn {
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock morejs %}

@@ -1,0 +1,302 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>{{ school_name | default:"Element Lakezone Pre & Primary School" }}</title>
+
+  <!-- Bootstrap CSS from CDN -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/Datatables/datatables.min.css' %}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <style>
+    .sidebar {
+      background-color: BlueViolet !important; /* Carrot color */
+    }
+    .brand-link {
+      background-color: BlueViolet !important; /* Darker carrot color for the brand link */
+    }
+    .navbar-light {
+      background-color: BlueViolet !important; /* Carrot color for navbar */
+    }
+    .navbar, .sidebar {
+      color: #ffffff !important; /* White text color for better visibility */
+    }
+    .nav-link, .brand-link {
+      color: #ffffff !important; /* White text color for links */
+    }
+    .profile-picture {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer; /* Add pointer cursor */
+    }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+  <div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-dark navbar-light">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <a href="{% url 'academic_dashboard' %}" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <a class="nav-link">Year: {{ current_session }}</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <a class="nav-link">Term: {{ current_term }}</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <!-- Profile Picture or Link to Upload -->
+        <li class="nav-item">
+          {% if request.user.profile_picture %}
+            <a href="{% url 'academic_profile' %}">
+              <img src="{{ request.user.profile_picture.url }}" class="profile-picture" alt="Profile Picture">
+            </a>
+          {% else %}
+            <a href="{% url 'academic_profile' %}" class="nav-link">Upload a picture</a>
+          {% endif %}
+        </li>
+        <!-- Notifications Dropdown Menu -->
+        <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#">
+            <i class="far fa-user"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-user mr-2"></i> Profile
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="{% url 'login' %}" class="dropdown-item">
+              <i class="fas fa-sign-out"></i> Sign out
+            </a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-th-large"></i></a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="{% url 'academic_dashboard' %}" class="brand-link">{{"Elements Lakezone Pre & Primary School" }}</a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Placeholder for your app links -->
+            <li class="nav-header">Pupils management</li>
+            <li class="nav-item">
+              <a href="{% url 'academic-student-list' %}" class="nav-link">
+                <i class="nav-icon fas fa-user-graduate"></i>
+                <p>Pupils</p>
+              </a>
+            </li>
+            <li class="nav-header">Staff management</li>
+            <li class="nav-item">
+              <a href="{% url 'academic-staff-list' %}" class="nav-link">
+                <i class="nav-icon fas fa-users"></i>
+                <p>
+                  Staffs
+                </p>
+              </a>
+            </li>
+            <li class="nav-header">Event management</li>
+            <li class="nav-item">
+                <a href="{% url 'academic_event_list' %}" class="nav-link">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>Events</p>
+              </a>
+            </li>
+            <li class="nav-header">Salary payments</li>
+            <li class="nav-item">
+                <a href="{% url 'academic_salary_invoices' %}" class="nav-link">
+                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                <p>Salary Invoices</p>
+              </a>
+            </li>
+            <li class="nav-header">Academic comments</li>
+            <li class="nav-item">
+                <a href="{% url 'academic_parent_comments_view' %}" class="nav-link">
+                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                <p>Parent comments</p>
+              </a>
+            </li>
+            <li class="nav-header">Results management</li>
+            <li class="nav-item">
+              <a href="{% url 'academic_pick' %}" class="nav-link">
+                <i class="nav-icon fas fa-plus-square"></i>
+                <p>
+                  Results
+                </p>
+              </a>
+            </li>
+        <li class="nav-header">Library Management</li>
+              <li class="nav-item">
+                <a href="{% url 'academic_view_available_books' %}" class="nav-link">
+                  <i class="nav-icon fas fa-book-open"></i>
+                  <p>Manage Books</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'academic_stationery_list' %}" class="nav-link">
+                  <i class="nav-icon fas fa-pen-alt"></i>
+                  <p>Stationeries</p>
+                </a>
+              </li>
+            <li class="nav-header">School Properties</li>
+              <li class="nav-item">
+                <a href="{% url 'academic_property_list' %}" class="nav-link">
+                  <i class="nav-icon fas fa-building"></i>
+                  <p>Manage Property</p>
+                </a>
+              </li>
+              <li class="nav-header">Staff Roles</li>
+              <li class="nav-item">
+                <a href="{% url 'staff-role-list' %}" class="nav-link">
+                  <i class="nav-icon fas fa-building"></i>
+                  <p>Roles</p>
+                </a>
+              </li>
+              <li class="nav-header">School timetable</li>
+              <li class="nav-item">
+                <a href="{% url 'daily-schedule-list' %}" class="nav-link">
+                  <i class="nav-icon fas fa-building"></i>
+                  <p>Timetable</p>
+                </a>
+              </li>
+              <li class="nav-header">School meetings</li>
+              <li class="nav-item">
+                <a href="{% url 'academic_meetings_list' %}" class="nav-link">
+                  <i class="nav-icon fas fa-building"></i>
+                  <p>Meetings</p>
+                </a>
+              </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-1">
+            <div class="col-sm-8">
+              <h1>{% block title %}{% endblock title %}</h1>
+            </div>
+            <div class="col-sm-4">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">{% block breadcrumb %}{% endblock breadcrumb %}</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              {% block fullcard %}
+              <div class="card">
+                {% block content-header %}{% endblock content-header %}
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      {% block content %}
+
+                      {% endblock content %}
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                </div>
+                <!-- ./card-body -->
+              </div>
+              {% endblock fullcard %}
+              <!-- /.card -->
+            </div>
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+        </div>
+        <!--/. container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- REQUIRED SCRIPTS -->
+  <!-- jQuery -->
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap -->
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- overlayScrollbars -->
+  <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static 'dist/js/adminlte.js' %}"></script>
+  <!-- OPTIONAL SCRIPTS -->
+  <script src="{% static 'dist/js/demo.js' %}"></script>
+  <!-- Toastr -->
+  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+  <!-- Datatables -->
+  <script src="{% static 'plugins/Datatables/datatables.min.js' %}"></script>
+
+  {% if messages %}
+  {% for message in messages %}
+  <script type=text/javascript>
+    toastr.options.progressBar = true;
+    toastr.{{ message.tags }}('{{ message }}')
+  </script>
+  {% endfor %}
+  {% endif %}
+
+  <script>
+    (function ($) {
+      $('.clickable-row').css('cursor', 'pointer');
+      $(".clickable-row").click(function () {
+        window.location = $(this).data("href");
+      });
+    })(jQuery)
+  </script>
+
+  {% block morejs %}
+
+  {% endblock morejs %}
+</body>
+</html>

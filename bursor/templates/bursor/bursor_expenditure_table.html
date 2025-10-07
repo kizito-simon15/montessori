@@ -1,0 +1,51 @@
+{% extends "bursor/bursor_base.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ school_name | default:"MySchool" }}</title>
+    <!-- Add any additional meta tags, CSS, or JavaScript here -->
+</head>
+<body>
+    <div class="container">
+        <h2>Expenditure Table</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Amount</th>
+                    <th>Quantity</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Attachment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in expenditure_rows %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ row.amount }}</td>
+                        <td>{{ row.quantity }}</td>
+                        <td>{{ row.date }}</td>
+                        <td>{{ row.description }}</td>
+                        <td>
+                            {% if row.attachment %}
+                                <a href="{{ row.attachment.url }}" target="_blank">Download Attachment</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Add any additional JavaScript at the bottom of the page -->
+</body>
+</html>
+{% endblock %}

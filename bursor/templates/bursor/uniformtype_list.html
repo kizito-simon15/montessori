@@ -1,0 +1,271 @@
+{% extends 'bursor/bursor_base.html' %}
+{% block content %}
+<!-- Include Font Awesome CSS for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+/* Container styling */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Heading styling */
+.container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: slideInDown 1s ease-out;
+}
+
+/* Button styling */
+.btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border: none;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* Table styling */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: #fff;
+    border-collapse: collapse;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.table th, .table td {
+    padding: 1rem;
+    vertical-align: middle;
+    text-align: center;
+    border: 1px solid #dee2e6;
+}
+
+.table thead th {
+    background-color: #007bff;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.table td {
+    font-size: 1.1rem;
+}
+
+/* Total row styling */
+.total-row td {
+    font-weight: bold;
+    background-color: #e9ecef;
+}
+
+/* Hidden table styling */
+.hidden-table {
+    display: none;
+}
+
+/* Total amount text */
+.total-amount-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const priceOneCells = document.querySelectorAll('.price-one');
+    const priceTwoCells = document.querySelectorAll('.price-two');
+    const totalOneElement = document.getElementById('totalOne');
+    const totalTwoElement = document.getElementById('totalTwo');
+
+    let totalOne = 0;
+    let totalTwo = 0;
+
+    priceOneCells.forEach((cell) => {
+        totalOne += parseFloat(cell.textContent);
+    });
+
+    priceTwoCells.forEach((cell) => {
+        totalTwo += parseFloat(cell.textContent);
+    });
+
+    totalOneElement.textContent = totalOne.toFixed(2) + ' TZS';
+    totalTwoElement.textContent = totalTwo.toFixed(2) + ' TZS';
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.getElementById('toggleTableButton');
+    const hiddenTable = document.getElementById('hiddenTable');
+
+    toggleButton.addEventListener('click', function() {
+        if (hiddenTable.style.display === 'none' || hiddenTable.style.display === '') {
+            hiddenTable.style.display = 'table';
+        } else {
+            hiddenTable.style.display = 'none';
+        }
+    });
+});
+</script>
+
+<div class="container mt-5">
+    <h2>Uniform Types</h2>
+    <a href="{% url 'bursoruniformtype_add' %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Uniform Type</a>
+    <a href="{% url 'bursoruniform_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Uniform List</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price @1</th>
+                <th>Price @2</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in uniform_type_data %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td class="price-one">{{ item.price_one|floatformat:2 }}</td>
+                <td class="price-two">{{ item.price_two|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'uniformtype_edit' item.id %}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</a>
+                    <a href="{% url 'uniformtype_delete' item.id %}" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td>Total</td>
+                <td id="totalOne" class="total-price"></td>
+                <td id="totalTwo" class="total-price"></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Toggle button to show the hidden table -->
+    <div class="text-center mt-4">
+        <a href="javascript:void(0);" id="toggleTableButton" class="btn btn-info"><i class="fas fa-eye"></i> Tap here to see the required uniform for the pupil</a>
+    </div>
+
+    <!-- Hidden table with the required uniforms -->
+    <table id="hiddenTable" class="table hidden-table mt-3">
+        <thead>
+            <tr>
+                <th>Aina ya Sare</th>
+                <th>Idadi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Shati</td>
+                <td>Jozi 02</td>
+            </tr>
+            <tr>
+                <td>Sketi/Kaptula</td>
+                <td>Jozi 02</td>
+            </tr>
+            <tr>
+                <td>Sweta</td>
+                <td>Jozi 02</td>
+            </tr>
+            <tr>
+                <td>T-Shirt</td>
+                <td>Jozi 01</td>
+            </tr>
+            <tr>
+                <td>Kaptula ya Michezo</td>
+                <td>Jozi 01</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Total amount text -->
+    <div class="total-amount-text">
+        The total amount to get the full uniform is 100,000 TZS.
+    </div>
+</div>
+{% endblock %}

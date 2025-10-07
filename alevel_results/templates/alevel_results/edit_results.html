@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Edit A-Level Results
+{% endblock title %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="header-section">
+    <h3 class="single-line-text">
+        <span class="emoji">📝</span> Edit A-Level Results
+    </h3>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section mb-4">
+    <form method="GET" class="filter-form">
+        <div class="row g-3 align-items-center">
+            <!-- Session Filter -->
+            <div class="col-md-2">
+                <label for="session" class="form-label fw-semibold text-secondary">
+                    <i class="fas fa-calendar-alt me-1"></i> Session
+                </label>
+                <select name="session" id="session" class="form-select shadow-sm rounded-pill">
+                    <option value="">All Sessions</option>
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>
+                            {{ session.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Term Filter -->
+            <div class="col-md-2">
+                <label for="term" class="form-label fw-semibold text-secondary">
+                    <i class="fas fa-layer-group me-1"></i> Term
+                </label>
+                <select name="term" id="term" class="form-select shadow-sm rounded-pill">
+                    <option value="">All Terms</option>
+                    {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>
+                            {{ term.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Exam Type Filter -->
+            <div class="col-md-2">
+                <label for="exam" class="form-label fw-semibold text-secondary">
+                    <i class="fas fa-clipboard-list me-1"></i> Exam Type
+                </label>
+                <select name="exam" id="exam" class="form-select shadow-sm rounded-pill">
+                    <option value="">All Exam Types</option>
+                    {% for exam in exam_types %}
+                        <option value="{{ exam.id }}" {% if exam.id == current_exam_type.id %}selected{% endif %}>
+                            {{ exam.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Class Filter -->
+            <div class="col-md-2">
+                <label for="class_select" class="form-label fw-semibold text-secondary">
+                    <i class="fas fa-school me-1"></i> Class
+                </label>
+                <select name="class_select" id="class_select" class="form-select shadow-sm rounded-pill">
+                    <option value="">All Classes</option>
+                    {% for class in student_classes %}
+                        <option value="{{ class.id }}" {% if class.id|stringformat:"s" == request.GET.class_select %}selected{% endif %}>
+                            {{ class.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Subject Filter -->
+            <div class="col-md-2">
+                <label for="subject_select" class="form-label fw-semibold text-secondary">
+                    <i class="fas fa-book me-1"></i> Subject
+                </label>
+                <select name="subject_select" id="subject_select" class="form-select shadow-sm rounded-pill">
+                    <option value="">All Subjects</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}" {% if subject.id|stringformat:"s" == request.GET.subject_select %}selected{% endif %}>
+                            {{ subject.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Student Name Filter -->
+            <div class="col-md-2">
+                <label for="student_name" class="form-label fw-semibold text-secondary">
+                    <i class="fas fa-user me-1"></i> Student Name
+                </label>
+                <input type="text" name="student_name" id="student_name" class="form-control shadow-sm rounded-pill" 
+                       value="{{ request.GET.student_name|default_if_none:'' }}" placeholder="Search by name">
+            </div>
+
+            <!-- Filter Button -->
+            <div class="col-md-2 text-center">
+                <button type="submit" class="btn btn-primary filter-button">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Formset Section -->
+<form method="POST" class="formset-section">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {{ formset.non_field_errors }}
+
+    <div class="table-responsive">
+        <table class="table class-table">
+            <thead class="table-header">
+                <tr>
+                    <th scope="col">S/N</th>
+                    <th scope="col">Student Name</th>
+                    <th scope="col">Class</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Test Score</th>
+                    <th scope="col">Exam Score</th>
+                    <th scope="col">Delete</th>
+                    <th scope="col">Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                    <tr class="table-row">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ form.instance.student }}</td>
+                        <td>{{ form.instance.current_class }}</td>
+                        <td>{{ form.instance.subject }}</td>
+                        <td>
+                            {{ form.test_score|add_class:"form-control small-input" }}
+                            <small class="text-danger">{{ form.test_score.errors }}</small>
+                        </td>
+                        <td>
+                            {{ form.exam_score|add_class:"form-control small-input" }}
+                            <small class="text-danger">{{ form.exam_score.errors }}</small>
+                        </td>
+                        <td>
+                            {{ form.DELETE|add_class:"form-check-input delete-check" }}
+                        </td>
+                        <td>
+                            <input type="checkbox" name="result_ids" value="{{ form.instance.id }}">
+                            {{ form.id }} <!-- Hidden id field -->
+                            <small class="text-danger">{{ form.id.errors }}</small>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-muted text-center">No results found for the selected filters.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success create-button">
+            <i class="fas fa-save me-1"></i> Save Changes
+        </button>
+    </div>
+</form>
+
+<!-- Additional CSS -->
+<style>
+    :root {
+        --carrot: #ff6f61;
+        --carrot-dark: #e65a50;
+        --gradient-start: #f3f4f6;
+        --gradient-end: #d1d5db;
+    }
+
+    body {
+        background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .dark-mode body {
+        background: linear-gradient(180deg, #2b2b2b, #1e1e1e);
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .single-line-text {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--carrot);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .dark-mode .filter-section {
+        background: #2b2b2b;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .filter-form {
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-label {
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #4a4a4a;
+        margin-bottom: 0.5rem;
+    }
+
+    .dark-mode .form-label {
+        color: #d1d1d1;
+    }
+
+    .form-select, .form-control {
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: 1px solid #ced4da;
+    }
+
+    .form-select:hover, .form-control:hover {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-select:focus, .form-control:focus {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        outline: none;
+    }
+
+    .filter-button {
+        font-size: 1rem;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 25px;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        transition: transform 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #0056b3, #004085);
+    }
+
+    .table-responsive {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 0;
+        padding: 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .class-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+        margin: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+    }
+
+    .dark-mode .class-table {
+        background: #2b2b2b;
+        border: 1px solid #444;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, var(--carrot), var(--carrot-dark));
+        color: white;
+    }
+
+    .class-table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        padding: 0.75rem;
+        border: none;
+    }
+
+    .class-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+        border-right: none;
+        border-left: none;
+        border-top: none;
+        color: #212529;
+    }
+
+    .dark-mode .class-table td {
+        color: #d1d1d1;
+        border-bottom: 1px solid #444;
+    }
+
+    .small-input {
+        width: 100px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .delete-check {
+        transform: scale(1.2);
+        cursor: pointer;
+        accent-color: #dc3545;
+    }
+
+    .table-row:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+
+    .dark-mode .table-row:hover {
+        background-color: #343a40;
+    }
+
+    .create-button {
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+        border-radius: 25px;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .create-button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .single-line-text {
+            font-size: 1.25rem;
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+        }
+
+        .filter-section {
+            padding: 1rem;
+        }
+
+        .form-label {
+            font-size: 1rem;
+        }
+
+        .form-select, .form-control {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .filter-button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .class-table th, .class-table td {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .small-input {
+            width: 80px;
+        }
+
+        .create-button {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+    }
+</style>
+{% endblock content %}

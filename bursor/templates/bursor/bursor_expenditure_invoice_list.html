@@ -1,0 +1,65 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load humanize %}
+
+{% block title %}Expenditure Invoices{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Expenditure Invoices</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-3">
+        <div class="col text-end">
+            <a href="{% url 'bursor-expenditure-invoice-create' %}" class="btn btn-success">Create Expenditure Invoice</a>
+            <button onclick="window.print()" class="btn btn-primary">Print</button>
+        </div>
+    </div>
+    <h1 class="mb-4">Expenditure Invoices</h1>
+    <div class="table-responsive mb-5"> <!-- Added margin bottom -->
+        <table class="table table-bordered" id="invoiceTable">
+            <thead style="background-color: blue; color: white;">
+                <tr>
+                    <th scope="col">SN</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Depositor Name</th>
+                    <th scope="col">Initial Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr data-href="{% url 'expenditure-invoice-detail' invoice.pk %}">
+                    <td>{{ forloop.counter }}</td> <!-- Serial number -->
+                    <td>{{ invoice.date|date:"F d, Y" }}</td>
+                    <td>{{ invoice.depositor_name }}</td>
+                    <td>{{ invoice.initial_balance|intcomma }}</td> <!-- Removed '$' from initial balance -->
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">Total Balance:</td>
+                    <td style="color: red;">{{ total_initial_balance|intcomma }}</td> <!-- Changed color to red -->
+                </tr>
+                <tr>
+                    <td colspan="3">Total Expenditure Amount:</td>
+                    <td style="color: blue;">{{ total_general_amount|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Reminder Balance:</td>
+                    <td style="color: teal;">{{ reminder_balance|intcomma }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll("#invoiceTable tbody tr").forEach(function(row) {
+            row.addEventListener("click", function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+</script>
+{% endblock content %}

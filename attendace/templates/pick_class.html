@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pick Class</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+        }
+        h2 {
+            animation: colorChange1 2s infinite alternate;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            animation: colorChange2 3s infinite alternate;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        @keyframes colorChange1 {
+            0% { color: red; }
+            50% { color: orange; }
+            100% { color: yellow; }
+        }
+
+        @keyframes colorChange2 {
+            0% { color: green; }
+            50% { color: blue; }
+            100% { color: indigo; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Select a Class</h2>
+        <ul>
+            {% for class in classes|dictsort:"name" %}
+            <li>
+                <a href="{% url 'all_students' class.id %}">{{ class.name|upper }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
+{% endblock content %}

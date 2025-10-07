@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Delete Student
+{% endblock title %}
+
+{% block content %}
+<style>
+    /* Container styling */
+    .delete-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #fff0f0; /* Light reddish background to signify warning */
+        border: 2px solid #f5c2c7;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        animation: fadeIn 0.6s ease-in-out; /* Simple fade-in */
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Header icon */
+    .delete-icon {
+        font-size: 4rem;
+        color: #dc3545; /* Bootstrap danger color */
+    }
+
+    /* Headings and paragraphs */
+    .delete-container h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+
+    .delete-container p {
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .delete-container p span {
+        font-weight: 600;
+        color: #d9534f; 
+    }
+
+    /* Buttons */
+    .delete-container .btn {
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+        margin: 10px 5px;
+    }
+
+    .delete-container .btn:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-cancel {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: #fff;
+    }
+
+    .btn-cancel:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    /* Hover shake animation for the icon */
+    .delete-icon:hover {
+        animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+
+</style>
+
+<div class="delete-container">
+    <i class="fas fa-exclamation-triangle delete-icon"></i>
+    <h1>Warning!</h1>
+    <p>Are you sure you want to delete <span>"{{ object }}"</span>? 😢</p>
+    <p>All contents attached to this student will be permanently removed.</p>
+
+    <form action="" method="POST" style="margin-top: 30px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-delete">
+            <i class="fas fa-trash-alt"></i> Confirm Deletion
+        </button>
+        <a href="javascript:history.back();" class="btn btn-cancel">
+            <i class="fas fa-arrow-left"></i> Cancel
+        </a>
+    </form>
+</div>
+
+<!-- Optional: Additional JS for a fade-in effect on the container -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.delete-container');
+        container.style.opacity = '0';
+        setTimeout(() => {
+            container.style.transition = 'opacity 0.5s, transform 0.5s';
+            container.style.opacity = '1';
+            container.style.transform = 'scale(1)';
+        }, 100);
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,10 @@
+{#  open a collapsible field-set  #}
+<fieldset class="vs-fieldset">
+  <legend class="vs-legend {{ collapsed|default_if_none:'' }}"
+          onclick="this.nextElementSibling.style.display =
+                   this.nextElementSibling.style.display==='none'?'grid':'none';
+                   this.classList.toggle('collapsed');">
+     {{ icon|default:"❖" }} {{ title }}
+  </legend>
+  <hr>
+  <div class="fieldset-content" style="display:{% if collapsed %}none{% else %}grid{% endif %};">

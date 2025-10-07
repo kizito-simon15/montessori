@@ -1,0 +1,220 @@
+{% extends 'parents/parent_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .container {
+    background-color: #f1f2f6;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    text-align: center;
+    font-weight: bold;
+    color: #1e90ff;
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    color: #555;
+  }
+
+  .form-control {
+    border-radius: 20px;
+    border: 1px solid #d1d8e0;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+  }
+
+  .form-control:focus {
+    border-color: #1e90ff;
+    box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
+  }
+
+  textarea {
+    resize: none;
+    min-height: 60px;
+  }
+
+  button {
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #1e90ff;
+    border: none;
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background-color: #1c86ee;
+  }
+
+  .btn-secondary {
+    background-color: #ced6e0;
+    color: #555;
+  }
+
+  .btn-secondary:hover {
+    background-color: #a4b0be;
+  }
+
+  .audio-preview {
+    margin-top: 10px;
+    border-radius: 15px;
+    width: 100%;
+  }
+
+  .record-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .record-controls p {
+    font-style: italic;
+    color: #e74c3c;
+  }
+
+  .record-controls button {
+    margin: 0 5px;
+    flex: 1;
+    text-align: center;
+  }
+
+  .btn-info {
+    background-color: #2ed573;
+    color: #fff;
+  }
+
+  .btn-info:hover {
+    background-color: #26c281;
+  }
+
+  .btn-danger {
+    background-color: #ff6b6b;
+    color: #fff;
+  }
+
+  .btn-danger:hover {
+    background-color: #ff4757;
+  }
+</style>
+
+<div class="container mt-4">
+  <h2>Update Invoice Comment</h2>
+  <hr>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group mb-3">
+      <label for="comment">Previous Text Comment:</label>
+      {% if invoice_comment.comment %}
+      <textarea class="form-control" rows="2" readonly>{{ invoice_comment.comment }}</textarea>
+      {% else %}
+      <p class="text-muted">No previous text comment available.</p>
+      {% endif %}
+    </div>
+    
+    <div class="form-group mb-3">
+      <label for="audio_comment">Previous Audio Comment:</label>
+      {% if invoice_comment.audio_comment %}
+      <audio controls class="audio-preview">
+        <source src="{{ invoice_comment.audio_comment.url }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      {% else %}
+      <p class="text-muted">No previous audio comment available.</p>
+      {% endif %}
+    </div>
+    
+    <hr>
+    <h4>Update Your Comments</h4>
+    
+    {{ form.as_p }}
+
+    <div class="form-group mb-3">
+      <label for="audio_comment">Record New Audio Comment:</label>
+      <input type="file" name="audio_comment" id="audio_comment" accept="audio/*" class="form-control">
+      <div class="record-controls">
+        <button type="button" class="btn btn-info" onclick="startRecording()">Start Recording</button>
+        <button type="button" class="btn btn-danger" onclick="stopRecording()" disabled id="stopRecordingBtn">Stop Recording</button>
+      </div>
+      <p id="recordingIndicator" class="text-danger" style="display: none;">Recording... <span id="recordingTime">0</span> seconds</p>
+      <audio id="audio-preview" controls class="audio-preview" style="display: none;"></audio>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Update Comment</button>
+    <a href="{% url 'parent_invoice_detail' invoice_comment.invoice.id %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+
+<script>
+  let mediaRecorder;
+  let audioChunks = [];
+  let recordingTime = 0;
+  let recordingInterval;
+
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+        audioChunks = [];
+
+        document.getElementById('recordingIndicator').style.display = 'block';
+        document.getElementById('stopRecordingBtn').disabled = false;
+        recordingTime = 0;
+        document.getElementById('recordingTime').textContent = recordingTime;
+
+        recordingInterval = setInterval(() => {
+          recordingTime++;
+          document.getElementById('recordingTime').textContent = recordingTime;
+        }, 1000);
+
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          clearInterval(recordingInterval);
+          document.getElementById('recordingIndicator').style.display = 'none';
+          const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audioPreview = document.getElementById('audio-preview');
+          audioPreview.src = audioUrl;
+          audioPreview.style.display = 'block';
+
+          // Automatically fill the audio input field
+          const audioInput = document.getElementById('audio_comment');
+          const file = new File([audioBlob], "recorded-audio.mp3", {
+            type: 'audio/mpeg',
+            lastModified: Date.now()
+          });
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          audioInput.files = dataTransfer.files;
+        });
+      })
+      .catch(error => {
+        console.error("Error accessing microphone: ", error);
+        alert("Error accessing the microphone. Please check your device settings.");
+      });
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+      document.getElementById('stopRecordingBtn').disabled = true;
+    }
+  }
+</script>
+{% endblock content %}

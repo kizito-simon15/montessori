@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load humanize static %}
+{% block title %}📜 SMS History{% endblock %}
+
+{# ──────────────  CSS  ────────────── #}
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --clr-bg:#f1f5f9; --clr-card:#ffffff40; --clr-primary:#6366f1;
+  --clr-secondary:#0ea5e9; --clr-success:#22c55e; --clr-danger:#ef4444;
+  --clr-info:#3b82f6; --radius:18px; --blur:14px; --shadow:0 8px 32px rgba(0,0,0,.15);
+}
+html,body{margin:0;background:var(--clr-bg);font-family:Inter,sans-serif;font-size:15px}
+
+/* ── header ────────────────────────────────────────────────────── */
+.title-section{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  padding:2rem 1rem;color:#fff;text-align:center;border-radius:0 0 28px 28px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.title-section::after{content:"";position:absolute;inset:0;background:inherit;opacity:.35;filter:blur(60px)}
+.title-section h2{display:flex;gap:.6rem;align-items:center;justify-content:center;
+  font-size:clamp(1.8rem,5vw,2.4rem);font-weight:800;position:relative;z-index:1}
+
+/* ── KPI cards ─────────────────────────────────────────────────── */
+.kpi-section{width:95%;margin:-50px auto 1.6rem;display:flex;justify-content:center}
+.kpi-wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;width:100%}
+.kpi-card{flex:1 1 150px;min-width:140px;padding:1.1rem;border-radius:var(--radius);
+  background:var(--clr-card);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow);color:#fff;text-align:center;position:relative}
+.kpi-card h3{margin:0 0 .3rem;font-size:.85rem;font-weight:600;opacity:.9}
+.kpi-card span{font-size:1.4rem;font-weight:800}
+
+/* ── controls bar ──────────────────────────────────────────────── */
+.controls{width:95%;margin:0 auto 1.6rem;padding:1.3rem;border-radius:var(--radius);
+  background:var(--clr-card);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow);
+  display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center}
+.controls input,.controls select{min-width:150px;padding:.6rem 1rem;border:none;border-radius:25px;
+  font-weight:600;background:#ffffff;color:#111}
+.controls input:focus,.controls select:focus{outline:2px solid var(--clr-primary)}
+.btn-main,.btn-danger{border:none;border-radius:25px;padding:.6rem 1.4rem;font-weight:700;color:#fff;cursor:pointer;
+  box-shadow:var(--shadow);backdrop-filter:blur(var(--blur));transition:.25s}
+.btn-main{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary))}
+.btn-main:hover{filter:brightness(1.08)}
+.btn-danger{background:var(--clr-danger)} .btn-danger:hover{filter:brightness(1.05)}
+.btn-balance{background:linear-gradient(135deg,#22c55e,#4ade80)} .btn-balance:hover{filter:brightness(1.08)}
+
+/* ── table ─────────────────────────────────────────────────────── */
+.table-wrap{width:95%;margin:0 auto 1.6rem;border-radius:var(--radius);overflow-x:auto;
+  background:var(--clr-card);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow)}
+.table-glass{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem;color:#1e293b}
+thead{background:linear-gradient(135deg,var(--clr-success),var(--clr-info));color:#fff}
+thead th{padding:1rem;font-weight:700;font-size:.8rem;text-transform:uppercase;white-space:nowrap}
+tbody tr:nth-child(even){background:#ffffff38} tbody tr:hover{background:#0ea5e93b}
+td{padding:.75rem 1rem;white-space:nowrap}
+.message-cell{max-width:300px;white-space:normal}
+
+/* no-data */
+.no-data{text-align:center;padding:2rem;background:var(--clr-card);border-radius:var(--radius);
+  backdrop-filter:blur(var(--blur));box-shadow:var(--shadow);color:#475569}
+</style>
+{% endblock %}
+
+{# ──────────────  CONTENT  ────────────── #}
+{% block content %}
+<div class="title-section"><h2>📜 SMS History</h2></div>
+
+<section class="kpi-section">
+  <div class="kpi-wrap">
+    <div class="kpi-card" style="background:linear-gradient(135deg,#22c55ecc,#4ade80cc)">
+      <h3>🟢 Sent</h3><span>{{ total_sent|intcomma }}</span>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,var(--clr-info),#60a5fa)">
+      <h3>👥 Recipients</h3><span>{{ unique_recipients|intcomma }}</span>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#ef4444cc,#f87171cc)">
+      <h3>🔴 Failed</h3><span>{{ total_failed|intcomma }}</span>
+    </div>
+  </div>
+</section>
+
+<!-- filters + actions -->
+<div class="controls">
+  <input type="text"  id="searchBox"   placeholder="Search name / number…">
+  <input type="date"  id="dateFilter">
+  <select id="statusFilter">
+    <option value="">All Status</option>
+    <option value="Sent">Sent</option>
+    <option value="Failed">Failed</option>
+  </select>
+
+  <a href="{% url 'send_sms_form' %}" class="btn-main">✉️ Send SMS</a>
+  <a href="{% url 'check_balance' %}" class="btn-main btn-balance">💳 Check Balance</a>
+  <button class="btn-main"   id="btnFilter">🔍 Apply</button>
+  <button class="btn-danger" id="bulkDelete">🗑️ Delete Selected</button>
+</div>
+
+<!-- table -->
+<div class="table-wrap">
+<table class="table-glass" id="smsTable">
+  <thead>
+    <tr>
+      <th><input type="checkbox" id="selAll"></th>
+      <th>Status</th><th>📅 Date</th><th>First</th><th>Last</th>
+      <th>📞 Number</th><th>Message</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for m in messages %}
+    <tr data-status="{{ m.status }}" data-date="{{ m.sent_date|date:'Y-m-d' }}"
+        data-search="{{ m.first_name }} {{ m.last_name }} {{ m.dest_addr }} {{ m.message }}">
+      <td><input type="checkbox" class="rowCB" value="{{ m.id }}"></td>
+      <td>{% if m.status|lower == 'sent' %}🟢 Sent{% else %}🔴 {{ m.status }}{% endif %}</td>
+      <td>{{ m.sent_date|date:"Y-m-d H:i" }}</td>
+      <td>{{ m.first_name }}</td>
+      <td>{{ m.last_name }}</td>
+      <td>{{ m.dest_addr }}</td>
+      <td class="message-cell">{{ m.message }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="no-data">No messages found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
+{# ──────────────  JS  ────────────── #}
+{% block extra_js %}
+<script>
+/*select-all*/
+document.getElementById('selAll').addEventListener('change',e=>{
+  document.querySelectorAll('.rowCB').forEach(cb=>cb.checked=e.target.checked);
+});
+
+/*filter*/
+function applyFilter(){
+  const term=document.getElementById('searchBox').value.toLowerCase();
+  const date=document.getElementById('dateFilter').value;
+  const status=document.getElementById('statusFilter').value;
+  document.querySelectorAll('#smsTable tbody tr').forEach(r=>{
+    const okTerm=r.dataset.search.toLowerCase().includes(term);
+    const okDate=!date||r.dataset.date===date;
+    const okStatus=!status||r.dataset.status===status;
+    r.style.display=(okTerm&&okDate&&okStatus)?'':'none';
+  });
+}
+document.getElementById('btnFilter').addEventListener('click',applyFilter);
+document.getElementById('searchBox').addEventListener('input',applyFilter);
+
+/*bulk delete*/
+function cookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'=([^;]+)');return m?decodeURIComponent(m[2]):null;}
+const csrftoken=cookie('csrftoken');
+document.getElementById('bulkDelete').addEventListener('click',()=>{
+  const ids=[...document.querySelectorAll('.rowCB:checked')].map(cb=>cb.value);
+  if(!ids.length||!confirm(`Delete ${ids.length} message(s)?`)) return;
+  const body=new URLSearchParams(); ids.forEach(id=>body.append('sms_ids',id));
+  fetch("{% url 'delete_sms' %}",{method:'POST',headers:{'X-CSRFToken':csrftoken},body})
+    .then(r=>r.ok?location.reload():alert('Delete failed')).catch(alert);
+});
+</script>
+{% endblock %}

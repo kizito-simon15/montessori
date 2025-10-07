@@ -1,0 +1,136 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+{% if object %}
+Update Invoice {{ object }}
+{% else %}
+Add New Invoice
+{% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">{% if object %}Update Invoice{% else %}Add New Invoice{% endif %}</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6">
+            <!-- Search input field for student -->
+            <div class="form-group mb-3">
+              <label for="student-search" class="form-label">Search Student:</label>
+              <input type="text" id="student-search" class="form-control" placeholder="Enter student name">
+            </div>
+
+            {% for field in form %}
+            <div class="form-group mb-3">
+              <label for="{{ field.auto_id }}" class="form-label">
+                {{ field.label }}
+                {% if field.errors %}
+                <small class="text-danger">{{ field.errors|join:", " }}</small>
+                {% endif %}
+              </label>
+              {% if field.name == "student" %}
+              {{ field|add_class:"form-control"|attr:"required" }}
+              {% else %}
+              {{ field|add_class:"form-control" }}
+              {% endif %}
+              {% if field.help_text %}
+              <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            <div class="card border-primary mb-3">
+              <div class="card-header bg-info text-white text-center">FEE STRUCTURE</div>
+              <div class="card-body">
+                {{ items.management_form }}
+                <div class="row">
+                  <div class="col"><strong>Fee Type</strong></div>
+                  <div class="col"><strong>Amount</strong></div>
+                </div>
+                {% for item in items %}
+                <div class="form-group row mb-3">
+                  {{ item.id }}
+                  <div class="col">{{ item.description|add_class:"form-control" }}</div>
+                  <div class="col">{{ item.amount|add_class:"form-control" }}</div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if object %}
+        <h4>RECEIPTS</h4>
+        <table class="table table-sm table-bordered">
+          {{ receipts.management_form }}
+          <thead class="thead-light">
+            <tr>
+              <th>Amount Paid</th>
+              <th>Date Paid</th>
+              <th>Comment</th>
+              <th>Payment Method</th>
+              <th><i class="fa fa-trash"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for receipt in receipts %}
+            {% for hidden in receipt.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+            <tr>
+              {% for field in receipt.visible_fields %}
+              <td>{{ field|add_class:"form-control form-control-sm" }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">{% if object %}Update Record{% else %}Add New Invoice{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<hr>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    $('#student-search').on('input', function() {
+      var searchText = $(this).val().toLowerCase();
+      $('#id_student option').each(function() {
+        var studentName = $(this).text().toLowerCase();
+        if (studentName.includes(searchText)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    });
+
+    const studentData = {{ student_data|safe }};
+    const currentSession = {{ current_session }};
+    const currentInstallment = {{ current_installment }};
+    
+    $('#id_student').on('change', function() {
+      const selectedStudentId = $(this).val();
+      const selectedStudentClass = studentData[selectedStudentId];
+      
+      $('#id_class_for').val(selectedStudentClass);
+      $('#id_session').val(currentSession);
+      $('#id_installment').val(currentInstallment);
+    });
+  });
+</script>
+{% endblock morejs %}

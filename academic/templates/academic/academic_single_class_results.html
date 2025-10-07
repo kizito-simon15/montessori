@@ -1,0 +1,186 @@
+{% extends 'academic/academic_base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .results-table {
+                page-break-after: always;
+            }
+            .rankings-table {
+                page-break-before: always;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-inline {
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            margin-right: 10px;
+        }
+        .header-section {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h2, h3 {
+            color: #8B4513; /* Brown color */
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+        }
+        th {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        td {
+            background-color: #f1f1f1;
+        }
+        .table-success th, .table-success td {
+            border: 2px solid #007bff;
+        }
+        .rankings-table p {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .btn {
+            margin-top: 10px;
+        }
+        .text-center {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="no-print mb-4">
+        <form id="filter-form" class="form-inline">
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="session" class="sr-only">Session</label>
+                <select id="session" name="session" class="form-control">
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}" {% if session == current_session %}selected{% endif %}>{{ session.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="term" class="sr-only">Term</label>
+                <select id="term" name="term" class="form-control">
+                    {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term == current_term %}selected{% endif %}>{{ term.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="exam" class="sr-only">Exam</label>
+                <select id="exam" name="exam" class="form-control">
+                    {% for exam in exams %}
+                        <option value="{{ exam.id }}" {% if exam == current_exam %}selected{% endif %}>{{ exam.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Filter</button>
+        </form>
+    </div>
+
+    <div class="header-section">
+        <h2 class="text-center"><u>ELEMENT LAKEZONE PRE &amp PRIMARY SCHOOL</u></h2>
+        <h2 class="text-center"><u>THE RESULTS OF {{ current_session }}-{{ current_term }}</u></h2>
+        <h2 class="text-center"><u>The {{ current_exam }} results</u></h2>
+        <h3 class="text-center"><u>Class: {{ selected_class }}</u></h3>
+    </div>
+
+    {% if no_results %}
+        <h4 class="text-center text-danger">No results found to be created in this class in this session, term and exam type</h4>
+    {% else %}
+    <!-- Table for displaying student results -->
+    <div class="results-table">
+        <table class="table table-bordered table-success">
+            <thead>
+            <tr>
+                <th>Serial Number</th>
+                <th>Student</th>
+                <th>Student Class</th>
+                {% for subject in subjects %}
+                <th>{{ subject }}</th>
+                {% endfor %}
+                <th>Total</th>
+                <th>Overall Average</th>
+                <th>Overall Status</th>
+                <th>Position</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for student_data in data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="{% url 'academic-single-student' student_id=student_data.student.id %}" class="text-decoration-none">{{ student_data.student }}</a>
+                </td>
+                <td>{{ student_data.student_class }}</td>
+                {% for subject, subject_data in student_data.subjects.items %}
+                <td>{{ subject_data.average|default:"None" }}</td>
+                {% endfor %}
+                <td>{{ student_data.total }}</td>
+                <td>{{ student_data.overall_average|floatformat:"2" }}</td>
+                <td>{{ student_data.overall_status }}</td>
+                <td>{{ student_data.position }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="rankings-table">
+        <p><u>Subjects Rankings:</u></p>
+        <table class="table table-bordered table-success">
+            <thead>
+            <tr>
+                <th>Subject Position</th>
+                <th>Subject</th>
+                <th>Subject Average</th>
+                <th>Subject Grade</th>
+                <th>Subject GPA</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for subject in subject_data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ subject.subject }}</td>
+                <td>{{ subject.average }}</td>
+                <td>{{ subject.grade }}</td>
+                <td>{{ subject.gpa }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="no-print text-center">
+        <button type="button" class="btn btn-success btn-lg me-2" onclick="window.print()">Print</button>
+        <a href="{% url 'academic_class_list' %}" class="btn btn-success btn-lg" role="button">Back</a>
+        <a href="{% url 'academic_form_status' class_id=class_id %}" class="btn btn-success btn-lg" role="button">Form Status</a>
+    </div>
+</div>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

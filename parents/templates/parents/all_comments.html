@@ -1,0 +1,325 @@
+{% extends 'parents/parent_base.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="card-header bg-primary text-white">
+  <div class="card-tools">
+    <button class="btn btn-outline-light btn-sm" onclick="printPage()">Print</button>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<style>
+  .filter-select {
+    border-radius: 10px;
+    border: 2px solid #17a2b8;
+    color: #17a2b8;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .comment-container {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .comment-box, .academic-answer-box {
+    border-radius: 25px;
+    padding: 15px 20px;
+    max-width: 80%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    position: relative;
+    font-size: 16px;
+    transition: transform 0.3s ease;
+    margin: 10px 0;
+  }
+
+  .comment-box {
+    background-color: #f8f9fa;
+    color: #333;
+    align-self: flex-start;
+  }
+
+  .academic-answer-box {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+  }
+
+  .comment-dates, .answer-dates {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+    text-align: right;
+  }
+
+  .read-icon {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+  }
+
+  .read-icon i {
+    color: #28a745; /* WhatsApp-like green */
+    font-size: 1em;
+    margin-left: -5px; /* Adjust overlap */
+  }
+
+  .read-icon i:first-child {
+    margin-left: 0;
+  }
+
+  h2 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .filters {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .filters .form-check-inline {
+    margin-right: 20px;
+  }
+
+  .form-check-label {
+    font-weight: bold;
+    color: #007bff;
+    margin-left: 5px;
+    transition: color 0.3s ease;
+  }
+
+  .form-check-input:checked + .form-check-label {
+    color: #0056b3;
+  }
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <h2>Comments for {{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</h2>
+  
+  <div class="filters mb-3">
+    <div class="row">
+      <div class="col-md-6 mb-2">
+        <select id="filterSession" class="form-control filter-select">
+          <option value="">Select Session</option>
+          {% for session in sessions %}
+          <option value="{{ session.id }}" {% if session == current_session %}selected{% endif %}>{{ session.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters mb-3">
+    <div class="row">
+      <div class="col-md-12 mb-2 text-center">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="commentType" id="resultComments" value="parent" checked>
+          <label class="form-check-label" for="resultComments">Maoni ya matokeo</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="commentType" id="studentDetailsComments" value="student">
+          <label class="form-check-label" for="studentDetailsComments">Maoni ya taarifa za mwanafunzi</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="commentType" id="invoiceComments" value="invoice">
+          <label class="form-check-label" for="invoiceComments">Maoni ya taarifa za malipo na michango</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="commentsContainer">
+    <!-- Parent Comments with Academic Answer -->
+    <div id="parentComments" class="comment-section">
+      {% for comment in parent_comments %}
+      <div class="comment-container">
+        <div class="comment-box">
+          {% if comment.comment %}
+            <p>{{ comment.comment }}</p>
+          {% endif %}
+          {% if comment.audio_comment %}
+            <audio controls>
+              <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          {% endif %}
+          <div class="comment-dates">
+            <span>Date Commented: {{ comment.date_commented|date:"d M Y, H:i" }}</span>
+            {% if comment.mark_comment %}
+              <span class="read-icon">
+                <i class="fas fa-check"></i>
+                <i class="fas fa-check"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% if comment.academic_answer %}
+        <div class="academic-answer-box">
+          {% if comment.academic_answer.answer %}
+            <p>{{ comment.academic_answer.answer }}</p>
+          {% endif %}
+          {% if comment.academic_answer.audio_answer %}
+            <audio controls>
+              <source src="{{ comment.academic_answer.audio_answer.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          {% endif %}
+          <div class="answer-dates">
+            <span>Answered on: {{ comment.academic_answer.date_commented|date:"d M Y, H:i" }}</span>
+            {% if comment.academic_answer.mark_comment %}
+              <span class="read-icon">
+                <i class="fas fa-check"></i>
+                <i class="fas fa-check"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Student Comments -->
+    <div id="studentComments" class="comment-section">
+      {% for comment in student_comments %}
+      <div class="comment-container">
+        <div class="comment-box">
+          {% if comment.comment %}
+            <p>{{ comment.comment }}</p>
+          {% endif %}
+          {% if comment.audio_comment %}
+            <audio controls>
+              <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          {% endif %}
+          <div class="comment-dates">
+            <span>Date Commented: {{ comment.date_commented|date:"d M Y, H:i" }}</span>
+            {% if comment.mark_student_comment %}
+              <span class="read-icon">
+                <i class="fas fa-check"></i>
+                <i class="fas fa-check"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% if comment.secretaryanswers %}
+        <div class="academic-answer-box">
+          {% if comment.secretaryanswers.answer %}
+            <p>{{ comment.secretaryanswers.answer }}</p>
+          {% endif %}
+          {% if comment.secretaryanswers.audio_answer %}
+            <audio controls>
+              <source src="{{ comment.secretaryanswers.audio_answer.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          {% endif %}
+          <div class="answer-dates">
+            <span>Answered on: {{ comment.secretaryanswers.date_commented|date:"d M Y, H:i" }}</span>
+            {% if comment.secretaryanswers.mark_secretary_answer %}
+              <span class="read-icon">
+                <i class="fas fa-check"></i>
+                <i class="fas fa-check"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Invoice Comments -->
+    <div id="invoiceCommentsSection" class="comment-section">
+      {% for comment in invoice_comments %}
+      <div class="comment-container">
+        <div class="comment-box">
+          {% if comment.comment %}
+            <p>{{ comment.comment }}</p>
+          {% endif %}
+          {% if comment.audio_comment %}
+            <audio controls>
+              <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          {% endif %}
+          <div class="comment-dates">
+            <span>Date Commented: {{ comment.date_commented|date:"d M Y, H:i" }}</span>
+            {% if comment.satisfied %}
+              <span class="read-icon">
+                <i class="fas fa-check"></i>
+                <i class="fas fa-check"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% if comment.bursoranswer %}
+        <div class="academic-answer-box">
+          {% if comment.bursoranswer.answer %}
+            <p>{{ comment.bursoranswer.answer }}</p>
+          {% endif %}
+          {% if comment.bursoranswer.audio_answer %}
+            <audio controls>
+              <source src="{{ comment.bursoranswer.audio_answer.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          {% endif %}
+          <div class="answer-dates">
+            <span>Answered on: {{ comment.bursoranswer.date_commented|date:"d M Y, H:i" }}</span>
+            {% if comment.bursoranswer.satisfied %}
+              <span class="read-icon">
+                <i class="fas fa-check"></i>
+                <i class="fas fa-check"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    function switchCommentSection() {
+      const commentType = document.querySelector('input[name="commentType"]:checked').value;
+      document.querySelectorAll('.comment-section').forEach(section => {
+        section.style.display = 'none';
+      });
+      if (commentType === 'parent') {
+        document.getElementById('parentComments').style.display = 'block';
+      } else if (commentType === 'student') {
+        document.getElementById('studentComments').style.display = 'block';
+      } else if (commentType === 'invoice') {
+        document.getElementById('invoiceCommentsSection').style.display = 'block';
+      }
+    }
+
+    document.querySelectorAll('input[name="commentType"]').forEach(radio => {
+      radio.addEventListener('change', switchCommentSection);
+    });
+
+    function filterCommentsBySession() {
+      const sessionId = document.getElementById('filterSession').value;
+      const studentId = {{ student.id }};
+      const url = "{% url 'all_comments_view' student.id %}?session_id=" + sessionId;
+      window.location.href = url;
+    }
+
+    document.getElementById('filterSession').addEventListener('change', filterCommentsBySession);
+
+    switchCommentSection();
+  });
+</script>
+
+{% endblock content %}

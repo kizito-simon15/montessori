@@ -1,0 +1,129 @@
+<!-- parents/invoice_chat_room.html -->
+{% extends 'parents/parent_base.html' %}
+{% load humanize %}
+
+{% block title %}Invoice Chat Room{% endblock title %}
+
+{% block content %}
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <h2>Invoice Chat Room</h2>
+  <div class="chat-container">
+    {% for comment in comments %}
+    <div class="chat-message {{ comment.is_answered|yesno:'answered,question' }}">
+      <div class="chat-status">
+        {% if comment.date_commented == comment.date_updated_comments %}
+        <span class="new-status">New</span>
+        {% else %}
+        <span class="old-status">Old</span>
+        {% endif %}
+      </div>
+      <div class="chat-content">
+        <div class="chat-text">
+          <p>{{ comment.comment }}</p>
+          <small>{{ comment.date_commented|naturaltime }}</small>
+        </div>
+        <div class="chat-actions">
+          <a href="{% url 'update_comment' comment.id %}" class="update-action">
+            <i class="fas fa-edit"></i> Update
+          </a>
+          <a href="{% url 'delete_comment' comment.id %}" class="delete-action">
+            <i class="fas fa-trash"></i> Delete
+          </a>
+          {% if not comment.satisfied %}
+          <a href="{% url 'satisfy_comment' comment.id %}" class="satisfied-action">
+            <i class="fas fa-thumbs-up"></i> Satisfied
+          </a>
+          {% else %}
+          <i class="fas fa-thumbs-up" style="color: green;"></i>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="chat-message department-answer">
+      <div class="chat-status">
+        <span class="answered-status">Answered</span>
+      </div>
+      <div class="chat-content">
+        <div class="chat-text">
+          <p>Answer from the department goes here...</p>
+          <small>{{ comment.date_updated_comments|naturaltime }}</small>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Additional CSS for styling -->
+<style>
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-message {
+    max-width: 60%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-message.question {
+    background-color: #e0f7fa;
+    align-self: flex-start;
+  }
+  .chat-message.answered {
+    background-color: #f1f8e9;
+    align-self: flex-end;
+  }
+  .chat-message.department-answer {
+    background-color: #d1c4e9;
+    align-self: flex-end;
+  }
+  .chat-status {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  .new-status {
+    color: green;
+  }
+  .old-status {
+    color: gray;
+  }
+  .answered-status {
+    color: blue;
+  }
+  .chat-content {
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-text {
+    margin-bottom: 5px;
+  }
+  .chat-text p {
+    margin: 0;
+    font-size: 16px;
+  }
+  .chat-text small {
+    font-size: 12px;
+    color: #666;
+  }
+  .chat-actions {
+    display: flex;
+    gap: 15px;
+  }
+  .update-action {
+    color: green;
+    text-decoration: none;
+  }
+  .delete-action {
+    color: red;
+    text-decoration: none;
+  }
+  .satisfied-action {
+    color: blue;
+    text-decoration: none;
+  }
+</style>
+{% endblock content %}

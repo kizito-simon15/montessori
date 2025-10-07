@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Comments</title>
+    <style>
+        /* Styling details */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #74ebd5, #ACB6E5);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1.8s ease-in-out;
+        }
+
+        .radio-group label {
+            margin: 0 15px;
+            font-size: 18px;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .radio-group label:hover {
+            color: #007bff;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .filters input,
+        .filters select {
+            margin: 0 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            width: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+
+        .no-comments {
+            color: red;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+            animation: fadeIn 2.2s ease-in-out;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            animation: fadeIn 2.5s ease-in-out;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            position: relative;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .status-icon {
+            position: absolute;
+            right: 10px;
+            bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .status-icon.new {
+            color: red;
+            font-weight: bold;
+            background-color: #fff;
+            border: 2px solid red;
+            border-radius: 50%;
+            padding: 0.2em 0.5em;
+            font-size: 0.8em;
+            line-height: 1em;
+        }
+        
+        .status-icon.read {
+            color: #007bff;
+            font-size: 1em;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: blue">Parent Comments</h1>
+
+        <div class="radio-group">
+            <label><input type="radio" name="comment_type" value="student_comments" checked> Student Details Comments</label>
+            <label><input type="radio" name="comment_type" value="invoice_comments"> Invoice Comments</label>
+            <label><input type="radio" name="comment_type" value="parent_comments"> Results Comments</label>
+        </div>
+
+        <div class="filters">
+            <input type="text" id="filterName" placeholder="Filter by Student Name">
+            <select id="filterClass">
+                <option value="">Filter by Class</option>
+                {% for class in student_classes %}
+                    <option value="{{ class.name }}">{{ class.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Student Comments Table -->
+        <div id="student_comments" class="comment-table">
+            {% if student_comments %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Student Name</th>
+                            <th>Class</th>
+                            <th>Parent Comments</th>
+                            <th>Secretary Answers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in student_comments %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td class="student-name">{{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</td>
+                                <td class="student-class">{{ comment.student.current_class.name }}</td>
+                                <td>
+                                    {% if comment.comment %}
+                                        {{ comment.comment }}<br>
+                                    {% endif %}
+                                    {% if comment.audio_comment %}
+                                        <audio controls>
+                                            <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    {% endif %}
+                                    <small>Commented on: {{ comment.date_commented }}</small>
+                                    {% if comment.mark_student_comment %}
+                                        <span class="status-icon read">✔✔</span>
+                                    {% else %}
+                                        <span class="status-icon new">N</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if comment.secretary_answer %}
+                                        {% if comment.secretary_answer.answer %}
+                                            {{ comment.secretary_answer.answer }}<br>
+                                        {% endif %}
+                                        {% if comment.secretary_answer.audio_answer %}
+                                            <audio controls>
+                                                <source src="{{ comment.secretary_answer.audio_answer.url }}" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        {% endif %}
+                                        <small>Answered on: {{ comment.secretary_answer.date_commented }}</small>
+                                        {% if comment.secretary_answer.mark_secretary_answer %}
+                                            <span class="status-icon read">✔✔</span>
+                                        {% else %}
+                                            <span class="status-icon new">N</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <em>No answer yet</em>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-comments">No comments available</p>
+            {% endif %}
+        </div>
+
+        <!-- Invoice Comments Table -->
+        <div id="invoice_comments" class="comment-table hidden">
+            {% if invoice_comments %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Student Name</th>
+                            <th>Class</th>
+                            <th>Parent Comments</th>
+                            <th>Bursor Answers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in invoice_comments %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td class="student-name">{{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</td>
+                                <td class="student-class">{{ comment.student.current_class.name }}</td>
+                                <td>
+                                    {% if comment.comment %}
+                                        {{ comment.comment }}<br>
+                                    {% endif %}
+                                    {% if comment.audio_comment %}
+                                        <audio controls>
+                                            <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    {% endif %}
+                                    <small>Commented on: {{ comment.date_commented }}</small>
+                                    {% if comment.satisfied %}
+                                        <span class="status-icon read">✔✔</span>
+                                    {% else %}
+                                        <span class="status-icon new">N</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if comment.bursor_answer %}
+                                        {% if comment.bursor_answer.answer %}
+                                            {{ comment.bursor_answer.answer }}<br>
+                                        {% endif %}
+                                        {% if comment.bursor_answer.audio_answer %}
+                                            <audio controls>
+                                                <source src="{{ comment.bursor_answer.audio_answer.url }}" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        {% endif %}
+                                        <small>Answered on: {{ comment.bursor_answer.date_commented }}</small>
+                                        {% if comment.bursor_answer.satisfied %}
+                                            <span class="status-icon read">✔✔</span>
+                                        {% else %}
+                                            <span class="status-icon new">N</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <em>No answer yet</em>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-comments">No comments available</p>
+            {% endif %}
+        </div>
+
+        <!-- Parent Comments Table -->
+        <div id="parent_comments" class="comment-table hidden">
+            {% if parent_comments %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Student Name</th>
+                            <th>Class</th>
+                            <th>Parent Comments</th>
+                            <th>Academic Answers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in parent_comments %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td class="student-name">{{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</td>
+                                <td class="student-class">{{ comment.student.current_class.name }}</td>
+                                <td>
+                                    {% if comment.comment %}
+                                        {{ comment.comment }}<br>
+                                    {% endif %}
+                                    {% if comment.audio_comment %}
+                                        <audio controls>
+                                            <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    {% endif %}
+                                    <small>Commented on: {{ comment.date_commented }}</small>
+                                    {% if comment.mark_comment %}
+                                        <span class="status-icon read">✔✔</span>
+                                    {% else %}
+                                        <span class="status-icon new">N</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if comment.academic_answer %}
+                                        {% if comment.academic_answer.answer %}
+                                            {{ comment.academic_answer.answer }}<br>
+                                        {% endif %}
+                                        {% if comment.academic_answer.audio_answer %}
+                                            <audio controls>
+                                                <source src="{{ comment.academic_answer.audio_answer.url }}" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        {% endif %}
+                                        <small>Answered on: {{ comment.academic_answer.date_commented }}</small>
+                                        {% if comment.academic_answer.mark_comment %}
+                                            <span class="status-icon read">✔✔</span>
+                                        {% else %}
+                                            <span class="status-icon new">N</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <em>No answer yet</em>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-comments">No comments available</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const radioButtons = document.querySelectorAll('input[name="comment_type"]');
+            const commentTables = document.querySelectorAll('.comment-table');
+            const filterName = document.getElementById('filterName');
+            const filterClass = document.getElementById('filterClass');
+
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    commentTables.forEach(table => {
+                        table.classList.add('hidden');
+                    });
+                    document.getElementById(this.value).classList.remove('hidden');
+                });
+            });
+
+            // Filter logic
+            function filterComments() {
+                const nameFilter = filterName.value.toLowerCase();
+                const classFilter = filterClass.value.toLowerCase();
+
+                commentTables.forEach(table => {
+                    const rows = table.querySelectorAll('tbody tr');
+
+                    rows.forEach(row => {
+                        const name = row.querySelector('.student-name').textContent.toLowerCase();
+                        const className = row.querySelector('.student-class').textContent.toLowerCase();
+
+                        if (name.includes(nameFilter) && (className.includes(classFilter) || classFilter === "")) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            filterName.addEventListener('input', filterComments);
+            filterClass.addEventListener('change', filterComments);
+        });
+    </script>
+</body>
+</html>
+{% endblock content %}

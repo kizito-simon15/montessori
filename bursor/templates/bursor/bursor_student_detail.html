@@ -1,0 +1,214 @@
+{% extends "bursor/bursor_base.html" %}
+{% load static %}
+
+{% block title %}Student Detail{% endblock title %}
+
+{% block content-header %}
+<div class="d-flex justify-content-between align-items-center bg-light p-3 shadow-sm rounded">
+  <h3 class="text-primary"><i class="fas fa-user"></i> Student Detail</h3>
+
+  <!-- Three Dots Menu -->
+  <div class="dropdown">
+    <button class="btn btn-light btn-sm rounded-circle dropdown-toggle shadow-sm" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background: white; color: #2575fc; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-ellipsis-v"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="menuDropdown">
+      <li>
+        <a class="dropdown-item" href="{% url 'bursor-student-list' %}">
+          <i class="fas fa-users me-2"></i> Student List
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{% url 'bursor-inactive-student-list' %}">
+          <i class="fas fa-user-slash me-2"></i> Inactive Students
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{% url 'bursor-completed-students' %}">
+          <i class="fas fa-user-graduate me-2"></i> Alumni
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<script>
+  function printPage() {
+    window.print();
+  }
+
+  // Function to calculate total
+  function calculateTotal() {
+    let totalPayable = 0;
+    let totalPaid = 0;
+    let totalBalance = 0;
+
+    // Iterate through each row in the table body
+    document.querySelectorAll('#payment-table tbody tr').forEach(row => {
+      // Get values from cells
+      const payable = parseFloat(row.cells[1].innerText);
+      const paid = parseFloat(row.cells[2].innerText);
+      const balance = parseFloat(row.cells[3].innerText);
+
+      // Add values to totals
+      totalPayable += payable;
+      totalPaid += paid;
+      totalBalance += balance;
+    });
+
+    // Update total cells with animation
+    const totalPayableCell = document.getElementById('total-payable');
+    const totalPaidCell = document.getElementById('total-paid');
+    const totalBalanceCell = document.getElementById('total-balance');
+
+    totalPayableCell.innerText = totalPayable.toFixed(2);
+    totalPaidCell.innerText = totalPaid.toFixed(2);
+    totalBalanceCell.innerText = totalBalance.toFixed(2);
+
+    // Trigger AOS animation
+    totalPayableCell.setAttribute('data-aos', 'fade-up');
+    totalPaidCell.setAttribute('data-aos', 'fade-up');
+    totalBalanceCell.setAttribute('data-aos', 'fade-up');
+  }
+
+  // Function to open table with animation
+  function openTable() {
+    const table = document.getElementById('payment-table');
+    table.style.opacity = 1;
+
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+      setTimeout(() => {
+        row.style.opacity = 1;
+      }, 100 * index);
+    });
+  }
+
+  // Function to go back
+  function goBack() {
+    window.history.back();
+  }
+
+  // Call the function when the page loads
+  window.addEventListener('DOMContentLoaded', () => {
+    calculateTotal();
+    openTable();
+  });
+</script>
+
+<div class="container py-4" style="background: linear-gradient(to right, #f8fbfd, #eef2f7); border-radius: 12px;">
+  <div class="row align-items-center" data-aos="fade-up">
+    <!-- Student Profile Section -->
+    <div class="col-md-4 text-center">
+      <div class="mb-3">
+        {% if object.passport %}
+        <img src="{{ object.passport.url }}" class="rounded-circle border border-secondary shadow-sm" style="width: 150px; height: 150px;">
+        {% else %}
+        <img src="{% static 'dist/img/avatar.png' %}" class="rounded-circle border border-secondary shadow-sm" style="width: 150px; height: 150px;">
+        {% endif %}
+      </div>
+      <h4 class="text-primary">{{ object.firstname }} {{ object.middle_name }} {{ object.surname }}</h4>
+      <p class="text-muted">{{ object.registration_number }}</p>
+      <p class="text-muted">{{ object.get_gender_display }} | {{ object.get_current_status_display }}</p>
+    </div>
+
+    <!-- Student Details Section -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="row mb-3">
+            <label class="col-sm-4 fw-bold text-secondary">Date of Birth:</label>
+            <div class="col-sm-8">{{ object.date_of_birth }}</div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-4 fw-bold text-secondary">Father's Mobile:</label>
+            <div class="col-sm-8">{{ object.father_mobile_number }}</div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-4 fw-bold text-secondary">Mother's Mobile:</label>
+            <div class="col-sm-8">{{ object.mother_mobile_number }}</div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-4 fw-bold text-secondary">Address:</label>
+            <div class="col-sm-8">{{ object.address }}</div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-4 fw-bold text-secondary">Comments:</label>
+            <div class="col-sm-8">{{ object.others }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment History Section -->
+  <div class="mt-4">
+    <h4 class="text-primary" data-aos="fade-up">
+      <i class="fas fa-file-invoice-dollar"></i> Invoice/Payment History
+    </h4>
+    {% if payments %}
+    <div class="table-responsive">
+      <table id="payment-table" class="table table-bordered table-hover" style="opacity: 0; transition: opacity 0.5s ease;">
+        <thead class="table-info">
+          <tr>
+            <th>For</th>
+            <th>Amount Payable</th>
+            <th>Amount Paid</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr class="clickable-row" data-href="{% url 'bursor-invoice-detail' payment.id %}" style="opacity: 0; transition: opacity 0.5s ease;">
+            <td>{{ payment.session }} - {{ payment.installment }} - {{ payment.class_for }}</td>
+            <td>{{ payment.total_amount_payable }}</td>
+            <td>{{ payment.total_amount_paid }}</td>
+            <td>{{ payment.balance }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="fw-bold text-secondary">
+            <td>Total:</td>
+            <td id="total-payable"></td>
+            <td id="total-paid"></td>
+            <td id="total-balance"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted">No payment history available for {{ object.firstname }}.</p>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .rounded-circle {
+    transition: transform 0.3s ease;
+  }
+
+  .rounded-circle:hover {
+    transform: scale(1.1);
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+  }
+
+  .card {
+    border-radius: 12px;
+  }
+
+  .table-info {
+    background-color: #dbe9ff;
+  }
+
+  .text-primary {
+    color: #2575fc !important;
+  }
+</style>
+{% endblock content %}

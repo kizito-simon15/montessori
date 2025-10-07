@@ -1,0 +1,83 @@
+{# ================== budgetline_list.html ================== #}
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{
+  --primary:#1e3a8a; --accent:#d97706; --bg:#f1f5f9;
+  --danger:#dc2626;  --radius:22px;
+}
+/* page base */
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+/* animated card */
+.card{background:#fff;border-radius:var(--radius);box-shadow:0 6px 14px rgba(0,0,0,.08);
+      overflow:hidden;margin-top:1.2rem;opacity:0;transform:translateY(35px);transition:.55s;}
+.card.show{opacity:1;transform:translateY(0);}
+/* gradient banner header */
+.banner{background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);
+        padding:.9rem 1.2rem;display:flex;justify-content:space-between;align-items:center;}
+.banner h2{margin:0;font-size:clamp(1.35rem,4vw,1.7rem);font-weight:700;color:#fff;display:flex;gap:.5rem;align-items:center;}
+.btn{
+  border:none;border-radius:var(--radius);padding:.45rem .95rem;font-weight:600;font-size:.8rem;
+  cursor:pointer;transition:.15s;color:#fff;background:#10b981; /* emerald */
+}
+.btn:hover{background:#059669;transform:translateY(-2px);}
+.table{width:100%;border-collapse:collapse;font-size:.9rem;margin:0;}
+.table thead{background:var(--primary);color:#fff;position:sticky;top:0;}
+.table th,.table td{padding:.48rem .7rem;text-align:left;border-bottom:1px solid #e5e7eb;}
+.table tbody tr:nth-child(odd){background:#f8fafc;}
+.table tbody tr:hover{background:#e2e8f0;}
+.action{display:flex;gap:.35rem;}
+.action a{
+  display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  width:28px;height:28px;color:#fff;font-size:.8rem;text-decoration:none;
+}
+.action a.edit{background:#3b82f6;}   /* blue */
+.action a.edit:hover{background:#2563eb;}
+.action a.del{background:#dc2626;}     /* red */
+.action a.del:hover{background:#b91c1c;}
+@media(max-width:640px){
+  .table th,.table td{padding:.35rem .5rem;font-size:.8rem;}
+  .action a{width:26px;height:26px;}
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  // reveal animation
+  setTimeout(()=>document.querySelector('.card')?.classList.add('show'),80);
+});
+</script>
+
+<div class="card">
+  <!-- banner -->
+  <div class="banner">
+    <h2>📁 Budget Lines</h2>
+    <a href="{% url 'budgetline_create' %}" class="btn">➕ Add New</a>
+  </div>
+
+  <!-- body -->
+  <div style="padding:1rem;">
+    <table class="table">
+      <thead><tr><th style="width:50px;">#</th><th>Name</th><th style="width:110px;">Actions</th></tr></thead>
+      <tbody>
+        {% for bl in rows %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ bl.name }}</td>
+            <td>
+              <div class="action">
+                <a href="{% url 'budgetline_update' bl.pk %}" class="edit" title="Edit">✏️</a>
+                <a href="{% url 'budgetline_delete' bl.pk %}" class="del"  title="Delete">🗑️</a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3" style="text-align:center;padding:.8rem 0;">No budget lines defined yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

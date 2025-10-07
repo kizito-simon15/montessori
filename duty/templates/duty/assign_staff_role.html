@@ -1,0 +1,280 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #eceff1;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        border: 2px solid #d1d9e6;
+    }
+
+    h2 {
+        color: #333;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        background-color: #007aff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #37474f;
+        font-weight: 600;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 30px;
+        border: 1px solid #b0bec5;
+        background-color: #fafafa;
+        outline: none;
+        font-size: 16px;
+        color: #37474f;
+        transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #42a5f5;
+        background-color: #e3f2fd;
+    }
+
+    .form-check-label {
+        font-weight: 600;
+        color: #37474f;
+    }
+
+    .form-check-input {
+        transform: scale(1.3);
+        margin-right: 10px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+        color: #fff;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #007aff;
+    }
+
+    .btn-primary:hover {
+        background-color: #005bb5;
+    }
+
+    .btn-danger {
+        background-color: #e53935;
+    }
+
+    .btn-danger:hover {
+        background-color: #b71c1c;
+    }
+
+    .btn-secondary {
+        background-color: #43a047;
+    }
+
+    .btn-secondary:hover {
+        background-color: #2e7d32;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        text-align: center;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .alert-success {
+        background-color: #43a047;
+    }
+
+    .alert-danger {
+        background-color: #e53935;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .col-md-5,
+    .col-md-2 {
+        flex: 1;
+        min-width: 180px;
+    }
+</style>
+
+<div class="container">
+    <h2>Assign Staff Role</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Staff Name Selection -->
+        <div class="form-group">
+            <label for="id_staff" class="form-label">Staff Name</label>
+            <div class="input-container">
+                {{ form.staff }}
+            </div>
+            {% if form.staff.errors %}
+                <div class="text-danger">{{ form.staff.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Class-Subject Dynamic Fields Container -->
+        <div id="class-subject-container" class="mb-4">
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <label for="class_subject_class" class="form-label">Class</label>
+                    <select name="class_subject_class[]" class="form-control">
+                        {% for student_class in form.class_teacher_class.field.queryset %}
+                            <option value="{{ student_class.id }}">{{ student_class.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="class_subject_subject" class="form-label">Subject</label>
+                    <select name="class_subject_subject[]" class="form-control">
+                        {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Remove</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Class-Subject Button -->
+        <button type="button" id="add-class-subject-btn" class="btn btn-secondary">+ Add Another Class & Subject</button>
+        
+        <!-- Is Class Teacher Checkbox -->
+        <div class="form-check mb-4">
+            <input type="checkbox" class="form-check-input" id="id_is_class_teacher" name="is_class_teacher">
+            <label class="form-check-label" for="id_is_class_teacher">Is Class Teacher</label>
+            {% if form.is_class_teacher.errors %}
+                <div class="text-danger">{{ form.is_class_teacher.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Class Teacher Class Selection -->
+        <div id="class-teacher-class-field" class="form-group mb-4" style="display: none;">
+            <label for="id_class_teacher_class" class="form-label">Class for Class Teacher</label>
+            <div class="input-container">
+                {{ form.class_teacher_class }}
+            </div>
+            {% if form.class_teacher_class.errors %}
+                <div class="text-danger">{{ form.class_teacher_class.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Assign Role</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const classSubjectContainer = document.getElementById("class-subject-container");
+    const addClassSubjectBtn = document.getElementById("add-class-subject-btn");
+    const classTeacherCheckbox = document.getElementById("id_is_class_teacher");
+    const classTeacherClassField = document.getElementById("class-teacher-class-field");
+
+    // Function to create a new class-subject row
+    function createClassSubjectRow() {
+        const row = document.createElement("div");
+        row.classList.add("row", "mb-3");
+
+        // Class selection
+        const classCol = document.createElement("div");
+        classCol.classList.add("col-md-5");
+        const classSelect = document.createElement("select");
+        classSelect.name = "class_subject_class[]";
+        classSelect.classList.add("form-control");
+        classSelect.innerHTML = `{% for student_class in form.class_teacher_class.field.queryset %}
+                                    <option value="{{ student_class.id }}">{{ student_class.name }}</option>
+                                  {% endfor %}`;
+        classCol.appendChild(classSelect);
+
+        // Subject selection
+        const subjectCol = document.createElement("div");
+        subjectCol.classList.add("col-md-5");
+        const subjectSelect = document.createElement("select");
+        subjectSelect.name = "class_subject_subject[]";
+        subjectSelect.classList.add("form-control");
+        subjectSelect.innerHTML = `{% for subject in subjects %}
+                                      <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                    {% endfor %}`;
+        subjectCol.appendChild(subjectSelect);
+
+        // Remove button
+        const removeCol = document.createElement("div");
+        removeCol.classList.add("col-md-2");
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.classList.add("btn", "btn-danger");
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", function() {
+            row.remove();
+        });
+        removeCol.appendChild(removeBtn);
+
+        // Append columns to the row
+        row.appendChild(classCol);
+        row.appendChild(subjectCol);
+        row.appendChild(removeCol);
+        classSubjectContainer.appendChild(row);
+    }
+
+    // Add new class-subject row on button click
+    addClassSubjectBtn.addEventListener("click", function() {
+        createClassSubjectRow();
+    });
+
+    // Show or hide the class teacher field based on checkbox
+    classTeacherCheckbox.addEventListener("change", function() {
+        if (classTeacherCheckbox.checked) {
+            classTeacherClassField.style.display = "block";
+        } else {
+            classTeacherClassField.style.display = "none";
+        }
+    });
+});
+</script>
+{% endblock %}

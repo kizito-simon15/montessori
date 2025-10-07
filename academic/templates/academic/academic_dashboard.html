@@ -1,0 +1,383 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .current-time {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: green;
+            font-size: 1.2em;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .box {
+            width: 18%;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .box a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .box i {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .box h3 {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+        .box p {
+            margin: 0;
+            color: #555;
+            font-size: 0.8em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .box p i {
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        .box:hover {
+            background-color: #e2e6ea;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .box-1 {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .box-2 {
+            background-color: #28a745;
+            color: white;
+        }
+        .box-3 {
+            background-color: #ffc107;
+            color: white;
+        }
+        .box-4 {
+            background-color: #dc3545;
+            color: white;
+        }
+        .extra-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .calendar {
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .calendar h3 {
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .calendar-table th, .calendar-table td {
+            padding: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .calendar-table th {
+            background-color: #f4f4f4;
+        }
+        .current-day {
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+        }
+        .month-header {
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+        }
+        .month-header.january { background-color: #ff7f7f; }
+        .month-header.february { background-color: #7fbfff; }
+        .month-header.march { background-color: #7fff7f; }
+        .month-header.april { background-color: #ffbf7f; }
+        .month-header.may { background-color: #bfff7f; }
+        .month-header.june { background-color: #7fffbf; }
+        .month-header.july { background-color: #ffdf7f; }
+        .month-header.august { background-color: #ffaf7f; }
+        .month-header.september { background-color: #bf7fff; }
+        .month-header.october { background-color: #ff7fff; }
+        .month-header.november { background-color: #7f7fff; }
+        .month-header.december { background-color: #ff7fbf; }
+        .map {
+            width: 100%;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .weekend {
+            color: red;
+        }
+
+        /* New Comment Box */
+        .new-comments-box {
+            background-color: #ffc107;
+            color: #000;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            text-align: center;
+            animation: slideDown 0.5s ease-in-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .new-comments-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .new-comments-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .new-comments-box ul li {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+
+        /* Sign-in Button */
+        .sign-in-button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+            width: 100%;
+        }
+
+        .sign-in-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Welcome {{ staff }}</h2>
+        <h3>Academic Dashboard</h3>
+        <div class="current-time" id="current-time"></div>
+    </div>
+
+    {% if new_comments %}
+        <div class="new-comments-box">
+            <h4>{{ new_comments.count }} New academic comments</h4>
+            <ul>
+                {% for comment in new_comments %}
+                    <li>{{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if show_sign_in_button %}
+        <form action="{% url 'mark_academic_attendance' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="sign-in-button"><i class="fas fa-check-circle"></i> Sign in</button>
+        </form>
+    {% endif %}
+
+    <div class="container">
+        <div class="box box-1">
+            <a href="{% url 'academic_details' %}">
+                <i class="fas fa-user"></i>
+                <h3>View Your Details</h3>
+                <p>More info <i class="fas fa-arrow-right"></i></p>
+            </a>
+        </div>
+        <div class="box box-2">
+            <a href="{% url 'academic_salary_invoices' %}">
+                <i class="fas fa-dollar-sign"></i>
+                <h3>Salary Details</h3>
+                <p>More info <i class="fas fa-arrow-right"></i></p>
+            </a>
+        </div>
+        <div class="box box-3">
+            <a href="{% url 'create_academic_results_view' %}">
+                <i class="fas fa-pen"></i>
+                <h3>Create Results</h3>
+                <p>More info <i class="fas fa-arrow-right"></i></p>
+            </a>
+        </div>
+        <div class="box box-4">
+            <a href="{% url 'academic_class_list' %}">
+                <i class="fas fa-chart-line"></i>
+                <h3>View Results</h3>
+                <p>More info <i class="fas fa-arrow-right"></i></p>
+            </a>
+        </div>
+    </div>
+
+    <div class="extra-section">
+        <div class="calendar">
+            <h3 id="current-year"></h3>
+            <div id="calendar-container" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+        </div>
+        <div id="map" class="map"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+            document.getElementById('current-time').innerText = `${hours}:${minutes}:${seconds}:${milliseconds}`;
+        }
+
+        setInterval(updateTime, 1);
+
+        function generateCalendar() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            document.getElementById('current-year').innerText = currentYear;
+
+            const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
+            const monthClasses = [
+                "january", "february", "march", "april", "may", "june",
+                "july", "august", "september", "october", "november", "december"
+            ];
+
+            let calendarContainer = document.getElementById('calendar-container');
+            calendarContainer.innerHTML = '';
+            for (let month = 0; month < 12; month++) {
+                let monthDiv = document.createElement('div');
+                monthDiv.style.width = '30%';
+                monthDiv.style.margin = '10px';
+                monthDiv.style.textAlign = 'center';
+
+                let monthHeader = document.createElement('div');
+                monthHeader.className = `month-header ${monthClasses[month]}`;
+                monthHeader.innerText = months[month];
+                monthDiv.appendChild(monthHeader);
+
+                let table = document.createElement('table');
+                table.className = 'calendar-table';
+
+                let headerRow = document.createElement('tr');
+                for (let day = 0; day < 7; day++) {
+                    let th = document.createElement('th');
+                    th.innerText = daysOfWeek[day];
+                    if (day === 0 || day === 6) {
+                        th.className = 'weekend';
+                    }
+                    headerRow.appendChild(th);
+                }
+                table.appendChild(headerRow);
+
+                let firstDay = new Date(currentYear, month, 1).getDay();
+                let daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+
+                let row = document.createElement('tr');
+                for (let i = 0; i < firstDay; i++) {
+                    let cell = document.createElement('td');
+                    row.appendChild(cell);
+                }
+                for (let day = 1; day <= daysInMonth; day++) {
+                    if ((firstDay + day - 1) % 7 === 0 && row.children.length > 0) {
+                        table.appendChild(row);
+                        row = document.createElement('tr');
+                    }
+                    let cell = document.createElement('td');
+                    let isToday = now.getDate() === day && now.getMonth() === month && now.getFullYear() === currentYear;
+                    cell.innerHTML = isToday ? `<span class="current-day">${day}</span>` : day;
+                    if ((firstDay + day - 1) % 7 === 0 || (firstDay + day - 1) % 7 === 6) {
+                        cell.className = 'weekend';
+                    }
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+                monthDiv.appendChild(table);
+                calendarContainer.appendChild(monthDiv);
+            }
+        }
+
+        function initMap() {
+            const map = L.map('map').setView([-6.3690, 34.8888], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            L.marker([-6.3690, 34.8888]).addTo(map)
+                .bindPopup('Tanzania, Africa')
+                .openPopup();
+        }
+
+        generateCalendar();
+        initMap();
+    </script>
+</body>
+</html>
+{% endblock %}

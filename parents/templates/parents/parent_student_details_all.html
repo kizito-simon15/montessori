@@ -1,0 +1,551 @@
+{% extends "parents/parent_base.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Academic Details</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ffecd2, #fcb69f);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        h2, h3, h4, h5 {
+            color: #333;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: #007bff;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-image-container {
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .student-details {
+            text-align: left;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        .filters select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            width: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .filters select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 15px;
+            text-align: center;
+            border-color: #007bff;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #e9f7fd;
+        }
+
+        .comment-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .comment-box textarea {
+            width: 80%;
+            resize: none;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment-box button {
+            width: 20%;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .comment-box button:hover {
+            background-color: #0056b3;
+        }
+
+        .saved-comment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: darkgreen;
+            text-decoration: underline;
+        }
+
+        .edit-icon {
+            color: darkblue;
+            cursor: pointer;
+        }
+
+        .no-info-message {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .colored-text {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .highlighted-section {
+            background-color: #ffe6cc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @media print {
+            .print-button {
+                display: none !important;
+            }
+            .filters {
+                display: none !important;
+            }
+            .edit-icon, .comment-box button {
+                display: none !important;
+            }
+        }
+
+        .print-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .print-button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signature-box {
+            width: 150px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px auto;
+        }
+
+        .signature-box img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .stamp-box {
+            width: 150px;
+            height: 100px;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+
+        .stamp-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .no-signature {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .signature-container {
+            text-align: center;
+        }
+
+        .signature-container p {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Filters at the Top -->
+        <div class="filters">
+            <select id="sessionFilter" class="form-select" onchange="filterForms()">
+                <option value="">Select Session</option>
+                {% for session in sessions %}
+                    <option value="session-{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>{{ session.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="termFilter" class="form-select" onchange="filterForms()">
+                <option value="">Select Term</option>
+                {% for term in terms %}
+                    <option value="term-{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>{{ term.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="examTypeFilter" class="form-select" onchange="filterForms()">
+                <option value="">Select Exam Type</option>
+                {% for exam_type in exam_types %}
+                    <option value="exam-{{ exam_type.id }}" {% if exam_type.id == current_exam.id %}selected{% endif %}>{{ exam_type.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Content Section -->
+        <h2><u>ELEMENTS LAKEZONE PRE & PRIMARY SCHOOL</u></h2>
+        <div class="image-container">
+            <img src="{% static 'images/lake.png' %}" alt="School Logo" width="150">
+        </div>
+        <h3 style="color: darkgreen;"><u>TAARIFA YA MAENDELEO YA TAALUMA NA TABIA</u></h3>
+
+        <div class="student-info">
+            <div class="student-image-container">
+                {% if student.passport %}
+                    <img src="{{ student.passport.url }}" class="img-fluid rounded-circle" style="width: 120px; height: 120px;">
+                {% else %}
+                    <img src="{% static 'dist/img/avatar.png' %}" class="img-fluid rounded-circle" style="width: 120px; height: 120px;">
+                {% endif %}
+            </div>
+            <div class="student-details">
+                <h4 style="color: blueviolet;">Jina la mwanafunzi: <u>{{ student_name }}</u></h4>
+                <h5 style="color: blueviolet;">Namba ya usajili: <u>{{ registration_number }}</u></h5>       
+            </div>
+        </div>            
+        <div class="table-container">
+            {% for session, terms in organized_results.items %}
+                {% for term, exams in terms.items %}
+                    {% for exam_type, data in exams.items %}
+                        <div class="session-term-exam card" data-session="session-{{ session.id }}" data-term="term-{{ term.id }}" data-exam="exam-{{ exam_type.id }}">
+                            <div class="card-body">
+                                <h3 style="color: blueviolet;">
+                                    DARASA: <u>{{ student_class.name }}</u> MHULA: <u>{{ term.name }}</u> MWAKA: <u>{{ session.name }}</u> MTIHANI: <u>{{ exam_type.name }}</u>
+                                </h3>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Somo</th>
+                                            <th>Jalibio</th>
+                                            <th>Mhula</th>
+                                            <th>Wastani</th>
+                                            <th>Daraja</th>
+                                            <th>Maoni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in data.results %}
+                                        <tr>
+                                            <td>{{ result.subject.name }}</td>
+                                            <td>{{ result.test_score }}</td>
+                                            <td>{{ result.exam_score }}</td>
+                                            <td>{{ result.average }}</td>
+                                            <td>{{ result.calculate_grade }}</td>
+                                            <td>{{ result.calculate_comments }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                                <!-- Highlighted Section -->
+                                <div class="highlighted-section">
+                                    <p>
+                                    JUMLA YA ALAMA ALIZOPATA <u class="colored-text">{{ data.total_average|floatformat:"2" }}</u> KATI YA ALAMA <u class="colored-text">{{ data.total_marks|floatformat:"2" }}</u> WASTANI <u class="colored-text">{{ data.overall_average|floatformat:"2" }}</u> DARAJA <u class="colored-text">{{ data.overall_grade }}</u> NAFASI YAKE DARASANI <u class="colored-text">{{ data.position }}</u> KATI YA WANAFUNZI <u class="colored-text">{{ data.total_students }}</u>
+                                    </p>
+                                    <p><u style ="color: deepskyblue">TABIA YAKE KWA UJUMLA</u></p>
+                                    <p>A.VIZURI SANA B.VIZURI C.WASTANI D.HAFIFU F.MBAYA</p>
+
+                                    {% if data.student_info %}
+                                    <p>
+                                        Nidhamu: <u style="color: darkblue">{{ data.student_info.disprine }}</u> Michezo: <u style=" color: darkblue">{{ data.student_info.sports }}</u> Kujali Mali: <u style="color: darkblue">{{ data.student_info.care_of_property }}</u> Ushirikiano: <u style="color: darkblue">{{ data.student_info.collaborations }}</u>
+                                    </p>
+                                    <p>
+                                        Shule imefungwa tarehe: <u style="color: magenta">{{ data.student_info.date_of_closing }}</u> Itafunguliwa tarehe: <u style=" color: magenta">{{ data.student_info.date_of_opening }}</u>
+                                    </p>
+                                    <p>
+                                        Maoni ya mwalimu wa darasa: <u style="color: green">{{ data.student_info.teacher_comments }}</u>
+                                    </p>
+                                    <p>
+                                        Mwalimu mkuu: <u style=" color: green">{{ data.student_info.head_comments }}</u>
+                                    </p>
+                                    {% else %}
+                                    <p class="no-info-message">No student information available for this session, term, and exam type.</p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="signature-section">
+                                    <div class="signature-container">
+                                        <p>SAHIHI:</p>
+                                        <div class="signature-box">
+                                            {% if headmaster_signature %}
+                                                <img src="{{ headmaster_signature.signature_image.url }}" alt="Headmaster's Signature">
+                                            {% else %}
+                                                <span class="no-signature">No headmaster's signature found.</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="signature-container">
+                                        <p>MHURI:</p>
+                                        <div class="stamp-box">
+                                            <img src="{% static 'images/COMPANY.jpg' %}" alt="School Stamp">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p><u>MAONI YA MZAZI:</u></p>
+                                {% if data.parent_comment %}
+                                    <div class="saved-comment">
+                                        {% if data.parent_comment.comment %}
+                                            <textarea readonly>{{ data.parent_comment.comment }}</textarea>
+                                        {% endif %}
+                                        {% if data.parent_comment.audio_comment %}
+                                            <div>
+                                                <label>Audio Comment:</label>
+                                                <audio controls>
+                                                    <source src="{{ data.parent_comment.audio_comment.url }}" type="audio/mpeg">
+                                                    Your browser does not support the audio element.
+                                                </audio>
+                                            </div>
+                                        {% endif %}
+                                        <a href="{% url 'edit_comment' data.parent_comment.id %}" class="edit-icon">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <form method="post" enctype="multipart/form-data" class="comment-box">
+                                        {% csrf_token %}
+                                        <textarea name="comment" rows="2" class="form-control" placeholder="Enter your comments here..."></textarea>
+                                        <div class="mt-2">
+                                            <label for="audio_comment">Upload or record an audio comment:</label>
+                                            <input type="file" name="audio_comment" accept="audio/*" class="form-control">
+                                            <button type="button" class="btn btn-info mt-2" onclick="startRecording(this)">Start Recording</button>
+                                            <button type="button" class="btn btn-danger mt-2" onclick="stopRecording()">Stop Recording</button>
+                                            <audio id="audio-player" controls style="display:none;"></audio>
+                                        </div>
+                                        <input type="hidden" name="session" value="{{ session.id }}">
+                                        <input type="hidden" name="term" value="{{ term.id }}">
+                                        <input type="hidden" name="exam" value="{{ exam_type.id }}">
+                                        <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                                    </form>
+                                {% endif %}
+
+                                <p><u>MAJIBU YA MTAALUMA:</u></p>
+                                <p>
+                                    {% if data.academic_answer %}
+                                        <span class="saved-comment">{{ data.academic_answer.answer }}</span>
+                                    {% else %}
+                                        <span class="no-info-message">No academic answer available for this session, term, and exam type.</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <button class="print-button" onclick="printAllForms()">Print All Forms</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        function startRecording(buttonElement) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    audioChunks = [];
+
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audioPlayer = buttonElement.nextElementSibling.nextElementSibling;
+                        audioPlayer.src = audioUrl;
+                        audioPlayer.style.display = 'block';
+
+                        const audioInput = buttonElement.previousElementSibling;
+                        const file = new File([audioBlob], "recorded-audio.mp3", {
+                            type: 'audio/mpeg',
+                            lastModified: Date.now()
+                        });
+
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        audioInput.files = dataTransfer.files;
+                    });
+                })
+                .catch(error => {
+                    console.error("Error accessing microphone: ", error);
+                });
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+        }
+
+        function printAllForms() {
+            window.print();
+        }
+
+        function filterForms() {
+            const sessionFilter = document.getElementById('sessionFilter').value;
+            const termFilter = document.getElementById('termFilter').value;
+            const examTypeFilter = document.getElementById('examTypeFilter').value;
+            const forms = document.querySelectorAll('.session-term-exam');
+
+            forms.forEach(form => {
+                const sessionMatch = sessionFilter === "" || form.getAttribute('data-session') === sessionFilter;
+                const termMatch = termFilter === "" || form.getAttribute('data-term') === termFilter;
+                const examTypeMatch = examTypeFilter === "" || form.getAttribute('data-exam') === examTypeFilter;
+
+                if (sessionMatch && termMatch && examTypeMatch) {
+                    form.style.display = "";
+                    form.style.opacity = 1;
+                    form.style.transform = "translateY(0)";
+                } else {
+                    form.style.display = "none";
+                    form.style.opacity = 0;
+                    form.style.transform = "translateY(20px)";
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const filters = document.querySelectorAll('.filters select');
+            filters.forEach(filter => {
+                filter.style.opacity = 1;
+                filter.style.transition = "opacity 1s, transform 1s";
+            });
+
+            const content = document.querySelectorAll('.session-term-exam');
+            content.forEach(item => {
+                item.style.opacity = 0;
+                item.style.transform = "translateY(20px)";
+                item.style.transition = "opacity 1s, transform 1s";
+            });
+
+            filterForms();
+        });
+    </script>
+</body>
+</html>
+{% endblock content %}

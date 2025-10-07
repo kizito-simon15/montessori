@@ -1,0 +1,197 @@
+{#  Finance » Expenditure dashboard – rebuilt 10 Jul 2025  #}
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Expenditure Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ─── palette & base ──────────────────────────────────────────── */
+:root{
+  --indigo:#6366f1; --teal:#14b8a6; --amber:#fbbf24; --rose:#f43f5e;
+  --violet:#8b5cf6; --slate:#0f172a; --muted:#64748b;
+  --paper:#f8fafc;  --card:#ffffff;
+}
+*,*:before,*:after{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--slate);
+          font-family:Poppins,sans-serif}
+h2{margin:.2rem 0 .6rem;font-size:1.05rem;font-weight:700;letter-spacing:-.25px}
+.card{background:var(--card);border-radius:20px;padding:1.35rem 1.5rem;
+      box-shadow:0 6px 22px rgba(0,0,0,.08);opacity:0;
+      transform:translateY(46px);
+      transition:opacity .55s ease,transform .55s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+/* ─── KPI tiles ───────────────────────────────────────────────── */
+.tiles{display:grid;gap:1rem;margin-top:.95rem}
+@media(min-width:780px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{display:flex;flex-direction:column;align-items:center;color:#fff}
+.tile h3{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.4px}
+.tile p {margin:0;font-size:.78rem;font-weight:600}
+.t-indigo{background:linear-gradient(135deg,#818cf8,#6366f1)}
+.t-teal  {background:linear-gradient(135deg,#2dd4bf,#14b8a6)}
+.t-amber {background:linear-gradient(135deg,#fde047,#fbbf24)}
+.t-rose  {background:linear-gradient(135deg,#fb7185,#f43f5e)}
+/* ─── layout helpers ─────────────────────────────────────────── */
+.section{margin-top:1.4rem}
+.flex{display:flex;gap:1rem;flex-wrap:wrap}
+.item50{flex:1 1 340px}
+.table{width:100%;border-collapse:collapse;font-size:.8rem}
+.table th,.table td{padding:.46rem .6rem}
+.table thead{background:#f1f5f9}
+.table tbody tr:hover{background:rgba(0,0,0,.045)}
+.right{text-align:right}
+.danger{color:#dc2626}
+.links{display:grid;gap:.85rem;margin-top:.95rem}
+@media(min-width:560px){.links{grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}}
+.link{display:flex;align-items:center;gap:.5rem;padding:.65rem .95rem;border-radius:16px;
+      background:var(--card);text-decoration:none;color:var(--slate);
+      font-weight:600;font-size:.83rem;box-shadow:0 4px 12px rgba(0,0,0,.07);
+      transition:transform .18s}
+.link:hover{transform:translateY(-3px)}
+.alert{background:rgba(251,133,138,.15);border-left:4px solid var(--rose);
+       padding:.7rem 1.1rem;border-radius:14px;
+       color:#b91c1c;font-size:.82rem}
+canvas{user-select:none}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+/* ── graceful “no-data” overlay ─────────────────────────────── */
+Chart.register({
+  id:"nodata",
+  afterDraw(c){if(c.data.datasets.some(ds=>ds.data.some(v=>v))) return;
+    const{ctx,chartArea:{left,top,width,height}}=c;
+    ctx.save();
+    ctx.font="600 15px Poppins";ctx.fillStyle="#cbd5e1";ctx.textAlign="center";
+    ctx.fillText("No data",left+width/2,top+height/2);ctx.restore();}
+});
+/* ── page-load animations & counters ─────────────────────────── */
+document.addEventListener("DOMContentLoaded",()=>{
+  /* slide-in */
+  document.querySelectorAll(".card").forEach((c,i)=>setTimeout(()=>c.classList.add("show"),70*i));
+  /* rolling numbers */
+  const roll=(id,val)=>{
+    const el=document.getElementById(id);let n=0,step=Math.max(1,Math.ceil(val/60));
+    (function tick(){n+=step;if(n>=val){el.textContent=val.toLocaleString();return}
+      el.textContent=n.toLocaleString();requestAnimationFrame(tick)})();};
+  roll("alloc", {{ total_allocated|floatformat:0 }});
+  roll("spent", {{ spent_total|floatformat:0 }});
+  roll("rem",   {{ remaining_all|floatformat:0 }});
+  roll("risk",  {{ budgets_red|length }});
+  /* colours */
+  const ind="rgba(99,102,241,.85)",teal="rgba(20,184,166,.85)",amb="rgba(251,191,36,.85)";
+  /* stacked bar */
+  new Chart("bar",{type:"bar",
+    data:{labels:{{ chart_labels|safe }},
+          datasets:[
+            {label:"Expenditures",backgroundColor:ind ,data:{{ chart_exp|safe }}},
+            {label:"Seasonal purchases",backgroundColor:teal,data:{{ chart_pur|safe }}},
+            {label:"Processing fees",backgroundColor:amb ,data:{{ chart_proc|safe }}},
+          ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+             scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}},
+             plugins:{legend:{position:"top"}}}});
+  /* doughnut – spent vs remaining */
+  new Chart("donut",{type:"doughnut",
+    data:{labels:["Spent","Remaining"],
+          datasets:[{data:[{{ spent_total }},{{ remaining_all }}],
+                     backgroundColor:[ind,"rgba(148,163,184,.27)"],borderWidth:0}]},
+    options:{cutout:"70%",plugins:{legend:{display:false}}}});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- ───── KPI tiles ─────────────────────────────────────────────── -->
+<div class="tiles">
+  <div class="card tile t-indigo"><h3 id="alloc">0</h3><p>Allocated TZS</p></div>
+  <div class="card tile t-teal"><h3 id="spent">0</h3><p>Total Outflows</p></div>
+  <div class="card tile t-amber"><h3 id="rem">0</h3><p>Remaining</p></div>
+  <div class="card tile t-rose"><h3 id="risk">0</h3><p>Envelopes in Red</p></div>
+</div>
+
+{% if budgets_red %}
+  <div class="card section alert">
+    Warning – {{ budgets_red|length }} budget envelope{{ budgets_red|pluralize }} over-drawn.
+  </div>
+{% endif %}
+
+<!-- ───── doughnut + top budget lines ───────────────────────────── -->
+<div class="flex section">
+  <div class="card item50" style="display:flex;align-items:center;justify-content:center;height:260px">
+    <canvas id="donut" width="200" height="200"></canvas>
+  </div>
+  <div class="card item50">
+    <h2>Top Budget Lines</h2>
+    <table class="table">
+      <thead><tr><th>Line</th><th class="right">Amount</th></tr></thead><tbody>
+      {% for row in budget_totals %}
+        <tr><td>{{ row.budget_line__name }}</td>
+            <td class="right">{{ row.total|floatformat:0|intcomma }}</td></tr>
+      {% empty %}
+        <tr><td colspan="2">— none yet —</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ───── top products ──────────────────────────────────────────── -->
+<div class="flex section">
+  <div class="card item50">
+    <h2>Top Seasonal Products</h2>
+    <table class="table">
+      <thead><tr><th>Product</th><th class="right">Cost</th></tr></thead><tbody>
+      {% for p in top_seasonal %}
+        <tr><td>{{ p.product__name }}</td>
+            <td class="right">{{ p.total|floatformat:0|intcomma }}</td></tr>
+      {% empty %}<tr><td colspan="2">— none yet —</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card item50">
+    <h2>Top Kitchen Products</h2>
+    <table class="table">
+      <thead><tr><th>Product</th><th class="right">Cost</th></tr></thead><tbody>
+      {% for p in top_kitchen %}
+        <tr><td>{{ p.product__name }}</td>
+            <td class="right">{{ p.total|floatformat:0|intcomma }}</td></tr>
+      {% empty %}<tr><td colspan="2">— none yet —</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ───── monthly stacked bar ───────────────────────────────────── -->
+<div class="card section" style="height:300px">
+  <h2>{{ now|date:"Y" }} Monthly Spend</h2>
+  <canvas id="bar"></canvas>
+</div>
+
+<!-- ───── low-stock banner ──────────────────────────────────────── -->
+{% if low_stock %}
+  <div class="card section alert">
+    Low stock – {{ low_stock|length }} item{{ low_stock|pluralize }} below threshold.
+  </div>
+{% endif %}
+
+<!-- ───── quick links ────────────────────────────────────────────── -->
+<div class="card section">
+  <h2>Quick Links</h2>
+  <div class="links">
+    <a class="link" href="{% url 'budgetline_list' %}">📁 Budget Lines</a>
+    <a class="link" href="{% url 'expenditure_list' %}">💸 Expenditures</a>
+    <a class="link" href="{% url 'seasonalpurchase_list' %}">🚚 Seasonal Purchases</a>
+    <a class="link" href="{% url 'seasonalproduct_list' %}">🌾 Seasonal Products</a>
+    <a class="link" href="{% url 'kitchenpurchase_list' %}">🛒 Kitchen Purchases</a>
+    <a class="link" href="{% url 'kitchenproduct_list'  %}">🍅 Kitchen Products</a>
+    <a class="link" href="{% url 'processingbatch_list' %}">🏭 Processing Batches</a>
+    <a class="link" href="{% url 'stock_dashboard' %}">📊 Stock-on-Hand</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--accent:#d97706;--bg:#f8fafc;--radius:25px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);
+      width:90%;max-width:640px;margin:2rem auto;opacity:0;transform:translateY(20px);transition:.45s;}
+.card.show{opacity:1;transform:none;}
+.card-header{padding:.75rem 1rem;border-bottom:1px solid #e5e7eb;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.7rem);color:var(--primary);}
+.card-body{padding:1rem;display:flex;flex-direction:column;gap:.9rem;}
+.form-label{font-weight:600;margin-bottom:.25rem;font-size:.9rem;color:#374151;}
+.form-control{border:1px solid #d1d5db;border-radius:var(--radius);padding:.55rem 1rem;font-size:.95rem;width:100%;background:#f9fafb;}
+.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,58,138,.15);outline:none;}
+.text-danger{color:#dc2626;font-size:.8rem;margin-top:.25rem;}
+.btn{border:none;border-radius:var(--radius);padding:.45rem 1.1rem;font-weight:600;font-size:.9rem;
+     cursor:pointer;transition:background .15s,transform .15s;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--accent);transform:translateY(-2px);}
+.btn-secondary{background:#6b7280;color:#fff;}
+.show-pwd{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--primary);}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelector('.card').classList.add('show');
+});
+function togglePwd(id,iconId){
+  const f=document.getElementById(id);
+  const icon=document.getElementById(iconId);
+  if(f.type==='password'){
+    f.type='text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  }else{
+    f.type='password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+</script>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Update {{ user_type }} User</h2>
+  </div>
+
+  <div class="card-body">
+    {% if messages %}
+      {% for m in messages %}
+        <div class="text-danger" style="color:{% if m.tags == 'success' %}green{% endif %};">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" style="display:grid;gap:.9rem;">
+      {% csrf_token %}
+      {% for field in form %}
+        <div style="position:relative;">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.name == "password1" or field.name == "password2" %}
+            <i class="fas fa-eye show-pwd" id="icon_{{ field.id_for_label }}"
+               onclick="togglePwd('{{ field.id_for_label }}','icon_{{ field.id_for_label }}')"></i>
+          {% endif %}
+          {% if field.errors %}
+            <div class="text-danger">{{ field.errors.0 }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <div style="display:flex;gap:.6rem;justify-content:flex-end;">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;Save</button>
+        <button type="button" onclick="history.back()" class="btn btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

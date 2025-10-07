@@ -1,0 +1,172 @@
+{% extends "academic/academic_base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background: linear-gradient(to right, #f8f9fa, #e2ecef);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h2 {
+            color: #007bff;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .table {
+            background: #f1f1f1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+
+        .table td {
+            font-size: 16px;
+            padding: 15px;
+            text-align: center;
+            color: #333;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #e9f7fd;
+        }
+
+        .btn-primary, .btn-success {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .d-flex {
+            margin-top: 20px;
+        }
+
+        .d-flex .btn {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .highlight {
+            background-color: #ffe6cc;
+            color: #cc3300;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        @media print {
+            .btn-primary, .btn-success {
+                display: none;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container" data-aos="fade-up" data-aos-duration="2000">
+    <h2>Student Name: <u>{{ student_name }}</u></h2>
+    <p>Registration Number: <u>{{ registration_number }}</u></p>
+    <!-- Table to display student results -->
+    <p>Student Results: <u>{{ current_exam }}</u></p>
+    <table class="table table-bordered" data-aos="fade-up" data-aos-duration="2000">
+        <thead class="table-light">
+        <tr>
+            <th>Subject</th>
+            <th>Test Score</th>
+            <th>Exam Score</th>
+            <th>Average</th>
+            <th>Grade</th>
+            <th>Comments</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for subject, details in subjects.items %}
+        <tr data-aos="fade-up" data-aos-duration="2000">
+            <td>{{ subject }}</td>
+            <td>{{ details.test_score | default:"None" }}</td>
+            <td>{{ details.exam_score | default:"None" }}</td>
+            <td>{{ details.average }}</td>
+            <td>{{ details.grade }}</td>
+            <td>{{ details.comments }}</td>
+            <td><span class="highlight">{{ details.status }}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-primary" onclick="window.history.back()">Back</button>
+        <button class="btn btn-success" onclick="window.print()">Print</button>
+        <a class="btn btn-success" href="{% url 'academic-student-results' student_id=student_id %}">Student Information</a>
+    </div>
+</div>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- AOS JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+</body>
+</html>
+{% endblock %}

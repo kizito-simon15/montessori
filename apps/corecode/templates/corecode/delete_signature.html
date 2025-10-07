@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Signature{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #ffe6e6, #e0f7fa);
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        margin-top: 50px;
+        background: #ffffffcc;
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        animation: fadeIn 0.6s ease-in-out;
+        max-width: 600px;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #dc3545; /* bootstrap danger color */
+        text-align: center;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    h2 .emoji {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1.1rem;
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .warning-text {
+        text-align: center;
+        color: #dc3545;
+        font-weight: 600;
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+
+    .btn-confirm {
+        background-color: #dc3545;
+        color: #fff;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        margin-right: 10px;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 8px rgba(220,53,69,0.3);
+    }
+
+    .btn-confirm:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+        transform: scale(1.05);
+    }
+
+    .btn-cancel {
+        background-color: #6c757d;
+        color: #fff;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 575.98px) {
+        h2 {
+            font-size: 1.5rem;
+        }
+        p {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+    <h2>
+        <span class="emoji">⚠️😢</span> Delete Signature
+    </h2>
+    <p>Are you absolutely sure you want to delete the signature for <span style="font-weight: 600; color:#dc3545;">"{{ signature.name }}"</span>?</p>
+    <p class="warning-text"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone!</p>
+    <div class="d-flex justify-content-center">
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-confirm">
+                <i class="fas fa-trash-alt"></i> Yes, Delete
+            </button>
+            <a href="{% url 'signature_list' %}" class="btn btn-cancel">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock content %}

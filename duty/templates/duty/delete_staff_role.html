@@ -1,0 +1,112 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e6ef;
+    }
+
+    h2 {
+        color: #333;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        background-color: #ff3b30;
+        color: #fff;
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    p {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    li {
+        font-size: 15px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    li strong {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+        margin: 10px 5px;
+        color: #fff;
+        transition: background-color 0.3s;
+    }
+
+    .btn-danger {
+        background-color: #ff3b30;
+    }
+
+    .btn-danger:hover {
+        background-color: #d32f2f;
+    }
+
+    .btn-secondary {
+        background-color: #007aff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #005bb5;
+    }
+</style>
+
+<div class="container">
+    <h2>Delete Staff Role</h2>
+
+    <p>Are you sure you want to delete the following staff role?</p>
+    <ul>
+        <li><strong>Staff Name:</strong> {{ staff_role.staff }}</li>
+        <li><strong>Class:</strong> {{ staff_role.assigned_class }}</li>
+        <li><strong>Subject:</strong> 
+            {% if staff_role.subject %}
+                {{ staff_role.subject.name }}
+            {% else %}
+                N/A
+            {% endif %}
+        </li>
+        <li><strong>Is Class Teacher:</strong> {{ staff_role.is_class_teacher|yesno:"Yes,No" }}</li>
+        <li><strong>On Duty:</strong> {{ staff_role.on_duty|yesno:"Yes,No" }}</li>
+        <li><strong>Date Assigned:</strong> {{ staff_role.date_assigned }}</li>
+    </ul>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'staff-role-list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

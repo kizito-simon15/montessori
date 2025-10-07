@@ -1,0 +1,332 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    /* Styling for a modern, user-friendly interface with varied colors */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        background-color: #007aff;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .staff-on-duty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #34c759;
+        color: #ffffff;
+        padding: 8px 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .staff-on-duty .check-icon {
+        display: inline-block;
+        margin-left: 8px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        color: #34c759;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 20px;
+        text-align: center;
+    }
+
+    h3 {
+        background-color: #34c759;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    h4 {
+        color: #005bb5;
+        font-weight: bold;
+        background-color: #f0f8ff;
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .day-button {
+        display: inline-block;
+        margin: 5px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        background-color: #ffcc00;
+        color: #333333;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .day-button:hover, .day-button.active {
+        background-color: #ff9f00;
+        color: #ffffff;
+    }
+
+    .schedule-container {
+        display: none;
+    }
+
+    .schedule-container.active {
+        display: block;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+    }
+
+    th {
+        background-color: #005bb5;
+        color: #ffffff;
+        padding: 10px;
+    }
+
+    td {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+        background-color: #eef3f8;
+    }
+
+    tr:hover {
+        background-color: #e0ecf8;
+    }
+
+    .btn-create {
+        display: inline-block;
+        margin-bottom: 15px;
+        padding: 10px 20px;
+        border-radius: 20px;
+        background-color: #34c759;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-create:hover {
+        background-color: #28a745;
+    }
+
+    .class-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f7fafc;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-update, .btn-delete {
+        display: flex;
+        align-items: center;
+        padding: 6px 10px;
+        font-size: 14px;
+        color: #ffffff;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-update {
+        background-color: #007aff;
+    }
+
+    .btn-update:hover {
+        background-color: #005bb5;
+    }
+
+    .btn-delete {
+        background-color: #ff3b30;
+    }
+
+    .btn-delete:hover {
+        background-color: #e63928;
+    }
+
+    .btn-update .icon, .btn-delete .icon {
+        margin-right: 5px;
+        font-size: 16px;
+    }
+
+    .whole-day-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    /* Style for the empty field indicator */
+    .empty-field {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #ffcc00;
+        color: #333333;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="container mt-5">
+    <a href="{% url 'create-schedule' %}" class="btn-create">+ Create New Schedule</a>
+    <h2>Weekly Class Schedule</h2>
+
+    <!-- Staff on Duty -->
+    <div class="staff-on-duty">
+        Staff on Duty: {{ staff_on_duty }}
+        <span class="check-icon">✔️</span>
+    </div>
+
+    <!-- Buttons for each day -->
+    <div class="text-center mb-4">
+        {% for schedule, class_schedules in schedule_data.items %}
+        <button class="day-button" onclick="showSchedule('{{ schedule.day }}')">{{ schedule.day }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- Class schedule containers -->
+    {% for schedule, class_schedules in schedule_data.items %}
+    <div id="schedule-{{ schedule.day }}" class="schedule-container">
+        <h3>{{ schedule.day }} Schedule ({{ schedule.start_time|time:"h:i A" }} - {{ schedule.end_time|time:"h:i A" }})</h3>
+
+        {% if class_schedules %}
+            {% for class_name, schedules in class_schedules.items %}
+            <div class="class-header">
+                <h4>{{ class_name }}</h4>
+                <div class="action-buttons">
+                    {% if schedules %}
+                        <a href="{% url 'update-class-schedule' schedule.id schedules.0.id %}" class="btn-update">
+                            <span class="icon">✏️</span> Update
+                        </a>
+                        <a href="{% url 'delete-class-schedule' schedule.id schedules.0.id %}" class="btn-delete">
+                            <span class="icon">🗑️</span> Delete
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Activity Type</th>
+                        <th>Subject</th>
+                        <th>Staff</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for class_schedule in schedules %}
+                    <tr>
+                        <td>{{ class_schedule.start_time|time:"h:i A" }}</td>
+                        <td>{{ class_schedule.end_time|time:"h:i A" }}</td>
+                        <td>{{ class_schedule.activity_type }}</td>
+                        <td>
+                            {% if class_schedule.subject %}
+                                {{ class_schedule.subject.name }}
+                            {% else %}
+                                <span class="empty-field">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if class_schedule.staff %}
+                                {{ class_schedule.staff.firstname }} {{ class_schedule.staff.surname }}
+                            {% else %}
+                                <span class="empty-field">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if class_schedule.description %}
+                                {{ class_schedule.description }}
+                            {% else %}
+                                <span class="empty-field">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+            
+            <!-- Whole Day Update and Delete Buttons -->
+            <div class="whole-day-buttons">
+                <a href="{% url 'update-schedule' schedule.id %}" class="btn-update">
+                    <span class="icon">✏️</span> Update Entire Day
+                </a>
+                <a href="{% url 'delete-schedule' schedule.id %}" class="btn-delete">
+                    <span class="icon">🗑️</span> Delete Entire Day
+                </a>
+            </div>
+        {% else %}
+        <p>No class schedules available for {{ schedule.day }}.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function showSchedule(day) {
+        document.querySelectorAll('.schedule-container').forEach(container => {
+            container.classList.remove('active');
+        });
+
+        document.querySelectorAll('.day-button').forEach(button => {
+            button.classList.remove('active');
+        });
+
+        document.getElementById(`schedule-${day}`).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Show the first schedule by default if available
+    document.querySelector('.day-button')?.click();
+</script>
+{% endblock %}

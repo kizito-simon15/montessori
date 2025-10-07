@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Classes
+{% endblock title %}
+
+{% block breadcrumb %}
+<button class="btn btn-primary rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#modal1" style="font-size:0.9rem;">
+    <i class="fas fa-plus-circle"></i> Add New Class
+</button>
+{% endblock breadcrumb %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #edf2fc, #e0f7fa);
+    }
+
+    .container {
+        margin-top: 20px;
+        background: #ffffffb3;
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .page-header h1 i {
+        font-size: 1.5rem;
+        color: #478ed1;
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .search-container input {
+        border-radius: 50px;
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        width: 100%;
+        border: 1px solid #ccc;
+        color: #333;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        background-color: #fff;
+    }
+
+    .search-container input:focus {
+        border-color: #478ed1;
+        outline: none;
+        background-color: #f9fbfd;
+    }
+
+    .search-container .fa-search {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+    }
+
+    .class-card {
+        border: none;
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        position: relative;
+    }
+
+    .class-card:hover {
+        transform: translateY(-3px);
+        background-color: #f9fafb;
+    }
+
+    .class-icon {
+        font-size: 2rem;
+        margin-right: 15px;
+        color: #478ed1;
+    }
+
+    .class-info {
+        flex: 1;
+    }
+
+    .class-info h5 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .class-info p {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .action-buttons a {
+        text-decoration: none;
+        font-size: 1.2rem;
+        color: #333;
+        transition: color 0.3s ease;
+    }
+
+    .action-buttons a:hover {
+        color: #478ed1;
+    }
+
+    .no-classes {
+        text-align: center;
+        margin-top: 50px;
+        color: #777;
+        font-size: 1.1rem;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Modal styling improvements */
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+        background: #478ed1;
+        color: #fff;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+    }
+
+    .modal-header h5 {
+        font-weight: 700;
+    }
+
+    .modal-footer {
+        border-top: none;
+    }
+
+    .btn-primary {
+        background-color: #478ed1;
+        border-color: #478ed1;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #3569a5;
+        border-color: #3569a5;
+        transform: scale(1.03);
+    }
+
+    .btn-secondary {
+        border-radius: 50px;
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 50px;
+    }
+
+    @media(max-width: 575.98px) {
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        .class-info h5 {
+            font-size: 1.1rem;
+        }
+        .search-container input {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="page-header">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Classes <span style="font-size:1.5rem;">🏫</span></h1>
+        <button class="btn btn-primary rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#modal1">
+            <i class="fas fa-plus-circle"></i> Add New Class
+        </button>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="classSearch" placeholder="Search classes..." autocomplete="off">
+        <i class="fas fa-search"></i>
+    </div>
+
+    <div id="classList">
+        {% if object_list %}
+            {% for object in object_list %}
+                <div class="class-card fade-in" data-name="{{ object.name|lower }}">
+                    <div class="class-icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="class-info">
+                        <h5>{{ object.name }}</h5>
+                        <p>Foster learning and growth! 🌱</p>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'class-update' object.id %}" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'class-delete' object.id %}" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-classes">
+                <i class="fas fa-info-circle"></i> No classes found. Consider adding one.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add New Class Modal -->
+<div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'class-create' %}" method="POST" novalidate>
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add New Class</h5>
+          <button type="button" class="btn-close btn-light" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }} <span class="text-danger">*</span></label>
+            {{ field|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }} 😊</small>
+            {% endif %}
+            {% if field.errors %}
+            <div class="invalid-feedback">
+              {{ field.errors|join:", " }}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary rounded-pill"><i class="fas fa-save"></i> Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('classSearch');
+    const classCards = document.querySelectorAll('.class-card');
+
+    searchInput.addEventListener('keyup', function() {
+        const query = this.value.toLowerCase().trim();
+        let found = false;
+        classCards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            if (name.includes(query)) {
+                card.style.display = 'flex';
+                found = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const noClasses = document.querySelector('.no-classes');
+        if (!found) {
+            if (!noClasses) {
+                const noClsDiv = document.createElement('div');
+                noClsDiv.classList.add('no-classes');
+                noClsDiv.innerHTML = '<i class="fas fa-info-circle"></i> No classes match your search.';
+                document.getElementById('classList').appendChild(noClsDiv);
+            }
+        } else {
+            if (noClasses) {
+                noClasses.remove();
+            }
+        }
+    });
+});
+</script>
+{% endblock content %}

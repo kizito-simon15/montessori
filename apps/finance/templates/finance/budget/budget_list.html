@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load humanize finance_tags %}
+
+{% block title %}Budget Envelopes{% endblock %}
+
+{% block extra_css %}
+<style>
+  .fancy-card{background:#fff;border-radius:1rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .fancy-card:hover{transform:translateY(-2px);transition:.2s}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto mt-8 px-4 sm:px-6 lg:px-0 space-y-10">
+
+  {# ───── Toolbar & Filters ─────────────────────────────────────────────── #}
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-2">📦 Budget Envelopes</h1>
+
+    <div class="flex flex-wrap gap-4">
+      <form method="get" class="flex flex-wrap gap-3 items-center">
+        <select name="category" class="rounded-full border-gray-300 px-3 py-1 text-sm">
+          <option value="">All Categories</option>
+          {% for slug,label in category_choices %}
+            <option value="{{ slug }}" {% if filters.category == slug %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+
+        <select name="budget_type" class="rounded-full border-gray-300 px-3 py-1 text-sm">
+          <option value="">All Types</option>
+          {% for slug,label in type_choices %}
+            <option value="{{ slug }}" {% if filters.budget_type == slug %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+
+        <button class="rounded-full bg-gray-200 hover:bg-gray-300 px-4 py-1 text-sm">Filter</button>
+      </form>
+
+      <a href="{% url 'budget-create' %}"
+         class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow">
+        ➕ New
+      </a>
+    </div>
+  </div>
+
+  {# ───── KPI tiles (explicit – no inline tuple trick) ───────────────────── #}
+  {% widthratio total_used total_alloc 100 as used_pct %}
+  <div class="grid gap-4 md:grid-cols-4">
+
+    <div class="fancy-card p-5 border-t-4 border-indigo-500">
+      <h3 class="text-xs uppercase font-semibold text-gray-500">Allocated</h3>
+      <p class="mt-2 text-3xl font-extrabold text-indigo-600">
+        {{ total_alloc|floatformat:0|intcomma }}
+      </p>
+    </div>
+
+    <div class="fancy-card p-5 border-t-4 border-rose-500">
+      <h3 class="text-xs uppercase font-semibold text-gray-500">Used</h3>
+      <p class="mt-2 text-3xl font-extrabold text-rose-600">
+        {{ total_used|floatformat:0|intcomma }}
+      </p>
+    </div>
+
+    <div class="fancy-card p-5 border-t-4 border-emerald-500">
+      <h3 class="text-xs uppercase font-semibold text-gray-500">Remaining</h3>
+      <p class="mt-2 text-3xl font-extrabold {{ total_remain|lt:0|yesno:'text-rose-600,text-emerald-600' }}">
+        {{ total_remain|floatformat:0|intcomma }}
+      </p>
+    </div>
+
+    <div class="fancy-card p-5 border-t-4 border-amber-500">
+      <h3 class="text-xs uppercase font-semibold text-gray-500">Utilisation&nbsp;%</h3>
+      <p class="mt-2 text-3xl font-extrabold text-amber-600">
+        {{ used_pct|floatformat:0 }}%
+      </p>
+    </div>
+  </div>
+
+  {# ───── Data Table ─────────────────────────────────────────────────────── #}
+  <div class="relative overflow-x-auto fancy-card">
+    <table class="min-w-full text-sm text-gray-700 divide-y divide-gray-200">
+      <thead class="bg-gray-50 text-xs text-gray-500 uppercase font-medium">
+        <tr>
+          <th class="px-4 py-3 text-left">Envelope</th>
+          <th class="px-4 py-3">Category</th>
+          <th class="px-4 py-3">Type</th>
+          <th class="px-4 py-3">Session</th>
+          <th class="px-4 py-3 text-right">Allocated</th>
+          <th class="px-4 py-3 text-right">Used</th>
+          <th class="px-4 py-3 text-right">Remaining</th>
+          <th class="px-4 py-3 w-24 text-center">%</th>
+          <th class="px-4 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for b in budgets %}
+          {% widthratio b.used b.allocated_amount 100 as pct %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 font-semibold">{{ b.name }}</td>
+            <td class="px-4 py-3">{{ b.get_category_display }}</td>
+            <td class="px-4 py-3">{{ b.get_budget_type_display }}</td>
+            <td class="px-4 py-3">{{ b.session }}</td>
+            <td class="px-4 py-3 text-right">{{ b.allocated_amount|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-3 text-right text-rose-600">{{ b.used|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-3 text-right {{ b.remaining|lt:0|yesno:'text-rose-600,text-emerald-600' }}">
+              {{ b.remaining|floatformat:0|intcomma }}
+            </td>
+            <td class="px-4 py-3 text-center">
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="h-2.5 rounded-full {{ pct|floatformat:0|gt:80|yesno:'bg-rose-500,bg-emerald-500' }}"
+                     style="width:{{ pct }}%"></div>
+              </div>
+              <span class="text-xs text-gray-500">{{ pct|floatformat:0 }}%</span>
+            </td>
+            <td class="px-4 py-3 text-center whitespace-nowrap">
+              <a href="{% url 'budget-update' b.id %}" class="text-indigo-600 hover:text-indigo-800 mr-2" title="Edit">✏️</a>
+              <a href="{% url 'budget-delete' b.id %}" class="text-rose-600 hover:text-rose-800" title="Delete">🗑️</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9" class="px-4 py-6 text-center text-gray-500">No budget envelopes found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="title">School Locations and Access Times</h1>
+
+{% if locations %}
+    <div class="location-list">
+        {% for location in locations %}
+        <div class="location-box animate__animated animate__fadeInUp">
+            <h3>{{ location.name }}</h3>
+            <p><strong>Latitude:</strong> {{ location.latitude|floatformat:7 }}</p>
+            <p><strong>Longitude:</strong> {{ location.longitude|floatformat:7 }}</p>
+            <p><strong>Measured radius:</strong> {{ location.distance|floatformat:2 }} metres from the selected coordinates</p>
+            <p><strong>Access Days:</strong> {{ location.start_day }} to {{ location.end_day }}</p>
+            <p><strong>Access Time:</strong> {{ location.start_time }} to {{ location.end_time }}</p>
+            <p><strong>Status:</strong> 
+                {% if location.is_active %}
+                    <span class="status active">
+                        <i class="fa fa-check"></i>
+                        <i class="fa fa-check"></i>
+                        Active
+                    </span>
+                {% else %}
+                    <span class="status inactive">
+                        <i class="fa fa-ban"></i> Inactive
+                    </span>
+                {% endif %}
+            </p>
+            
+            <div class="location-actions">
+                <a href="{% url 'update_location' location.pk %}" class="btn btn-warning">
+                    <i class="fa fa-edit"></i> Update
+                </a>
+
+                {% if location.is_active %}
+                <form action="{% url 'deactivate_location' location.pk %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa fa-toggle-off"></i> Deactivate
+                    </button>
+                </form>
+                {% else %}
+                <form action="{% url 'activate_location' location.pk %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-toggle-on"></i> Activate
+                    </button>
+                </form>
+                {% endif %}
+
+                <form action="{% url 'delete_location' location.pk %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa fa-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No locations have been set.</p>
+{% endif %}
+
+<a href="{% url 'set_school_location' %}" class="btn btn-primary">Set New Location</a>
+
+<style>
+    .title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #4A90E2;
+        font-family: 'Arial', sans-serif;
+    }
+    .location-list {
+        margin-top: 20px;
+    }
+    .location-box {
+        background-color: #eef5f9;
+        border: 1px solid #cfd8dc;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .location-box:hover {
+        transform: scale(1.03);
+        background-color: #d9edf7;
+    }
+    .location-box h3 {
+        margin-top: 0;
+        font-size: 26px;
+        color: #007bff;
+    }
+    .location-box p {
+        margin: 8px 0;
+        font-size: 18px;
+        color: #2c3e50;
+    }
+    .status {
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .status.active {
+        color: #28a745;
+    }
+    .status.inactive {
+        color: #dc3545;
+    }
+    .location-actions {
+        margin-top: 15px;
+    }
+    .location-actions .btn {
+        margin-right: 10px;
+        padding: 10px 20px;
+        font-size: 18px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .location-actions .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #fff;
+    }
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: #fff;
+    }
+    .btn-secondary:hover {
+        background-color: #545b62;
+        border-color: #4e555b;
+    }
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: #fff;
+    }
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        margin-top: 20px;
+        display: inline-block;
+    }
+    .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+</style>
+
+<!-- Adding animation library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+{% endblock %}

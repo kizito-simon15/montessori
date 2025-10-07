@@ -1,0 +1,67 @@
+{% extends 'bursor/bursor_base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} Items</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* Custom CSS styles */
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .item-table th {
+            background-color: teal;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+        .item-table td {
+            border: 1px solid lightblue;
+            padding: 8px;
+        }
+        .item-table tr {
+            border-bottom: 1px solid lightblue;
+        }
+        .item-table td:first-child {
+            border-left: 1px solid lightblue;
+        }
+        .item-table td:last-child {
+            border-right: 1px solid lightblue;
+        }
+        .item-name-link {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">{{ category.name }} Items</h1>
+        <table class="item-table mt-4">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in object_list %}
+                    <tr>
+                        <td><a href="{% url 'expenditure_create' item.pk %}" class="item-name-link">{{ item.name }}</a></td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td>No items found in this category.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+{% endblock %}

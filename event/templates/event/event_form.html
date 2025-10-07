@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Include AOS library for animations -->
+<link href="{% static 'css/aos.css' %}" rel="stylesheet">
+<script src="{% static 'js/aos.js' %}"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS for animations on form load
+    AOS.init({
+      duration: 800, // Animation duration
+      once: true, // Animate only once
+    });
+  });
+</script>
+
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #f0f4f8; /* Light background for a modern look */
+    color: #333;
+  }
+
+  .form-container {
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+
+  .form-header {
+    color: #007aff; /* Primary color for iOS-like feel */
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .form-group label {
+    color: #555;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1rem;
+  }
+
+  .form-control {
+    border: 1px solid #e0e7f1;
+    border-radius: 12px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 6px rgba(0, 122, 255, 0.4);
+    outline: none;
+  }
+
+  .btn-primary {
+    background-color: #007aff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 15px;
+    color: #fff;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #005bb5;
+    transform: scale(1.03);
+  }
+
+  .btn-primary:active {
+    background-color: #004494;
+  }
+
+  /* Subtle entrance animation for elements */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="form-container" data-aos="fade-up">
+  <form method="post">
+    {% csrf_token %}
+    <!-- Check if 'event' exists to determine header text -->
+    <h1 class="form-header">
+      {% if event %} Update Event {% else %} Create Event {% endif %}
+    </h1>
+    <div class="form-group">
+      {{ form.as_p }}
+    </div>
+    <button type="submit" class="btn btn-primary">
+      {% if event %} Save Changes {% else %} Create Event {% endif %}
+    </button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- templates/all_students.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Students</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+        .fade-color {
+            transition: color 2s ease-out;
+        }
+        .fade-bg-color {
+            transition: background-color 2s ease-out;
+        }
+        .fade-in-color {
+            color: green;
+        }
+        .fade-in-bg-color {
+            background-color: lightblue;
+        }
+        .gray-color {
+            color: gray;
+        }
+        .blue-color {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 fade-in fade-in-color">
+        <h2 class="text-center mb-4 fade-in-color">Students in {{ selected_class.name }}</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <table class="table table-bordered text-center fade-bg-color">
+                    <thead class="fade-in-bg-color">
+                        <tr>
+                            <th class="gray-color">Serial Number</th>
+                            <th class="blue-color">Student Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students|dictsort:"firstname" %}
+                        <tr class="fade-in fade-color">
+                            <td class="gray-color">{{ forloop.counter }}</td>
+                            <td>
+                                <a href="{% url 'single_student' class_id=class_id student_id=student.id %}">
+                                    {{ student.firstname }} {{ student.other_name }} {{ student.surname }}
+                                </a>                        
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // JavaScript for triggering fade-in animation
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelectorAll(".fade-in").forEach(element => {
+                    element.style.opacity = 1;
+                });
+            }, 500); // Trigger after 500ms
+        });
+    </script>
+</body>
+</html>
+
+{% endblock content %}

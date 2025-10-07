@@ -1,0 +1,53 @@
+
+{# ================== expenditure_detail.html ================== #}
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--secondary:#d97706;--bg:#f1f5f9;--danger:#dc2626;--radius:25px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease;}
+.card-header{background:#fff;padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e7eb;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--primary);} 
+.card-body{padding:0.6rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+.detail-box{background:#f8fafc;border-radius:var(--radius);padding:.6rem .9rem;font-size:.9rem;}
+.btn{border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;font-size:.8rem;cursor:pointer;transition:background .15s,transform .15s;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--secondary);transform:translateY(-2px);} 
+@media(max-width:640px){.card{border-radius:10px;}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const c=document.querySelector('.card');
+  if(c){setTimeout(()=>{c.style.opacity='1';c.style.transform='translateY(0)';},80);}
+});
+</script>
+<div class="card">
+  <div class="card-header">
+    <h2>🔍 Expenditure Details</h2>
+    <a href="{% url 'expenditure_update' obj.pk %}" class="btn btn-primary">✏️ Edit</a>
+  </div>
+  <div class="card-body">
+    <div class="detail-box">
+      <strong>Item:</strong> {{ obj.item_name }}<br>
+      <strong>Date:</strong> {{ obj.date }}<br>
+      <strong>Budget Line:</strong> {{ obj.budget_line.name }}<br>
+      <strong>Amount:</strong> {{ obj.amount|floatformat:2|intcomma }} TZS<br>
+      <strong>Quantity:</strong> {{ obj.quantity|default:"—" }} {{ obj.unit|default:"" }}
+    </div>
+
+    <h3 style="color:var(--primary);font-size:1rem;margin:.4rem 0 .2rem;">Description</h3>
+    <p style="margin:0;">{{ obj.description|default:"—" }}</p>
+
+    {% if obj.attachment %}
+      <h3 style="color:var(--primary);font-size:1rem;margin:.6rem 0 .2rem;">Attachment</h3>
+      <a href="{{ obj.attachment.url }}" target="_blank" class="btn btn-primary">📎 View / Download</a>
+    {% endif %}
+
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem;">
+      <a href="{% url 'expenditure_list' %}" class="btn btn-primary">← Back to list</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

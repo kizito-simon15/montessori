@@ -1,0 +1,24 @@
+<!-- Header Section -->
+<div class="header-section" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1000px; margin-bottom: 15px;">
+    <h2 style="font-size: 24px; font-weight: bold; color: #007bff;">📊 Class Results</h2>
+    <a href="{% url 'class-list' %}" class="back-button"
+       style="font-size: 16px; font-weight: bold; background: linear-gradient(130deg, #4caf50, #2e7d32); color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none;">
+        ⬅ Back to Classes
+    </a>
+</div>
+
+<style>
+    .header-section a:hover {
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .header-section h2 {
+            font-size: 20px;
+        }
+        .back-button {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+    }
+</style>

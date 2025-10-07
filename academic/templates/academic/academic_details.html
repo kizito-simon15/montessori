@@ -1,0 +1,170 @@
+{% extends 'academic/academic_base.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="card-header" data-aos="fade-down" data-aos-duration="1000">
+  <div class="card-tools">
+    <a href="#" class="btn btn-tool" id="print-button"><i class="fas fa-print"></i> Print</a>
+    <a href="{% url 'staff-update' object.id %}" class="btn btn-tool">
+      <i class="fas fa-edit"></i>
+    </a>
+    <a href="{% url 'staff-delete' object.id %}" class="btn btn-tool">
+      <i class="fas fa-times"></i>
+    </a>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+    <div class="row mb-4" data-aos="fade-up" data-aos-duration="1000">
+      <div class="col-sm-4">
+        <div class="row mb-2">
+
+          {% if object.passport_photo %}
+            <img
+              src="{{ object.passport_photo.url }}"
+              class="float-left rounded-circle mr-3" style="width: 120px; height: 120px;">
+          {% else %}
+            <img
+              src="{% static 'dist/img/avatar.png' %}"
+              class="float-left rounded-circle mr-3" style="width: 120px; height: 120px;">
+          {% endif %}
+
+          <div class="float-right">
+            <h4>{{ object.firstname }} {{ object.middle_name }} {{ object.surname }}</h4>
+          </div>
+        </div>
+        <h5>{{ object.occupation }}</h5>
+        <h5>{{ object.get_gender_display }} | {{ object.get_current_status_display }}</h5>
+
+      </div>
+      <div class="col-sm-8">
+        <div>
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Date of Birth
+            </label>
+            <div class="col">
+              {{ object.date_of_birth }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Mobile Number
+            </label>
+            <div class="col">
+              {{ object.mobile_number }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Address
+            </label>
+            <div class="col">
+              {{ object.address }}
+            </div>
+          </div>
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Comments
+            </label>
+            <div class="col">
+              {{ object.others }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              NIDA ID
+            </label>
+            <div class="col">
+              {{ object.nida_id }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              TIN Number
+            </label>
+            <div class="col">
+              {{ object.tin_number }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Guarantor
+            </label>
+            <div class="col">
+              {{ object.guarantor }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Contract Duration
+            </label>
+            <div class="col">
+              {{ object.contract_duration }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Contract Start Date
+            </label>
+            <div class="col">
+              {{ object.contract_start_date }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Contract End Date
+            </label>
+            <div class="col">
+              {{ object.contract_end_date }}
+            </div>
+          </div>
+
+          <div class="form-group border-bottom row">
+            <label class="col">
+              Salary
+            </label>
+            <div class="col">
+              {{ object.salary }}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+{% endblock content %}
+
+{% block morejs %}
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-NkU32VZyLgnbxVuSw/5CCg9zp4xA0mxZiuDAi9g4SM/LuIbr99HyrCP4KiLlXg+T"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+    integrity="sha384-5T5l20F6jpxmo3SiRUt7KA6uP6q/eFN6wxrbykcIcSVuW0eECCqxWOjNnlpmDYBp"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // Initialize AOS
+  AOS.init();
+
+  // Function to handle printing
+  function handlePrint() {
+    window.print();
+  }
+
+  // Add click event listener to the print button
+  document.addEventListener('DOMContentLoaded', function () {
+    const printButton = document.getElementById('print-button');
+    printButton.addEventListener('click', handlePrint);
+  });
+</script>
+{% endblock morejs %}

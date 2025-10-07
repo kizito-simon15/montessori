@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% load humanize static %}
+{% block title %}💵 Student Fees Summary{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────  GLASS THEME  ───────────────────────────────────────── */
+:root{
+  --clr-bg:#f1f5f9; --clr-card:#ffffff40; --clr-primary:#3b82f6;
+  --clr-secondary:#f97316; --clr-success:#22c55e; --clr-danger:#ef4444;
+  --clr-info:#0ea5e9; --radius:18px; --shadow:0 8px 32px rgba(0,0,0,.15);
+  --blur:14px;
+}
+html,body{margin:0;background:var(--clr-bg);font-family:Inter,sans-serif;font-size:15px}
+
+/* header */
+.title-section{background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));
+  padding:2rem 1rem;color:#fff;text-align:center;border-radius:0 0 28px 28px;
+  box-shadow:var(--shadow);position:relative;width:100%}
+.title-section::after{content:"";position:absolute;inset:0;background:inherit;opacity:.35;filter:blur(60px)}
+.title-section h2{display:flex;gap:.6rem;justify-content:center;align-items:center;
+  font-size:clamp(1.8rem,5vw,2.4rem);font-weight:800;position:relative;z-index:1}
+.title-section p{margin:.5rem 0 0;opacity:.85;position:relative;z-index:1}
+
+/* KPI cards */
+.kpi-section{width:95%;margin:-50px auto 1.6rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.kpi-wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;width:100%}
+.kpi-card{flex:1 1 180px;min-width:160px;padding:1.2rem;border-radius:var(--radius);
+  background:var(--clr-card);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow);color:#fff;text-align:center;position:relative}
+.kpi-card h3{margin:0 0 .4rem;font-size:.95rem;font-weight:600;opacity:.9}
+.kpi-card span{font-size:1.6rem;font-weight:800}
+.kpi-card::after{content:"";position:absolute;inset:0;background:inherit;opacity:.25;filter:blur(40px)}
+
+/* generic buttons */
+.btn-main{display:inline-flex;gap:.5rem;align-items:center;padding:.65rem 1.6rem;border:none;border-radius:30px;font-weight:700;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,var(--clr-primary),var(--clr-secondary));box-shadow:var(--shadow);backdrop-filter:blur(var(--blur));transition:.3s}
+.btn-main:hover{transform:translateY(-3px);background:linear-gradient(135deg,var(--clr-secondary),var(--clr-primary))}
+
+/* filter bar */
+.controls{width:95%;margin:0 auto 1.6rem;padding:1.4rem;border-radius:var(--radius);
+  background:var(--clr-card);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow);
+  display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center}
+.controls input,.controls select{min-width:160px;padding:.6rem 1rem;border:none;border-radius:25px;font-weight:600;background:#ffffff70;color:#111;backdrop-filter:blur(calc(var(--blur)/2))}
+.controls input:focus,.controls select:focus{outline:2px solid var(--clr-primary)}
+.sort-btn,.view-btn,.danger-btn{border:none;border-radius:25px;padding:.6rem 1.3rem;font-weight:700;color:#fff;cursor:pointer;box-shadow:var(--shadow);backdrop-filter:blur(var(--blur))}
+.sort-btn{background:var(--clr-info)}      .sort-btn:hover{filter:brightness(1.1)}
+.view-btn{background:var(--clr-secondary)} .view-btn:hover{filter:brightness(1.1)}
+.danger-btn{background:var(--clr-danger)}  .danger-btn:hover{filter:brightness(1.1)}
+
+/* table */
+.table-wrap{width:95%;margin:0 auto 1.6rem;border-radius:var(--radius);overflow:hidden;background:var(--clr-card);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow)}
+.table-glass{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem;color:#1e293b}
+thead{background:linear-gradient(135deg,var(--clr-success),var(--clr-info));color:#fff}
+thead th{padding:1rem;font-weight:700;white-space:nowrap;font-size:.8rem;text-transform:uppercase}
+tbody tr:nth-child(even){background:#ffffff38} tbody tr:hover{background:#0ea5e93b}
+td{padding:.85rem 1rem;white-space:nowrap}
+
+/* card grid */
+.card-grid{display:none;width:95%;margin:0 auto 1.6rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.3rem}
+.card{background:var(--clr-card);border-left:6px solid var(--clr-primary);border-radius:var(--radius);padding:1.3rem;backdrop-filter:blur(var(--blur));box-shadow:var(--shadow)}
+.card h3{margin:0 0 .6rem;font-size:1.2rem;color:var(--clr-primary);font-weight:800}
+.card p{margin:.25rem 0;display:flex;gap:.4rem;align-items:center}
+.card-actions{display:flex;gap:.5rem;margin-top:.8rem}
+.card-actions a{padding:.45rem .8rem;border-radius:20px;color:#fff;font-size:.8rem;display:inline-flex;align-items:center;box-shadow:var(--shadow);backdrop-filter:blur(var(--blur))}
+.btn-view{background:var(--clr-info)} .btn-edit{background:var(--clr-success)} .btn-receipt{background:var(--clr-primary)}
+
+.no-data{text-align:center;padding:2rem;background:var(--clr-card);border-radius:var(--radius);backdrop-filter:blur(var(--blur));box-shadow:var(--shadow);color:#475569}
+@media(max-width:768px){.table-wrap{overflow-x:auto}}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header + KPI -->
+<div class="title-section">
+  <h2>📊 Student Fees Dashboard</h2>
+  <p>One record per learner • {{ page_obj.paginator.count }} students</p>
+</div>
+
+<section class="kpi-section">
+  <div class="kpi-wrap">
+    <div class="kpi-card" style="background:linear-gradient(135deg,#3b82f6cc,#60a5facc)">
+      <h3>💰 Expected</h3><span>{{ total_expected|intcomma }}</span>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#22c55ecc,#4ade80cc)">
+      <h3>✅ Paid</h3><span>{{ total_paid|intcomma }}</span>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#ef4444cc,#f87171cc)">
+      <h3>⚖️ Balance</h3><span>{{ total_balance|intcomma }}</span>
+    </div>
+  </div>
+  <div class="d-flex flex-wrap gap-3 justify-content-center mt-3">
+    <a href="{% url 'invoice-create' %}"     class="btn-main">➕ New&nbsp;Invoice</a>
+    <a href="{% url 'school-fees-create' %}" class="btn-main" style="background:linear-gradient(135deg,#f97316,#fb923c)">🏷️ Add&nbsp;Annual&nbsp;Fees</a>
+  </div>
+</section>
+
+<!-- Filters -->
+<form method="get" class="controls">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search student…">
+  <select name="class_filter">
+    <option value="">All Classes</option>
+    {% for cls in classes %}
+      <option value="{{ cls.id }}" {% if class_filter == cls.id|stringformat:"s" %}selected{% endif %}>{{ cls.name }}</option>
+    {% endfor %}
+  </select>
+  <select name="session">
+    <option value="">All Sessions</option>
+    {% for s in sessions %}
+      <option value="{{ s.id }}" {% if session_sel == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="sort-btn">🔍 Filter</button>
+  <button type="button" class="sort-btn" data-sort="student">↕️ Sort&nbsp;Name</button>
+  <button type="button" class="sort-btn" data-sort="balance">↕️ Sort&nbsp;Balance</button>
+  <button type="button" class="view-btn"   id="toggleView">🗂️ Card&nbsp;View</button>
+  <button type="button" class="danger-btn" id="bulkDelete">🗑️ Delete&nbsp;Selected</button>
+</form>
+
+<!-- TABLE VIEW -->
+<div class="table-wrap" id="tblWrap">
+<table class="table-glass" id="tbl">
+  <thead>
+    <tr>
+      <th><input type="checkbox" id="selAll"></th>
+      <th>#</th><th>Student</th><th>Class</th><th>Category</th>
+      <th>Inst.</th><th>Expected</th><th>Paid</th><th>Balance</th><th>⚙️</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in students %}
+    {% with latest=row.student.invoices.last %}
+    <tr data-name="{{ row.student.firstname }} {{ row.student.surname }}"
+        data-balance="{{ row.balance }}">
+      <td><input type="checkbox" name="ids" value="{{ latest.id }}"></td>
+      <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+      <td>{{ row.student.firstname }} {{ row.student.surname }}</td>
+      <td>{{ row.student_class.name }}</td>
+      <td>{{ row.category }}</td>
+      <td>{{ row.latest_inst.name }}</td>
+      <td>{{ row.total_expected|intcomma }}</td>
+      <td>{{ row.total_paid|intcomma }}</td>
+      <td>{{ row.balance|intcomma }}</td>
+      <td>
+        <a class="btn-view"    href="{% url 'invoice-detail' pk=latest.id %}">👁️</a>
+        <a class="btn-edit"    href="{% url 'invoice-update' pk=latest.id %}">✏️</a>
+        <a class="btn-receipt" href="{% url 'receipt-create' %}?invoice={{ latest.id }}">➕</a>
+      </td>
+    </tr>
+    {% endwith %}
+  {% empty %}
+    <tr><td colspan="10" class="no-data">No students found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<!-- CARD GRID -->
+<div class="card-grid" id="cardGrid">
+{% for row in students %}
+  {% with latest=row.student.invoices.last %}
+  <div class="card" data-name="{{ row.student.firstname }} {{ row.student.surname }}"
+       data-balance="{{ row.balance }}">
+    <h3>🎓 {{ row.student.firstname }} {{ row.student.surname }}</h3>
+    <p>🏷️ <strong>Class:</strong> {{ row.student_class.name }}</p>
+    <p>📂 <strong>Category:</strong> {{ row.category }}</p>
+    <p>🗓️ <strong>Inst.:</strong> {{ row.latest_inst.name }}</p>
+    <p>💰 <strong>Expected:</strong> {{ row.total_expected|intcomma }}</p>
+    <p>✅ <strong>Paid:</strong> {{ row.total_paid|intcomma }}</p>
+    <p>⚖️ <strong>Balance:</strong> {{ row.balance|intcomma }}</p>
+    <div class="card-actions">
+      <a class="btn-view"    href="{% url 'invoice-detail' pk=latest.id %}">👁️ View</a>
+      <a class="btn-edit"    href="{% url 'invoice-update' pk=latest.id %}">✏️ Edit</a>
+      <a class="btn-receipt" href="{% url 'receipt-create' %}?invoice={{ latest.id }}">➕ Receipt</a>
+    </div>
+  </div>
+  {% endwith %}
+{% endfor %}
+</div>
+
+<!-- PAGINATION -->
+{% if page_obj.has_other_pages %}
+<nav class="d-flex gap-2 justify-content-center mb-4">
+  {% if page_obj.has_previous %}
+    <a class="btn-main" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">« Prev</a>
+  {% endif %}
+  <span class="fw-bold d-flex align-items-center gap-2">
+    Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+  </span>
+  {% if page_obj.has_next %}
+    <a class="btn-main" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">Next »</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ─── CSRF helper ─────────────────────────────────────────────── */
+function getCookie(name){
+  const match = document.cookie.match(new RegExp('(^|;)\\s*'+name+'=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+const csrftoken = getCookie('csrftoken');
+
+/* Select-all */
+document.getElementById('selAll')?.addEventListener('change', e=>{
+  document.querySelectorAll('input[name="ids"]').forEach(cb=>cb.checked=e.target.checked);
+});
+
+/* View toggle */
+const tblWrap=document.getElementById('tblWrap');
+const cardGrid=document.getElementById('cardGrid');
+document.getElementById('toggleView')?.addEventListener('click',()=>{
+  const showTable = tblWrap.style.display !== 'none';
+  tblWrap.style.display  = showTable ? 'none'  : 'block';
+  cardGrid.style.display = showTable ? 'grid'  : 'none';
+});
+
+/* Client-side sorting */
+document.querySelectorAll('[data-sort]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const key  = btn.dataset.sort;
+    const rows = [...document.querySelectorAll('#tbl tbody tr')];
+    rows.sort((a,b)=>{
+      if(key==='student')  return a.dataset.name.localeCompare(b.dataset.name);
+      if(key==='balance')  return (+b.dataset.balance) - (+a.dataset.balance);
+      return 0;
+    });
+    rows.forEach(r=>document.querySelector('#tbl tbody').appendChild(r));
+  });
+});
+
+/* Live search filter (table + cards) */
+const searchBox = document.querySelector('.controls input[name="q"]');
+function liveFilter(term){
+  const rows  = document.querySelectorAll('#tbl tbody tr');
+  const cards = document.querySelectorAll('#cardGrid .card');
+  term = term.toLowerCase();
+  rows .forEach(r=>r.style.display = r.dataset.name.toLowerCase().includes(term) ? ''      : 'none');
+  cards.forEach(c=>c.style.display = c.dataset.name.toLowerCase().includes(term) ? 'block' : 'none');
+}
+searchBox?.addEventListener('input',e=>liveFilter(e.target.value));
+
+/* Bulk delete */
+document.getElementById('bulkDelete')?.addEventListener('click',()=>{
+  const ids=[...document.querySelectorAll('input[name="ids"]:checked')].map(cb=>cb.value);
+  if(!ids.length||!confirm(`Delete ${ids.length} invoice(s)?`)) return;
+  const body=new URLSearchParams();
+  body.append('action','bulk_delete'); ids.forEach(id=>body.append('ids',id));
+  fetch('',{
+    method:'POST',
+    headers:{'X-CSRFToken':csrftoken},
+    body
+  }).then(r=>{
+    if(r.ok) location.reload();
+    else r.text().then(t=>alert('Delete failed:\\n'+t));
+  }).catch(err=>alert(err));
+});
+</script>
+{% endblock %}

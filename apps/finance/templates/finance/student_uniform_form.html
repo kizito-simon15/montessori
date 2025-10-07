@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Include Font Awesome CSS for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+  /* Container Styling */
+  .form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 25px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  /* Header Styling */
+  .form-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ffffff;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: slideInDown 1s ease-out;
+  }
+
+  /* Form Group Styling */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+    animation: fadeInLeft 0.8s ease;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #fff;
+    background-color: rgba(255, 255, 255, 0.9);
+    animation: fadeInRight 0.8s ease;
+  }
+
+  /* Button Styling */
+  .btn-primary, .btn-secondary {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 20px;
+    border: none;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+    animation: fadeInUp 1s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    animation: fadeInUp 1s ease;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideInDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+
+<div class="form-container">
+  <h2>{% if form.instance.pk %}Update{% else %}Create{% endif %} Payment</h2>
+  <form method="post" id="studentUniformForm">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="id_student">Student:</label>
+      {{ form.student }}
+    </div>
+    <div class="form-group">
+      <label for="id_student_class">Class:</label>
+      <input type="text" id="id_student_class" value="{{ form.instance.student_class }}" disabled>
+    </div>
+    <div class="form-group">
+      <label for="id_amount">Amount:</label>
+      {{ form.amount }}
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-check-circle"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %} Payment
+    </button>
+  </form>
+  <a href="{% url 'uniform_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Cancel
+  </a>
+</div>
+{% endblock %}

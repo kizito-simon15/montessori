@@ -1,0 +1,190 @@
+<!-- apps/disprine/templates/disprine/discipline_issue_form.html -->
+
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    .form-container {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 700px;
+        margin: 0 auto;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    .form-header {
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+        animation: slideInFromTop 1s ease-in-out;
+    }
+
+    @keyframes slideInFromTop {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(0); }
+    }
+
+    .form-section {
+        margin-bottom: 20px;
+    }
+
+    .form-section label {
+        font-weight: bold;
+        color: #007bff; /* Label color */
+    }
+
+    .form-check-label {
+        margin-left: 10px;
+        color: #007bff; /* Checkbox label color */
+    }
+
+    .btn-custom {
+        width: 100%;
+        padding: 10px;
+        font-size: 18px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3;
+    }
+
+    .animated-input {
+        animation: inputFocus 0.5s ease-in-out;
+    }
+
+    @keyframes inputFocus {
+        0% { border-color: #ced4da; }
+        100% { border-color: #007bff; }
+    }
+</style>
+
+<div class="form-container mt-5">
+    <div class="form-header">
+        <h2>{% if form.instance.pk %}Edit{% else %}Report New{% endif %} Discipline Issue</h2>
+    </div>
+
+    {% if messages %}
+        <div class="alert alert-success mt-3" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="needs-validation mt-3" novalidate>
+        {% csrf_token %}
+
+        <div class="form-section">
+            <label for="student-filter" class="form-label">Filter by Student Name</label>
+            <input type="text" id="student-filter" class="form-control form-control-lg mb-3" placeholder="Type to filter students...">
+            <label for="{{ form.student.id_for_label }}" class="form-label">{{ form.student.label }}</label>
+            {{ form.student|as_crispy_field }}
+        </div>
+
+        <div class="form-section">
+            <p>Reported by:</p>
+            {{ form.reported_by_choice|as_crispy_field }}
+        </div>
+
+        <div class="form-section" id="reported_by_student_field" style="display:none;">
+            <label for="reported_by_student_filter" class="form-label">Filter by Student Name</label>
+            <input type="text" id="reported_by_student_filter" class="form-control form-control-lg mb-3" placeholder="Type to filter students...">
+            <label for="{{ form.reported_by_student.id_for_label }}" class="form-label">{{ form.reported_by_student.label }}</label>
+            {{ form.reported_by_student|as_crispy_field }}
+        </div>
+
+        <div class="form-section" id="reported_by_staff_field" style="display:none;">
+            <label for="reported_by_staff_filter" class="form-label">Filter by Staff Name</label>
+            <input type="text" id="reported_by_staff_filter" class="form-control form-control-lg mb-3" placeholder="Type to filter staff...">
+            <label for="{{ form.reported_by_staff.id_for_label }}" class="form-label">{{ form.reported_by_staff.label }}</label>
+            {{ form.reported_by_staff|as_crispy_field }}
+        </div>
+
+        <div class="form-section">
+            <label for="{{ form.issue_description.id_for_label }}" class="form-label">{{ form.issue_description.label }}</label>
+            {{ form.issue_description|as_crispy_field }}
+        </div>
+
+        <div class="form-section">
+            <label for="{{ form.action_taken.id_for_label }}" class="form-label">{{ form.action_taken.label }}</label>
+            {{ form.action_taken|as_crispy_field }}
+        </div>
+
+        <div class="form-check form-section">
+            <input class="form-check-input" type="checkbox" value="" id="{{ form.resolved.id_for_label }}" name="{{ form.resolved.name }}">
+            <label class="form-check-label" for="{{ form.resolved.id_for_label }}">
+                {{ form.resolved.label }}
+            </label>
+        </div>
+
+        <div class="form-section">
+            <label for="{{ form.issue_file.id_for_label }}" class="form-label">{{ form.issue_file.label }}</label>
+            {{ form.issue_file|as_crispy_field }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-custom">Save</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const reportedByChoices = document.querySelectorAll('input[name="reported_by_choice"]');
+    const studentField = document.getElementById('reported_by_student_field');
+    const staffField = document.getElementById('reported_by_staff_field');
+
+    reportedByChoices.forEach(choice => {
+        choice.addEventListener('change', function () {
+            if (this.value === 'student') {
+                studentField.style.display = 'block';
+                staffField.style.display = 'none';
+            } else if (this.value === 'staff') {
+                studentField.style.display = 'none';
+                staffField.style.display = 'block';
+            } else if (this.value === 'both') {
+                studentField.style.display = 'block';
+                staffField.style.display = 'block';
+            }
+        });
+    });
+
+    const inputs = document.querySelectorAll('.form-control, .form-check-input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.classList.add('animated-input');
+        });
+        input.addEventListener('blur', () => {
+            input.classList.remove('animated-input');
+        });
+    });
+
+    function filterOptions(inputId, selectId) {
+        const filterInput = document.getElementById(inputId);
+        const select = document.getElementById(selectId);
+
+        filterInput.addEventListener('input', function () {
+            const filterValue = this.value.toLowerCase();
+            const options = select.querySelectorAll('option');
+
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                option.style.display = text.includes(filterValue) ? '' : 'none';
+            });
+        });
+    }
+
+    filterOptions('student-filter', 'student-select-main');
+    filterOptions('reported_by_student_filter', 'student-select');
+    filterOptions('reported_by_staff_filter', 'staff-select');
+});
+</script>
+{% endblock %}

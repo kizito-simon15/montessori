@@ -1,0 +1,113 @@
+{# ================== expenditureinvoice_detail.html ================== #}
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{
+  --primary:#1e3a8a; --secondary:#d97706; --bg:#f1f5f9;
+  --danger:#dc2626;  --success:#16a34a; --radius:25px;
+}
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+.card{
+  background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);
+  overflow:hidden;opacity:0;transform:translateY(20px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.card-header{background:#fff;padding:.5rem 1rem;border-bottom:1px solid #e5e7eb;
+             display:flex;justify-content:space-between;align-items:center;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);
+                font-weight:700;color:var(--primary);}
+.card-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:.8rem;}
+.btn{
+  border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;
+  font-size:.8rem;cursor:pointer;transition:background .15s,transform .15s;
+}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--secondary);transform:translateY(-2px);}
+.table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.table thead{background:var(--primary);color:#fff;}
+.table th,.table td{padding:.4rem .6rem;text-align:left;border-bottom:1px solid #e5e7eb;}
+.table tbody tr:nth-child(odd){background:#f8fafc;}
+.table tbody tr:hover{background:#e2e8f0;}
+.text-end{text-align:right;}
+@media(max-width:640px){.table th,.table td{padding:.3rem;font-size:.8rem;}}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{const c=document.querySelector('.card');
+  if(c){setTimeout(()=>{c.style.opacity='1';c.style.transform='translateY(0)';},80);}
+});
+</script>
+
+<div class="card">
+  <div class="card-header">
+    <h2>💰 Invoice Deposit Details</h2>
+    <a href="{% url 'expenditureinvoice_update' invoice.pk %}" class="btn btn-primary">✏️ Edit</a>
+  </div>
+
+  <div class="card-body">
+    <!-- Summary -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;">
+      <div>
+        <strong>Date</strong><br>{{ invoice.date }}
+      </div>
+      <div>
+        <strong>Depositor</strong><br>{{ invoice.depositor_name }}
+      </div>
+      <div>
+        <strong>Academic Session</strong><br>{{ invoice.session|default:"—" }}
+      </div>
+      <div>
+        <strong>Initial Balance</strong><br>
+        {{ invoice.initial_balance|floatformat:2|intcomma }}
+      </div>
+      <div>
+        <strong>Amount Spent</strong><br>
+        {{ invoice.spent|floatformat:2|intcomma }}
+      </div>
+      <div>
+        <strong>Remaining Balance</strong><br>
+        {% if invoice.remaining < 0 %}
+          <span style="color:var(--danger);">
+            {{ invoice.remaining|floatformat:2|intcomma }}
+          </span>
+        {% else %}
+          <span style="color:var(--success);">
+            {{ invoice.remaining|floatformat:2|intcomma }}
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Linked expenditures -->
+    <h3 style="margin-top:.5rem;color:var(--primary);font-size:1rem;">Linked Expenditures</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th><th>Date</th><th>Budget Line</th>
+          <th>Item</th><th class="text-end">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exp in invoice.expenditures.all %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ exp.date }}</td>
+            <td>{{ exp.budget_line.name }}</td>
+            <td>{{ exp.item_name }}</td>
+            <td class="text-end">{{ exp.amount|floatformat:2|intcomma }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">No expenditures recorded against this deposit.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Navigation -->
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+      <a href="{% url 'expenditureinvoice_list' %}" class="btn btn-primary">← Back to list</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

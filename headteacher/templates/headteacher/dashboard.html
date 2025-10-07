@@ -1,0 +1,126 @@
+{% extends "headteacher/base.html" %}
+{% load humanize %}
+
+{% block title %}Head-Teacher Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --grad-stu: linear-gradient(135deg,#3b82f6,#2563eb);
+  --grad-staff: linear-gradient(135deg,#16a34a,#22c55e);
+  --grad-sms: linear-gradient(135deg,#f59e0b,#d97706);
+  --radius: 22px;
+  --shadow: 0 8px 22px rgba(0,0,0,.12);
+}
+.dashboard-section {
+  padding: 1rem 0;
+}
+.kpi-card {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.6rem;
+  color: #fff;
+  text-align: center;
+  transition: .25s;
+}
+.kpi-card:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+.kpi-icon {
+  font-size: 2rem;
+  opacity: .85;
+  margin-bottom: .5rem;
+}
+.kpi-title {
+  font-size: .9rem;
+  font-weight: 600;
+  opacity: .95;
+}
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 800;
+}
+.section-header {
+  font-weight: 700;
+  margin: 1rem 0 .8rem;
+  font-size: 1.1rem;
+  color: #374151;
+}
+.action-card {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.4rem;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  transition: .25s;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: center;
+}
+.action-card i {
+  font-size: 1.8rem;
+}
+.action-card:hover {
+  transform: translateY(-4px);
+  filter: brightness(1.08);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-section">
+
+  <!-- header -->
+  <h1 class="h4 fw-bold mb-4">📋 Head-Teacher Dashboard</h1>
+
+  <!-- KPI row -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="kpi-card" style="background: var(--grad-stu);">
+        <div class="kpi-icon"><i class="bi bi-mortarboard"></i></div>
+        <div class="kpi-title">Active Students</div>
+        <div class="kpi-value">{{ stats.Students.total|intcomma }}</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="kpi-card" style="background: var(--grad-staff);">
+        <div class="kpi-icon"><i class="bi bi-people"></i></div>
+        <div class="kpi-title">Active Staff</div>
+        <div class="kpi-value">{{ stats.Staff.total|intcomma }}</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="kpi-card" style="background: var(--grad-sms);">
+        <div class="kpi-icon"><i class="bi bi-chat-dots"></i></div>
+        <div class="kpi-title">SMS This Month</div>
+        <div class="kpi-value">{{ stats.SMS.total|intcomma }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="section-header">⚡ Quick Actions</div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <a href="{% url 'headteacher_student_list' %}" class="action-card" style="background: var(--grad-stu);">
+        <i class="bi bi-mortarboard"></i>
+        Manage Students
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% url 'staff-list' %}" class="action-card" style="background: var(--grad-staff);">
+        <i class="bi bi-people"></i>
+        Manage Staff
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% url 'send_sms_form' %}" class="action-card" style="background: var(--grad-sms);">
+        <i class="bi bi-chat-dots"></i>
+        Send SMS
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

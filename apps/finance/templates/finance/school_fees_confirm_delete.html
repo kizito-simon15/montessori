@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Delete School Fees{% endblock title %}
+
+{% block content %}
+<style>
+:root {
+    --primary: #1e40af;
+    --secondary: #f59e0b;
+    --accent: #9333ea;
+    --success: #10b981;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --background: #f3f4f6;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--background);
+    margin: 0;
+    min-height: 100vh;
+}
+
+.title-section {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    margin-bottom: 0;
+    animation: fadeIn 0.5s ease;
+}
+
+.title-section h2 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.card-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    animation: slideUp 0.5s ease;
+    text-align: center;
+}
+
+.btn-danger {
+    border-radius: 50px;
+    font-weight: 600;
+    background: var(--danger);
+    border: none;
+    color: #fff;
+    padding: 0.85rem 2rem;
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow);
+}
+
+.btn-danger:hover {
+    transform: translateY(-3px);
+    background: #b91c1c;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    border-radius: 50px;
+    font-weight: 600;
+    background: var(--secondary);
+    border: none;
+    color: #fff;
+    padding: 0.85rem 2rem;
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    background: #d97706;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+
+<div data-aos="fade-up">
+    <div class="title-section">
+        <h2><i class="fas fa-trash-alt"></i> Delete School Fees</h2>
+    </div>
+
+    <div class="card-container" data-aos="fade-up" data-aos-delay="400">
+        <p>Are you sure you want to delete the school fees record for <strong>{{ object.student.firstname }} {{ object.student.surname }}</strong> in session <strong>{{ object.session.name }}</strong>?</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger"><i class="fas fa-trash"></i> Confirm Delete</button>
+            <a href="{% url 'school-fees-list' %}" class="btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 1000, once: true });
+</script>
+{% endblock %}

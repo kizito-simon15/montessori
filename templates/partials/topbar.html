@@ -1,0 +1,225 @@
+{% load static %}
+
+<header class="vs-topbar topbar">
+  <!-- brand -->
+  <a href="{% url 'dashboard' %}" class="vs-brand" aria-label="Maria Montessori Dashboard">
+    <img src="{% static 'img/logo.png' %}" alt="Maria Montessori Logo" class="vs-logo" loading="lazy">
+    Maria&nbsp;Montessori
+  </a>
+
+  <!-- search (desktop) -->
+  <div class="vs-search">
+    <label for="globalSearch" class="sr-only">Quick search</label>
+    <input id="globalSearch" type="search" placeholder="🔍 Quick search…" aria-label="Search dashboard">
+  </div>
+
+  <!-- right-hand tools -->
+  <div class="vs-tools">
+    <span class="vs-academic d-none d-xl-inline">
+      📅 {{ current_session }} • {{ current_term }}
+    </span>
+
+    <button class="vs-icon position-relative" aria-label="View notifications">
+      🛎️
+      {% if notification_count %}
+        <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+          {{ notification_count }}
+        </span>
+      {% endif %}
+    </button>
+
+    <button id="dmBtn" class="vs-icon" aria-label="Toggle dark mode">🌙</button>
+
+    <div class="dropdown">
+      <button class="vs-avatar" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User profile menu">
+        {% if request.user.is_authenticated and request.user.profile.avatar %}
+          <img src="{{ request.user.profile.avatar.url }}" alt="User avatar" loading="lazy">
+        {% else %}
+          <img src="{% static 'img/logo.png' %}" alt="Maria Montessori Logo" loading="lazy">
+        {% endif %}
+      </button>
+
+      <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-lg mt-2 text-sm">
+        {% if request.user.is_authenticated %}
+          <li><h6 class="dropdown-header">{{ request.user.get_full_name|default:request.user.username }}</h6></li>
+          <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person me-2"></i> My Profile</a></li>
+          <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+        {% else %}
+          <li><a class="dropdown-item" href="{% url 'custom_login' %}"><i class="bi bi-box-arrow-in-right me-2"></i> Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- Custom CSS -->
+<style>
+:root {
+  --clr-primary: #1d4ed8; /* Vibrant Blue */
+  --clr-accent: #93c5fd; /* Light Blue */
+  --clr-complementary: #2dd4bf; /* Teal */
+  --clr-neutral: #1f2937; /* Dark Gray */
+}
+
+.vs-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1053;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1.25rem;
+  height: 64px;
+  color: #fff;
+  background: linear-gradient(90deg, var(--clr-complementary), var(--clr-primary));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.vs-brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.vs-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.vs-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 18px;
+  transition: background 0.2s ease;
+}
+
+.vs-icon:hover {
+  background: var(--clr-accent);
+}
+
+.vs-search {
+  flex: 1 1 max(0, 1);
+  max-width: 380px;
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .vs-search {
+    display: block;
+  }
+}
+
+.vs-search input {
+  width: 100%;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.vs-search input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.vs-search input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 2px var(--clr-accent);
+}
+
+.vs-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vs-academic {
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.vs-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #fff;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vs-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px var(--clr-accent);
+}
+
+.dropdown-menu {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+}
+
+.dropdown-item {
+  color: var(--clr-neutral);
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: var(--clr-accent);
+  color: #fff;
+}
+
+.dropdown-header {
+  color: var(--clr-neutral);
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.75rem 1.25rem;
+}
+
+.dropdown-divider {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 0.5rem 0;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Ensure dropdown functionality
+  document.querySelectorAll('.dropdown-toggle').forEach(item => {
+    item.addEventListener('click', () => {
+      const dropdown = bootstrap.Dropdown.getOrCreateInstance(item);
+      dropdown.toggle();
+    });
+  });
+});
+</script>

@@ -1,0 +1,21 @@
+<!-- templates/check_balance.html -->
+
+{% extends 'secretary/base_secretary.html' %}
+
+{% block title %}Check Balance{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>{{ error }}</p>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">Credit Balance</h4>
+            <p>{{ balance }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

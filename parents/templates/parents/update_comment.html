@@ -1,0 +1,19 @@
+<!-- parents/update_comment.html -->
+{% extends 'parents/parent_base.html' %}
+{% load static %}
+
+{% block title %}Update Comment{% endblock title %}
+
+{% block content %}
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <h2>Update Comment</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.comment.label_tag }}
+      {{ form.comment }}
+    </div>
+    <button type="submit" class="btn btn-primary">Update Comment</button>
+  </form>
+</div>
+{% endblock content %}

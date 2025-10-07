@@ -1,0 +1,109 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-end mb-3">
+        <div class="col-auto">
+            <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Print</button>
+        </div>
+    </div>
+    <h1 class="text-center text-primary mb-4">{{ category.name }} Expenditures</h1>
+
+    <!-- Filter Inputs -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <input type="text" id="itemNameFilter" class="form-control" placeholder="Filter by Item Name" onkeyup="filterTable()">
+        </div>
+        <div class="col-md-4">
+            <input type="date" id="dateFilter" class="form-control" onchange="filterTable()">
+        </div>
+    </div>
+
+    <!-- Display Total Amount -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h4 class="text-success">Total Amount: <span id="totalAmount">{{ total_expenditure_amount|floatformat:2|intcomma }}</span></h4>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th>Date</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Attachment</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="expenditureTable">
+                {% for expenditure in expenditures %}
+                    <tr>
+                        <td>{{ expenditure.date|date:"m/d/Y" }}</td>
+                        <td>{{ expenditure.item_name }}</td>
+                        <td>{{ expenditure.quantity }}</td>
+                        <td class="amount">{{ expenditure.amount|floatformat:2|intcomma }}</td>
+                        <td>{{ expenditure.description }}</td>
+                        <td>
+                            {% if expenditure.attachment %}
+                                <a href="{{ expenditure.attachment.url }}" download class="text-decoration-none text-primary">{{ expenditure.attachment.name }}</a>
+                            {% else %}
+                                <span class="text-muted">No attachment</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'bursor_expenditure_edit' expenditure.pk %}" class="btn btn-warning btn-sm text-white"><i class="fas fa-edit"></i> Edit</a>
+                            <a href="{% url 'bursor_expenditure_delete' expenditure.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Total expenditure amount and total balance -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-auto">
+            <p class="font-weight-bold text-success">Total Expenditure Amount: <span>{{ total_expenditure_amount|floatformat:2|intcomma }}</span></p>
+        </div>
+        <div class="col-auto">
+            <p class="font-weight-bold text-info">Total Balance: <span>{{ total_balance|intcomma }}</span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterTable() {
+        var itemNameInput = document.getElementById('itemNameFilter').value.toUpperCase();
+        var dateInput = document.getElementById('dateFilter').value;
+        var table = document.getElementById('expenditureTable');
+        var rows = table.getElementsByTagName('tr');
+        var totalAmount = 0;
+
+        for (var i = 0; i < rows.length; i++) {
+            var itemName = rows[i].getElementsByTagName('td')[1].textContent.toUpperCase();
+            var dateText = rows[i].getElementsByTagName('td')[0].textContent;
+
+            var dateParts = dateText.split('/');
+            var tableDate = dateParts[2] + '-' + ('0' + dateParts[0]).slice(-2) + '-' + ('0' + dateParts[1]).slice(-2);
+
+            var itemNameMatch = itemName.indexOf(itemNameInput) > -1 || itemNameInput === '';
+            var dateMatch = (dateInput === tableDate) || dateInput === '';
+
+            if (itemNameMatch && dateMatch) {
+                rows[i].style.display = '';
+                totalAmount += parseFloat(rows[i].getElementsByClassName('amount')[0].textContent.replace(/,/g, ''));
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+
+        // Update the total amount displayed
+        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+</script>
+{% endblock %}

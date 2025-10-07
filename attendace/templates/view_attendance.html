@@ -1,0 +1,137 @@
+<!-- view_attendance.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Attendance</title>
+    <!-- Link Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            text-align: center; /* Align all contents at the center */
+        }
+        h2 {
+            color: cyan; /* Set the color of the h2 element to cyan */
+        }
+        .current-info {
+            color: red; /* Set the color of the current session and term to red */
+        }
+        .attendance-table {
+            width: 100%;
+            border: 2px solid #000;
+            transition: border-color 0.5s ease; /* Add transition effect for border color change */
+        }
+        .attendance-table th, .attendance-table td {
+            border: 1px solid #000;
+            text-align: center;
+        }
+        .serial-header {
+            color: gray; /* Set the color of the serial number header to gray */
+        }
+        .serial-number {
+            color: gray; /* Set the color of the serial numbers to gray */
+        }
+        .student-name-header {
+            color: chocolate; /* Set the color of the student names header to chocolate */
+        }
+        .student-name {
+            color: chocolate; /* Set the color of the displayed student names to chocolate */
+        }
+        .present-header {
+            color: green; /* Set the color of the Present header to green */
+        }
+        .absent-header {
+            color: brown; /* Set the color of the Absent header to brown */
+        }
+        .permission-header {
+            color: blue; /* Set the color of the Permission header to yellow */
+        }
+        .present {
+            color: green;
+        }
+        .absent {
+            color: red;
+        }
+        .permission {
+            color: blue;
+        }
+        /* Style for the permission circle */
+        .permission-circle {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: blue;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Attendance for {{ attendance_date }}</h2>
+        <p class="current-info">Current Session: {{ current_session }}</p>
+        <p class="current-info">Current Term: {{ current_term }}</p>
+        <table id="attendanceTable" class="table table-bordered attendance-table">
+            <thead>
+                <tr>
+                    <th class="serial-header">Serial No.</th>
+                    <th class="student-name-header">Student Name</th>
+                    <th class="present-header">Present</th>
+                    <th class="absent-header">Absent</th>
+                    <th class="permission-header">Permission</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances %}
+                <tr>
+                    <td class="serial-number">{{ forloop.counter }}</td>
+                    <td class="student-name">{{ attendance.student.firstname }} {{ attendance.student.other_name }} {{ attendance.student.surname }}</td>
+                    <td class="present">
+                        {% if attendance.present %}
+                            &#10004;
+                        {% endif %}
+                    </td>
+                    <td class="absent">
+                        {% if attendance.absent %}
+                            &#10060;
+                        {% endif %}
+                    </td>
+                    <td class="permission">
+                        {% if attendance.permission %}
+                            <div class="permission-circle">P</div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td class="present"><strong>{{ total_present }}</strong></td>
+                    <td class="absent"><strong>{{ total_absent }}</strong></td>
+                    <td class="permission"><strong>{{ total_permission }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <script>
+        setInterval(changeBorderColor, 5000); // Change border color every 5 seconds
+    
+        function changeBorderColor() {
+            const table = document.getElementById('attendanceTable');
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#ffff00']; // Array of colors
+            const currentColor = table.style.borderColor;
+            const currentIndex = colors.indexOf(currentColor);
+            const nextIndex = (currentIndex + 1) % colors.length; // Get the index of the next color
+            table.style.borderColor = colors[nextIndex]; // Set the border color to the next color
+        }
+    </script>
+</body>
+</html>
+
+{% endblock content %}

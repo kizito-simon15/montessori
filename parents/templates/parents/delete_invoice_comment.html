@@ -1,0 +1,24 @@
+{% extends 'parents/parent_base.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="card-header bg-primary text-white">
+  <div class="card-tools">
+    <button class="btn btn-outline-light btn-sm" onclick="printPage()">Print</button>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<h2 class="text-primary"><u>Delete Comment for Invoice {{ comment.invoice.id }}</u></h2>
+<br>
+<p>Are you sure you want to delete this comment?</p>
+<p>{{ comment.comment }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Delete</button>
+  <a href="{% url 'parent_student_invoices' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock content %}

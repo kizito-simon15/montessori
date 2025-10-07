@@ -1,0 +1,221 @@
+{% extends "parents/parent_base.html" %}
+{% load static %}
+{% block content %}
+<style>
+    .container {
+        background-color: #f2f2f2;
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #007aff;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 15px;
+        background-color: #fff;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #007aff;
+        box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+    }
+
+    button {
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #007aff;
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #006ae6;
+    }
+
+    .btn-secondary {
+        background-color: #d1d1d6;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background-color: #b1b1b6;
+    }
+
+    .btn-info {
+        background-color: #34c759;
+        color: #fff;
+    }
+
+    .btn-info:hover {
+        background-color: #28a745;
+    }
+
+    .btn-danger {
+        background-color: #ff3b30;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #e02e24;
+    }
+
+    audio {
+        width: 100%;
+        margin-top: 15px;
+        border-radius: 10px;
+    }
+
+    #audio-player {
+        display: none;
+    }
+
+    #recordingIndicator {
+        display: none;
+        color: #ff3b30;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .comment-preview {
+        background-color: #e6e6e6;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .comment-preview textarea {
+        background-color: #fff;
+        border: none;
+        resize: none;
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2>Edit Comment</h2>
+    <div class="comment-preview">
+        <h5>Previous Comment:</h5>
+        {% if comment.comment %}
+            <textarea class="form-control" rows="3" readonly>{{ comment.comment }}</textarea>
+        {% else %}
+            <p class="text-muted">No previous text comment available.</p>
+        {% endif %}
+
+        {% if comment.audio_comment %}
+            <h5 class="mt-3">Previous Audio Comment:</h5>
+            <audio controls>
+                <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        {% else %}
+            <p class="text-muted mt-2">No previous audio comment available.</p>
+        {% endif %}
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-group">
+            <label for="audio_comment">Upload or record a new audio comment:</label>
+            <input type="file" name="audio_comment" accept="audio/*" class="form-control mb-2" id="audio-file-input">
+            <div class="d-flex mt-2">
+                <button type="button" class="btn btn-info me-2" onclick="startRecording(this)">Start Recording</button>
+                <button type="button" class="btn btn-danger" onclick="stopRecording()" disabled id="stopRecordingBtn">Stop Recording</button>
+            </div>
+            <p id="recordingIndicator" class="mt-2">Recording... <span id="recordingTime">0</span> seconds</p>
+            <audio id="audio-player" controls></audio>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Save changes</button>
+        <a href="{% url 'parent_student_details_all' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+    let recordingTime = 0;
+    let recordingInterval;
+
+    function startRecording(buttonElement) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                audioChunks = [];
+
+                buttonElement.disabled = true;
+                document.getElementById('stopRecordingBtn').disabled = false;
+                document.getElementById('recordingIndicator').style.display = 'block';
+                recordingTime = 0;
+                document.getElementById('recordingTime').textContent = recordingTime;
+
+                recordingInterval = setInterval(() => {
+                    recordingTime++;
+                    document.getElementById('recordingTime').textContent = recordingTime;
+                }, 1000);
+
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener("stop", () => {
+                    clearInterval(recordingInterval);
+                    document.getElementById('recordingIndicator').style.display = 'none';
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioPlayer = document.getElementById('audio-player');
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.display = 'block';
+
+                    const audioInput = document.getElementById('audio-file-input');
+                    const file = new File([audioBlob], "recorded-audio.mp3", {
+                        type: 'audio/mpeg',
+                        lastModified: Date.now()
+                    });
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    audioInput.files = dataTransfer.files;
+
+                    buttonElement.disabled = false;
+                });
+            })
+            .catch(error => {
+                console.error("Error accessing microphone: ", error);
+                alert("Failed to access the microphone. Please check your device settings.");
+            });
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+            document.getElementById('stopRecordingBtn').disabled = true;
+        }
+    }
+</script>
+{% endblock %}

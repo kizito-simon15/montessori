@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Academic Analytics - St. John Paul II Secondary School
+{% endblock title %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #00b7eb;
+        --secondary: #5856d6;
+        --success: #34c759;
+        --danger: #ff3b30;
+        --warning: #ff9500;
+        --info: #5ac8fa;
+        --light: #f2f2f7;
+        --dark: #1c2526;
+        --background: #e6f7ff;
+        --section-bg: #ffffff;
+        --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-family);
+        color: #000000;
+        background: var(--background);
+        padding: 0;
+        margin: 0;
+    }
+
+    .dark-mode {
+        background: var(--dark);
+        color: #ffffff;
+    }
+
+    .dark-mode .dashboard-header,
+    .dark-mode .shadow-card {
+        background: #2c2c2e;
+    }
+
+    .dark-mode .dashboard-section-title {
+        color: var(--primary);
+    }
+
+    .dark-mode .list-group-item {
+        background: #3a3a3c;
+        color: #ffffff;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary), #0095c7);
+        color: #ffffff;
+        text-align: center;
+        padding: 1rem;
+        margin: 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-header h1 {
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .dashboard-header .lead {
+        font-size: 0.9rem;
+        margin: 0.3rem 0 0;
+    }
+
+    .dashboard-section-title {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-emoji {
+        font-size: 1.3rem;
+    }
+
+    .shadow-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(15px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeIn 0.8s ease forwards;
+    }
+
+    .shadow-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-group-item {
+        background: var(--section-bg);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        padding: 0.8rem;
+        transition: transform 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        border: none;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary:hover {
+        background: #0095c7;
+        transform: translateY(-2px);
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+    }
+
+    .col-md-3, .col-md-4, .col-md-6, .col-md-12 {
+        padding: 0 0.5rem;
+        box-sizing: border-box;
+    }
+
+    .col-md-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    .col-md-4 {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
+
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .col-md-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .col-md-3, .col-md-4, .col-md-6, .col-md-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .dashboard-section-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>📚 Academic Analytics</h1>
+    <p class="lead mb-0">
+        St. John Paul II Secondary School<br>
+        <small>As of May 26, 2025, 02:51 AM EAT</small>
+    </p>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<h3 class="dashboard-section-title"><span class="section-emoji">🏆</span> Top Performing Classes</h3>
+<div class="row">
+    {% for class, avg in top_classes %}
+        <div class="col-md-4">
+            <div class="shadow-card">
+                <h5>{{ class }}</h5>
+                <p class="text-muted">Average: {{ avg|floatformat:1 }}%</p>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-md-12">
+            <div class="shadow-card">
+                <p class="text-muted">No top-performing classes available.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<h3 class="dashboard-section-title"><span class="section-emoji">⚠️</span> Subjects Needing Attention</h3>
+<div class="row">
+    {% for subject in low_performing_subjects %}
+        <div class="col-md-3">
+            <div class="shadow-card list-group-item" style="border-left: 3px solid var(--danger);">
+                <h5>{{ subject }}</h5>
+                <p class="text-muted">Low Performance</p>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-md-12">
+            <div class="shadow-card">
+                <p class="text-muted">No subjects currently need intervention.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<h3 class="dashboard-section-title"><span class="section-emoji">🔗</span> Explore Academic Analytics</h3>
+<div class="row">
+    <div class="col-md-3">
+        <div class="shadow-card">
+            <h5>Class Performance Trends</h5>
+            <p class="text-muted">View performance trends across classes.</p>
+            <a href="{% url 'performance_trends' %}" class="btn-primary">Explore</a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="shadow-card">
+            <h5>Subject Trends</h5>
+            <p class="text-muted">Analyze subject performance over time.</p>
+            <a href="{% url 'subject_trends' %}" class="btn-primary">Explore</a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="shadow-card">
+            <h5>Student Trends</h5>
+            <p class="text-muted">Track individual student progress.</p>
+            <a href="{% url 'student_trends' %}" class="btn-primary">Explore</a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="shadow-card">
+            <h5>Subject Clusters</h5>
+            <p class="text-muted">Cluster subjects by performance levels.</p>
+            <a href="{% url 'subject_clusters' %}" class="btn-primary">Explore</a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="shadow-card">
+            <h5>Student Comparison</h5>
+            <p class="text-muted">Compare students within a class.</p>
+            <a href="{% url 'performance_overview' %}" class="btn-primary">Explore</a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="shadow-card">
+            <h5>Subject Intervention</h5>
+            <p class="text-muted">Identify subjects needing intervention.</p>
+            <a href="{% url 'subject_intervention' %}" class="btn-primary">Explore</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

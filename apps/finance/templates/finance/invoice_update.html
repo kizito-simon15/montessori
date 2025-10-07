@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load widget_tweaks humanize %}
+
+{% block title %}
+Update School Fees Invoice {{ object }}
+{% endblock title %}
+
+{% block content %}
+<style>
+:root {
+    --primary: #1e3a8a;
+    --secondary: #d97706;
+    --sidebar-bg: #2e1065;
+    --sidebar-hover: #a78bfa;
+    --sidebar-active: #6d28d9;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --info: #0284c7;
+}
+
+body {
+    background: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;
+    max-width: 1100px;
+    animation: slideInDown 0.5s ease;
+}
+
+.card-header {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 1rem;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-header h4 {
+    font-size: clamp(1.2rem, 4vw, 1.4rem);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.form-section-title {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    font-weight: 600;
+    color: var(--primary);
+    margin: 1rem 0 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-text {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 25px;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #333;
+    background: #f9fafb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    outline: none;
+}
+
+.form-check-input {
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.text-danger {
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: var(--danger);
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    border-radius: 25px;
+    font-weight: 600;
+    background: var(--primary);
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    border-radius: 25px;
+    font-weight: 600;
+    background: #6b7280;
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.col-md-6 {
+    flex: 1;
+    min-width: 300px;
+}
+
+.alert-danger {
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    background: #fee2e2;
+    color: var(--danger);
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .col-md-6 { min-width: 100%; }
+}
+</style>
+
+<div class="card" data-aos="fade-up">
+    <div class="card-header">
+        <h4><i class="fas fa-edit"></i> Update School Fees Invoice {{ object }}</h4>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="m-0" style="color: var(--secondary); font-weight: 600;">
+                <i class="fas fa-file-invoice"></i> Editing Invoice
+            </h4>
+            <a href="{% url 'invoice-detail' object.id %}" class="btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Details
+            </a>
+        </div>
+
+        <form method="POST" data-aos="fade-up" data-aos-delay="200">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <h5 class="form-section-title"><i class="fas fa-file"></i> Main Invoice Fields</h5>
+            <div class="row">
+                {% for field in form %}
+                    {% if field.name not in 'item_description item_amount' %}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    {% if field.name == 'student' %}<i class="fas fa-user"></i>{% endif %}
+                                    {% if field.name == 'session' %}<i class="fas fa-calendar"></i>{% endif %}
+                                    {% if field.name == 'installment' %}<i class="fas fa-list"></i>{% endif %}
+                                    {% if field.name == 'class_for' %}<i class="fas fa-school"></i>{% endif %}
+                                    {% if field.name == 'balance_from_previous_install' %}<i class="fas fa-money-bill"></i>{% endif %}
+                                    {% if field.name == 'status' %}<i class="fas fa-toggle-on"></i>{% endif %}
+                                    {{ field.label }}
+                                    {% if field.required %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                {{ field|add_class:"form-select form-control" }}
+                                <small class="form-text text-muted">{{ field.help_text|default_if_none:"" }}</small>
+                                {% if field.errors %}
+                                    <div class="text-danger">{{ field.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-tag"></i> School Fees Description</label>
+                        {{ form.item_description|add_class:"form-control" }}
+                        <small class="form-text text-muted">E.g. School Fees for Term.</small>
+                        {% if form.item_description.errors %}
+                            <div class="text-danger">{{ form.item_description.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-coins"></i> School Fees Amount</label>
+                        {{ form.item_amount|add_class:"form-control" }}
+                        <small class="form-text text-muted">E.g. 50000 (no commas).</small>
+                        {% if form.item_amount.errors %}
+                            <div class="text-danger">{{ form.item_amount.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="form-section-title"><i class="fas fa-list"></i> School Fees Items</h5>
+            <p class="form-text">Add or edit items for this invoice.</p>
+            {{ items.management_form }}
+            {% for form_item in items %}
+                {{ form_item.id }}
+                <div class="row align-items-end mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-tag"></i> Description</label>
+                            {{ form_item.description|add_class:"form-control" }}
+                            {% if form_item.description.errors %}
+                                <div class="text-danger">{{ form_item.description.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-coins"></i> Amount</label>
+                            {{ form_item.amount|add_class:"form-control" }}
+                            {% if form_item.amount.errors %}
+                                <div class="text-danger">{{ form_item.amount.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {% if form_item.DELETE %}
+                            <div class="form-check">
+                                {{ form_item.DELETE }}
+                                <label class="form-check-label" for="{{ form_item.DELETE.id_for_label }}">Remove</label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <h5 class="form-section-title"><i class="fas fa-receipt"></i> School Fees Receipts</h5>
+            <p class="form-text">Add or edit receipts for this invoice.</p>
+            {{ receipts.management_form }}
+            {% for receipt_form in receipts %}
+                {{ receipt_form.id }}
+                <div class="row align-items-end mb-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-money-bill-wave"></i> Amount Paid</label>
+                            {{ receipt_form.amount_paid|add_class:"form-control" }}
+                            {% if receipt_form.amount_paid.errors %}
+                                <div class="text-danger">{{ receipt_form.amount_paid.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Date Paid</label>
+                            {{ receipt_form.date_paid|add_class:"form-control" }}
+                            {% if receipt_form.date_paid.errors %}
+                                <div class="text-danger">{{ receipt_form.date_paid.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-comment"></i> Comment</label>
+                            {{ receipt_form.comment|add_class:"form-control" }}
+                            {% if receipt_form.comment.errors %}
+                                <div class="text-danger">{{ receipt_form.comment.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-credit-card"></i> Payment Method</label>
+                            {{ receipt_form.payment_method|add_class:"form-select form-control" }}
+                            {% if receipt_form.payment_method.errors %}
+                                <div class="text-danger">{{ receipt_form.payment_method.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        {% if receipt_form.DELETE %}
+                            <div class="form-check">
+                                {{ receipt_form.DELETE }}
+                                <label class="form-check-label" for="{{ receipt_form.DELETE.id_for_label }}">Remove</label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="text-end">
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 1000, once: true });
+</script>
+{% endblock %}

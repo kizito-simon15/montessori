@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{# ------------------------------------------------------------------ #}
+{#  Generic “Modern iPhone” form shell                               #}
+{# ------------------------------------------------------------------ #}
+{% block title %}Form{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  input,select,textarea{
+    transition:box-shadow .15s ease,border-color .15s ease;
+  }
+  input:focus,select:focus,textarea:focus{
+    border-color:#6366f1;
+    box-shadow:0 0 0 3px rgba(99,102,241,.30);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-lg w-full mx-auto mt-6 px-4 sm:px-0">
+  <div class="bg-white shadow-lg rounded-2xl p-6">
+    <h1 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      {% block heading %}📝 Form{% endblock %}
+    </h1>
+
+    <form method="post" enctype="multipart/form-data"
+          action="{% block form_action %}{% endblock %}"
+          class="space-y-5">
+      {% csrf_token %}
+
+      {# ─── hidden fields (e.g. category, school_fees) ─── #}
+      {% for h in form.hidden_fields %}{{ h }}{% endfor %}
+
+      {% if form.non_field_errors %}
+        <div class="rounded-md bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+          {{ form.non_field_errors.as_ul }}
+        </div>
+      {% endif %}
+
+      {# ─── visible fields rendered automatically ─── #}
+      {% for field in form.visible_fields %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            {{ field.label }}{% if field.field.required %}<span class="text-rose-600">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+            <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
+          {% endif %}
+          {% for err in field.errors %}
+            <p class="text-xs text-rose-600 mt-1">{{ err }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      {# ─── extra slot for per-form custom blocks ─── #}
+      {% block extra_fields %}{% endblock %}
+
+      <div class="flex items-center justify-between pt-4">
+        <a href="{{ request.META.HTTP_REFERER|default:'#' }}"
+           class="inline-flex items-center px-3 py-2 text-sm rounded-full
+                  bg-gray-200 hover:bg-gray-300 text-gray-700">
+          Cancel
+        </a>
+        <div class="flex gap-2">
+          {% block extra_buttons %}{% endblock %}
+          <button type="submit"
+                  class="inline-flex items-center gap-2 px-5 py-2 rounded-full
+                         bg-indigo-600 hover:bg-indigo-700 text-white shadow">
+            ✓ Submit
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

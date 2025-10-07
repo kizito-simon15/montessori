@@ -1,0 +1,30 @@
+{# apps/finance/templates/finance/_invoice_summary.html #}
+{% load humanize %}
+<table class="table table-sm mb-0">
+  <tbody>
+    <tr>
+      <th scope="row" class="w-25">Invoice&nbsp;#</th>
+      <td>{{ inv.invoice_number }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Student</th>
+      <td>{{ inv.student.firstname }} {{ inv.student.surname }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Expected</th>
+      <td>{{ inv.expected_amount|intcomma }}&nbsp;TZS</td>
+    </tr>
+    <tr>
+      <th scope="row">Paid</th>
+      <td>{{ inv.amount_paid|intcomma }}&nbsp;TZS</td>
+    </tr>
+    <tr>
+      <th scope="row">Balance</th>
+      <td>{{ inv.overall_balance|intcomma }}&nbsp;TZS</td>
+    </tr>
+    <tr>
+      <th scope="row">Due&nbsp;date</th>
+      <td>{{ inv.due_date|date:"d M Y" }}</td>
+    </tr>
+  </tbody>
+</table>

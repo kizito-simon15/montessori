@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" data-aos="fade-up">
+    <h2 class="text-primary fw-bold mb-4">Archived Students</h2>
+    {% for year, classes in grouped_students.items %}
+        <div class="card mb-4 shadow-sm" style="border-radius: 15px;">
+            <div class="card-header bg-info text-white" style="border-radius: 15px 15px 0 0;">
+                <h4 class="m-0">Archived in {{ year }}</h4>
+            </div>
+            <div class="card-body" style="background-color: #f9f9f9; border-radius: 0 0 15px 15px;">
+                {% for student_class, students in classes.items %}
+                    <div class="mb-3">
+                        <h5 class="fw-bold text-teal">Class: {{ student_class }}</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered table-striped">
+                                <thead class="table-light">
+                                    <tr class="text-center">
+                                        <th scope="col">S/N</th>
+                                        <th scope="col">Student Name</th>
+                                        <th scope="col">Archive Date</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr class="clickable-row">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url 'archived_student_details' student.pk %}" class="text-dark fw-semibold">
+                                                {{ student.firstname }} {{ student.surname }}
+                                            </a>
+                                        </td>
+                                        <td>{{ student.archive_date }}</td>
+                                        <td class="text-center">
+                                            <a href="{% url 'unarchive_student' student.pk %}" class="btn btn-sm btn-outline-success rounded-pill shadow-sm">Unarchive</a>
+                                            <a href="{% url 'delete_student' student.pk %}" class="btn btn-sm btn-outline-danger rounded-pill shadow-sm">Delete</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+    .container {
+        max-width: 900px;
+    }
+
+    .card-header {
+        background-color: #5ac8fa;
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 10px 20px;
+        font-weight: bold;
+    }
+
+    .card {
+        border: none;
+    }
+
+    h2, h4, h5 {
+        font-family: 'Arial', sans-serif;
+    }
+
+    table {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead th {
+        background-color: #e0f7fa;
+        color: #007aff;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1faff;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #ff3b30;
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function () {
+                window.location.href = row.querySelector('a').href;
+            });
+        });
+    });
+</script>
+{% endblock %}

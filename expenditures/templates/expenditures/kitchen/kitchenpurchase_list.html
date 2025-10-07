@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+{% include "expenditures/partials/_kitchen_css.html" %}
+
+<div class="card">
+  <div class="card-header">
+    <h2>🛒 Kitchen Purchases</h2>
+    <a href="{% url 'kitchenpurchase_create' %}" class="btn btn-primary">➕ New</a>
+  </div>
+
+  <div class="card-body">
+    <!-- filter bar -->
+    <form class="filter-bar" method="get">
+      <select name="product">
+        <option value="">— All products —</option>
+        {% for p in products %}
+          <option value="{{ p.pk }}" {% if request.GET.product == p.pk|stringformat:"s" %}selected{% endif %}>
+            {{ p.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary">Filter</button>
+      <a class="btn btn-secondary" href="{% url 'kitchenpurchase_list' %}">Reset</a>
+    </form>
+
+    <p class="stat">
+      Qty: <span>{{ total_qty|floatformat:2|intcomma }}</span>
+      &nbsp;|&nbsp; Spent: <span>{{ total_spent|floatformat:2|intcomma }} TZS</span>
+    </p>
+
+    <div style="overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th><th>Date</th><th>Product</th>
+            <th style="text-align:right;">Qty</th>
+            <th style="text-align:right;">Price/U</th>
+            <th style="text-align:right;">Total</th>
+            <th style="width:110px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in rows %}
+            <tr>
+              <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+              <td>{{ p.date }}</td>
+              <td>{{ p.product.name }}</td>
+              <td style="text-align:right;">{{ p.quantity|floatformat:2 }} {{ p.product.unit }}</td>
+              <td style="text-align:right;">{{ p.price_per_unit|floatformat:2|intcomma }}</td>
+              <td style="text-align:right;">{{ p.total_cost|floatformat:2|intcomma }}</td>
+              <td>
+                <a href="{% url 'kitchenpurchase_update' p.pk %}" class="btn btn-primary">✏️</a>
+                <a href="{% url 'kitchenpurchase_delete' p.pk %}" class="btn btn-danger">🗑️</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7">No kitchen purchases yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+      {% include "expenditures/partials/_pager.html" %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

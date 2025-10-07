@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<div class="container mt-5" data-aos="fade-up">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h1 class="mb-0">Issue Book to Staff</h1>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if success_message %}
+                        <div class="alert alert-success" role="alert" data-aos="fade-right">
+                            {{ success_message }}
+                        </div>
+                        {% endif %}
+                        <div class="mb-3 row">
+                            <div class="col-md-4" data-aos="fade-right">
+                                <label for="id_book_name" class="form-label text-primary">Search Book:</label>
+                                <input type="text" name="book_name" id="id_book_name" class="form-control text-brown" placeholder="Enter book name">
+                            </div>
+                            <div class="col-md-4" data-aos="fade-right">
+                                <label for="id_author" class="form-label text-primary">Select Author:</label>
+                                <select name="author" id="id_author" class="form-select form-select-lg text-brown">
+                                    <option value="">Select author</option>
+                                    {% for author in authors %}
+                                    <option value="{{ author }}">{{ author }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4" data-aos="fade-right">
+                                <label for="id_class" class="form-label text-primary">Select Class:</label>
+                                <select name="student_class" id="id_class" class="form-select form-select-lg text-brown">
+                                    <option value="">Select class</option>
+                                    {% for student_class in student_classes %}
+                                    <option value="{{ student_class.id }}">{{ student_class.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 row" data-aos="fade-right">
+                            <div class="col-md-12">
+                                <label for="id_staff_name" class="form-label text-primary">Search Staff:</label>
+                                <input type="text" name="staff_name" id="id_staff_name" class="form-control text-brown" placeholder="Enter staff name">
+                            </div>
+                        </div>
+                        <div class="text-center mb-3" data-aos="fade-right">
+                            <button type="submit" class="btn btn-success">Search</button>
+                        </div>
+                        <div class="mb-3" data-aos="fade-right">
+                            <label for="id_staff" class="form-label text-primary">Staff Name:</label>
+                            <select name="staff" id="id_staff" class="form-select form-select-lg text-brown">
+                                {% for staff in staffs %}
+                                <option value="{{ staff.id }}">{{ staff.surname }} {{ staff.firstname }} {{ staff.other_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3" data-aos="fade-right">
+                            <label for="id_book" class="form-label text-primary">Book to Issue:</label>
+                            <select name="book" id="id_book" class="form-select form-select-lg text-brown">
+                                {% for book in books %}
+                                <option value="{{ book.id }}">{{ book.book_name }} by {{ book.author }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3" data-aos="fade-right">
+                            <label for="id_book_number" class="form-label text-primary">Book Number:</label>
+                            <input type="number" name="book_number" id="id_book_number" class="form-control text-brown">
+                        </div>
+                        <div class="mb-3" data-aos="fade-right">
+                            <label for="id_date_issued" class="form-label text-primary">Date Issued:</label>
+                            <input type="date" name="date_issued" id="id_date_issued" class="form-control text-brown">
+                        </div>
+                        <div class="mb-3" data-aos="fade-right">
+                            <label for="id_expiry_date" class="form-label text-primary">Date to Return:</label>
+                            <input type="date" name="expiry_date" id="id_expiry_date" class="form-control text-brown">
+                        </div>
+                        <div class="text-center" data-aos="fade-right">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-danger mt-3" role="alert" data-aos="fade-right">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AOS CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+<!-- AOS JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 1000,
+    });
+
+    // JavaScript for form field decorations
+    document.addEventListener("DOMContentLoaded", function() {
+        const formControls = document.querySelectorAll(".form-control, .form-select");
+
+        formControls.forEach(function(control) {
+            control.addEventListener("focus", function() {
+                control.classList.add("border-success", "shadow");
+            });
+
+            control.addEventListener("blur", function() {
+                control.classList.remove("border-success", "shadow");
+            });
+        });
+    });
+</script>
+
+{% endblock content %}

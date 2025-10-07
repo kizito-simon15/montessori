@@ -1,0 +1,33 @@
+{# bottom nav: colourful emoji instead of blue FA icons #}
+<nav class="mobile-nav fixed bottom-0 inset-x-0 h-16
+            bg-gradient-to-r from-teal-500 to-cyan-500 text-white
+            shadow-lg flex justify-around items-center md:hidden z-[1050]">
+
+  <a href="{% url 'dashboard' %}"
+     class="flex flex-col items-center p-2 hover:bg-white/20 rounded-lg
+            {% if request.resolver_match.url_name == 'dashboard' %}opacity-80{% endif %}">
+    <span class="text-xl">🏠</span>
+    <span class="text-[11px] leading-none mt-1">Home</span>
+  </a>
+
+  <a href="{% url 'student-list' %}"
+     class="flex flex-col items-center p-2 hover:bg-white/20 rounded-lg
+            {% if request.resolver_match.url_name == 'student-list' %}opacity-80{% endif %}">
+    <span class="text-xl">👩‍🎓</span>
+    <span class="text-[11px] leading-none mt-1">Pupils</span>
+  </a>
+
+  <a href="{% url 'staff-list' %}"
+     class="flex flex-col items-center p-2 hover:bg-white/20 rounded-lg
+            {% if request.resolver_match.url_name == 'staff-list' %}opacity-80{% endif %}">
+    <span class="text-xl">👥</span>
+    <span class="text-[11px] leading-none mt-1">Staff</span>
+  </a>
+
+  <a href="{% url 'select_link' %}"
+     class="flex flex-col items-center p-2 hover:bg-white/20 rounded-lg
+            {% if request.resolver_match.url_name == 'select_link' %}opacity-80{% endif %}">
+    <span class="text-xl">💰</span>
+    <span class="text-[11px] leading-none mt-1">Finance</span>
+  </a>
+</nav>

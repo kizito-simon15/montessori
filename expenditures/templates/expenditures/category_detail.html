@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} Expenditures</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .container {
+            overflow-y: auto;
+            max-height: 80vh;
+            padding: 20px;
+        }
+        .bg-lightblue {
+            background-color: #add8e6;
+        }
+        .text-white {
+            color: white;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .filter-container input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            flex: 1;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .filter-container input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .table tbody tr:hover td {
+            background-color: #e9f5ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-primary">{{ category.name }} Expenditures</h1>
+
+        <!-- Filter Inputs -->
+        <div class="filter-container">
+            <input type="text" id="itemNameFilter" class="form-control" placeholder="Filter by Item Name" onkeyup="filterTable()">
+            <input type="date" id="dateFilter" class="form-control" onchange="filterTable()">
+        </div>
+
+        <!-- Display Total Amount -->
+        <div class="mb-3">
+            <h4 class="text-success">Total Amount: <span id="totalAmount">{{ total_expenditure_amount|floatformat:2|intcomma }}</span></h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="bg-lightblue text-white">
+                    <tr>
+                        <th>Date</th>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="expenditureTable">
+                    {% for expenditure in expenditures %}
+                        <tr>
+                            <td>{{ expenditure.date|date:"m/d/Y" }}</td>
+                            <td>{{ expenditure.item_name }}</td>
+                            <td>{{ expenditure.quantity }}</td>
+                            <td class="amount">{{ expenditure.amount|floatformat:2|intcomma }}</td>
+                            <td>{{ expenditure.description }}</td>
+                            <td>
+                                <a href="{% url 'expenditure_edit' expenditure.pk %}" class="btn btn-warning btn-sm text-white"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="{% url 'expenditure_delete' expenditure.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total expenditure amount and total balance -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-auto">
+                <p class="font-weight-bold text-success">Total Expenditure Amount: <span>{{ total_expenditure_amount|floatformat:2|intcomma }}</span></p>
+            </div>
+            <div class="col-auto">
+                <p class="font-weight-bold text-info">Total Balance: <span>{{ total_balance|intcomma }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterTable() {
+            var itemNameInput = document.getElementById('itemNameFilter').value.toUpperCase();
+            var dateInput = document.getElementById('dateFilter').value;
+            var table = document.getElementById('expenditureTable');
+            var rows = table.getElementsByTagName('tr');
+            var totalAmount = 0;
+
+            for (var i = 0; i < rows.length; i++) {
+                var itemName = rows[i].getElementsByTagName('td')[1].textContent.toUpperCase();
+                var dateText = rows[i].getElementsByTagName('td')[0].textContent;
+
+                var dateParts = dateText.split('/');
+                var tableDate = dateParts[2] + '-' + ('0' + dateParts[0]).slice(-2) + '-' + ('0' + dateParts[1]).slice(-2);
+
+                var itemNameMatch = itemName.indexOf(itemNameInput) > -1 || itemNameInput === '';
+                var dateMatch = (dateInput === tableDate) || dateInput === '';
+
+                if (itemNameMatch && dateMatch) {
+                    rows[i].style.display = '';
+                    totalAmount += parseFloat(rows[i].getElementsByClassName('amount')[0].textContent.replace(/,/g, ''));
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+
+            // Update the total amount displayed
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

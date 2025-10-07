@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="font-family: 'Times New Roman', Times, serif; color: #000;">
+    <!-- Header Section -->
+    <div class="print-header">
+        <div class="results-title">
+            <h1>THE CATHOLIC DIOCESE OF KAHAMA</h1>
+            <h2>ST. JOHN PAUL II KAHAMA SECONDARY SCHOOL</h2>
+            <h3>TERMINAL EXAMINATION RESULTS JUNE 2025</h3>
+        </div>
+    </div>
+
+    <!-- Filter Form (Hidden in Print) -->
+    <div class="filter-form no-print" style="background: #f8f9fa; padding: 20px; margin-bottom: 20px;">
+        <form method="get" id="filter-form" class="row gy-3">
+            <div class="col-md-4">
+                <label for="session" class="form-label fw-bold">Select Session</label>
+                <select
+                    id="session"
+                    name="session"
+                    class="form-select"
+                    style="font-size: 1rem; color: #333;"
+                >
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}" {% if session == current_session %}selected{% endif %}>
+                            {{ session.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="term" class="form-label fw-bold">Select Term</label>
+                <select
+                    id="term"
+                    name="term"
+                    class="form-select"
+                    style="font-size: 1rem; color: #333;"
+                >
+                    {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term == current_term %}selected{% endif %}>
+                            {{ term.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="exam" class="form-label fw-bold">Select Exam</label>
+                <select
+                    id="exam"
+                    name="exam"
+                    class="form-select"
+                    style="font-size: 1rem; color: #333;"
+                >
+                    {% for exam in exams %}
+                        <option value="{{ exam.id }}" {% if exam == current_exam %}selected{% endif %}>
+                            {{ exam.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="text-center mt-3">
+                <button
+                    type="submit"
+                    class="btn btn-primary text-uppercase fw-bold"
+                    style="
+                        padding: 0.8rem 2rem;
+                        font-size: 1rem;
+                        background-color: #2ecc71;
+                        color: white;
+                    "
+                >
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if no_results %}
+        <div class="alert alert-danger text-center no-print" style="padding: 15px;">
+            No results found for the selected session, term, or exam.
+        </div>
+    {% else %}
+    <!-- Results Table -->
+    <div class="table-container">
+        <h4 class="text-center text-uppercase fw-bold mb-4" style="color: #000;">
+            Class: {{ selected_class }} | {{ current_session }} | {{ current_term }} | {{ current_exam }}
+        </h4>
+        <table class="table table-bordered">
+            <thead style="background-color: #1e40af; color: white;">
+            <tr>
+                <th rowspan="2">Serial No.</th>
+                <th rowspan="2">Student</th>
+                <th rowspan="2">Class</th>
+                {% for subject in subjects %}
+                <th colspan="2">{{ subject }}</th>
+                {% endfor %}
+                <th rowspan="2">Total</th>
+                <th rowspan="2">Overall Average</th>
+                <th rowspan="2">Status</th>
+                <th rowspan="2">Division</th>
+                <th rowspan="2">Position</th>
+            </tr>
+            <tr>
+                {% for subject in subjects %}
+                <th>Test</th>
+                <th>Exam</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for student_data in data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="{% url 'alevel_results:single_student_results' student_id=student_data.student.id %}" class="text-decoration-none student-link no-print">
+                        {{ student_data.student }}
+                    </a>
+                    <span class="print-only">{{ student_data.student }}</span>
+                </td>
+                <td>{{ student_data.student_class }}</td>
+                {% for subject in subjects %}
+                <td>
+                    {% for subject_result in student_data.subject_results %}
+                        {% if subject_result.subject == subject %}
+                            {{ subject_result.test_score|default:"-" }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for subject_result in student_data.subject_results %}
+                        {% if subject_result.subject == subject %}
+                            {{ subject_result.exam_score|default:"-" }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                {% endfor %}
+                <td>{{ student_data.total }}</td>
+                <td>{{ student_data.overall_average|floatformat:"2" }}</td>
+                <td>{{ student_data.overall_status }}</td>
+                <td>{{ student_data.division }}</td>
+                <td>{{ student_data.position }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Subject Summary Table (Hidden in Print) -->
+    <div class="subject-summary-container mt-5 no-print">
+        <h4 class="text-center text-uppercase fw-bold mb-4" style="color: #000;">Subject Rankings</h4>
+        <table class="table table-bordered">
+            <thead style="background-color: #3498db; color: white;">
+            <tr>
+                <th>Subject Position</th>
+                <th>Subject</th>
+                <th>Overall Average</th>
+                <th>Subject Grade</th>
+                <th>Subject GPA</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for subject in subject_data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ subject.subject }}</td>
+                <td>{{ subject.average }}</td>
+                <td>{{ subject.grade }}</td>
+                <td>{{ subject.gpa }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons (Hidden in Print) -->
+    <div class="no-print text-center mt-4">
+        <button
+            type="button"
+            class="btn btn-success btn-lg me-2 fw-bold"
+            style="background-color: #27ae60;"
+            onclick="printResultsTable()"
+        >
+            Print
+        </button>
+        <a href="{% url 'alevel_results:class_list' %}" class="btn btn-danger btn-lg fw-bold">Back</a>
+        <a href="{% url 'alevel_results:form_status' class_id=class_id %}" class="btn btn-primary btn-lg fw-bold">
+            Form Status
+        </a>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        background: white;
+    }
+
+    .results-title {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+    }
+
+    .results-title h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #000;
+        margin: 8px 0;
+        text-transform: uppercase;
+    }
+
+    .results-title h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #000;
+        margin: 8px 0;
+        text-transform: uppercase;
+    }
+
+    .results-title h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #000;
+        margin: 8px 0;
+        text-transform: uppercase;
+    }
+
+    .table-container, .subject-summary-container {
+        width: 100%;
+        margin: 0;
+    }
+
+    .table-container table, .subject-summary-container table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border: 1px solid #000;
+    }
+
+    .table-container th, .table-container td,
+    .subject-summary-container th, .subject-summary-container td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #000;
+        vertical-align: middle;
+    }
+
+    .table-container tr:nth-child(even),
+    .subject-summary-container tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table-container tr:hover,
+    .subject-summary-container tr:hover {
+        background-color: #e0f2fe;
+    }
+
+    .student-link {
+        color: #2563eb;
+        font-weight: 500;
+    }
+
+    .student-link:hover {
+        color: #16a34a;
+        text-decoration: underline;
+    }
+
+    .print-only {
+        display: none;
+    }
+
+    @media print {
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            -webkit-font-smoothing: none !important;
+            -moz-osx-font-smoothing: auto !important;
+        }
+
+        .container {
+            background: white !important;
+            padding: 0;
+            margin: 0;
+            width: 100% !important;
+        }
+
+        .no-print, .subject-summary-container, .filter-form {
+            display: none !important;
+        }
+
+        .print-header {
+            position: running(header);
+            text-align: center;
+            margin-bottom: 10mm;
+        }
+
+        .results-title h1 {
+            font-size: 18pt;
+            font-weight: 800;
+            color: #000;
+            margin: 6pt 0;
+        }
+
+        .results-title h2 {
+            font-size: 16pt;
+            font-weight: 700;
+            color: #000;
+            margin: 6pt 0;
+        }
+
+        .results-title h3 {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #000;
+            margin: 6pt 0;
+        }
+
+        .table-container {
+            margin: 0;
+            width: 100% !important;
+        }
+
+        .table-container table {
+            width: 100% !important;
+            border: 1px solid #000;
+            table-layout: auto;
+            font-size: 10pt;
+        }
+
+        .table-container th, .table-container td {
+            border: 1px solid #000;
+            padding: 6px;
+            font-size: 10pt;
+            white-space: normal;
+            word-break: break-word;
+            vertical-align: middle;
+            min-width: 40px;
+        }
+
+        .table-container th {
+            background-color: #1e40af !important;
+            color: white !important;
+            font-weight: 700;
+            font-size: 11pt;
+            padding: 8px;
+        }
+
+        .table-container tr:nth-child(even) {
+            background-color: #f0f8ff !important;
+        }
+
+        .table-container table,
+        .table-container thead,
+        .table-container tbody,
+        .table-container tr,
+        .table-container th,
+        .table-container td {
+            page-break-inside: auto;
+            page-break-before: auto;
+            page-break-after: auto;
+        }
+
+        .table-container tr {
+            page-break-inside: avoid;
+        }
+
+        .student-link {
+            display: none;
+        }
+
+        .print-only {
+            display: block;
+        }
+
+        .print-footer {
+            position: running(footer);
+            font-size: 9pt;
+            color: #000;
+            text-align: right;
+        }
+
+        .print-footer::before {
+            content: "Printed on: May 27, 2025 | Page " counter(page) " of " counter(pages);
+        }
+
+        @page {
+            @top-center {
+                content: element(header);
+            }
+            @bottom-right {
+                content: element(footer);
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0;
+        }
+
+        .results-title h1 {
+            font-size: 22px;
+        }
+
+        .results-title h2 {
+            font-size: 20px;
+        }
+
+        .results-title h3 {
+            font-size: 18px;
+        }
+
+        .table-container th, .table-container td,
+        .subject-summary-container th, .subject-summary-container td {
+            padding: 8px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 0;
+        }
+
+        .results-title h1 {
+            font-size: 18px;
+        }
+
+        .results-title h2 {
+            font-size: 16px;
+        }
+
+        .results-title h3 {
+            font-size: 14px;
+        }
+
+        .table-container th, .table-container td,
+        .subject-summary-container th, .subject-summary-container td {
+            padding: 6px;
+            font-size: 11px;
+        }
+    }
+</style>
+
+<script>
+    function printResultsTable() {
+        window.print();
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{# templates/expenditures/expenditure_list.html #}
+{% extends "base.html" %}{% load humanize %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{
+  --indigo:#1e3a8a; --amber:#fbbf24; --rose:#e11d48;
+  --bg:#f1f5f9; --card:#ffffff; --radius:25px;
+}
+body{background:var(--bg);font-family:Inter,sans-serif;margin:0}
+.card{background:var(--card);border-radius:0 0 18px 18px;
+      box-shadow:0 4px 12px rgba(0,0,0,.06);
+      opacity:0;transform:translateY(26px);
+      transition:.5s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.card-header{padding:.6rem 1.2rem;border-bottom:1px solid #e2e8f0;
+             display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--indigo);flex:1}
+.card-body{padding:1rem 1.2rem;display:flex;flex-direction:column;gap:1rem}
+.table{width:100%;border-collapse:collapse;font-size:.9rem}
+.table thead{background:var(--indigo);color:#fff}
+.table th,.table td{padding:.42rem .6rem;border-bottom:1px solid #e2e8f0}
+.table tbody tr:nth-child(odd){background:#f8fafc}
+.table tbody tr.hide{display:none}
+.table tbody tr:hover{background:#e2e8f0}
+.text-end{text-align:right}.text-cent{text-align:center}
+.btn{border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;font-size:.8rem;
+     cursor:pointer;transition:background .15s,transform .15s}
+.btn-primary{background:var(--indigo);color:#fff}.btn-primary:hover{background:#0f172a;transform:translateY(-2px)}
+.btn-secondary{background:#64748b;color:#fff}
+.form-control,.form-select{border:1px solid #cbd5e1;border-radius:var(--radius);background:#f9fafb;
+  padding:.35rem .75rem;font-size:.85rem}
+#q{min-width:180px}
+@media(max-width:640px){.table th,.table td{padding:.35rem;font-size:.8rem}}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  /* reveal */
+  const card=document.querySelector('.card');
+  if(card) setTimeout(()=>card.classList.add('show'),80);
+
+  /* instant filter on item name */
+  const q=document.getElementById('q');
+  if(q){
+    q.addEventListener('input',()=>{
+      const t=q.value.toLowerCase().trim();
+      document.querySelectorAll('[data-row]').forEach(r=>{
+        r.classList.toggle('hide',t && !r.dataset.row.includes(t));
+      });
+    });
+  }
+});
+</script>
+
+<div class="card">
+  <div class="card-header">
+    <a href="{% url 'expenditure_dashboard' %}" class="btn btn-secondary">← Dashboard</a>
+    <h2>💸 Expenditures</h2>
+    <a href="{% url 'expenditure_create' %}" class="btn btn-primary">➕ New</a>
+  </div>
+
+  <div class="card-body">
+    <!-- filter bar -->
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:.5rem">
+      <select name="budget" class="form-select">
+        <option value="">All budgets</option>
+        {% for b in budgets %}
+          <option value="{{ b.pk }}" {% if current_env == b.pk|stringformat:'s' %}selected{% endif %}>
+            {{ b.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <input type="date" name="start" value="{{ start_date }}" class="form-control">
+      <input type="date" name="end"   value="{{ end_date }}"   class="form-control">
+      <button class="btn btn-primary" type="submit">🔍 Filter</button>
+      {% if request.GET %}<a href="{% url 'expenditure_list' %}" class="btn btn-secondary">✖ Clear</a>{% endif %}
+      <input id="q" class="form-control" type="search" placeholder="Search item…">
+    </form>
+
+    <!-- grand total -->
+    <div style="font-weight:700;font-size:1rem">
+      Total spent: {{ grand_total|floatformat:2|intcomma }} TZS
+    </div>
+
+    <!-- loop budget-line groups -->
+    {% for g in groups %}
+      <h3 style="margin:.8rem 0 .35rem;font-size:1.05rem;color:var(--indigo)">
+        {{ g.name }} ({{ g.subtotal|floatformat:2|intcomma }} TZS)
+      </h3>
+
+      <div style="overflow-x:auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th><th>Date</th><th>Item</th>
+              <th class="text-end">Price @</th>
+              <th class="text-end">Qty</th>
+              <th class="text-end">Total</th>
+              <th class="text-cent">Doc</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for obj in g.rows %}
+              <tr data-row="{{ obj.item_name|lower|escapejs }}">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ obj.date }}</td>
+                <td>{{ obj.item_name }}</td>
+                <td class="text-end">
+                  {{ obj.price_per_unit|floatformat:2|intcomma }}
+                </td>
+                <td class="text-end">
+                  {{ obj.quantity|default:"—"|floatformat:2 }}
+                  {% if obj.unit %}{{ obj.unit }}{% endif %}
+                </td>
+                <td class="text-end">
+                  {{ obj.total_amount|floatformat:2|intcomma }}
+                </td>
+                <td class="text-cent">
+                  {% if obj.attachment %}
+                    <a href="{{ obj.attachment.url }}" target="_blank">📄</a>
+                  {% elif obj.receipt %}
+                    <a href="{% firstof obj.receipt.get_absolute_url '#' %}">🔗</a>
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <a class="btn btn-primary" href="{% url 'expenditure_update' obj.pk %}">✏️</a>
+                  <a class="btn btn-danger"  href="{% url 'expenditure_delete' obj.pk %}">🗑️</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="8">— no items —</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% empty %}
+      <p>No expenditures found for current filter.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

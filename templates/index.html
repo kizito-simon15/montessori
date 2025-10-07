@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+  <!-- Hero Heading -->
+  <div class="p-4 rounded text-white mb-4" style="background: linear-gradient(135deg,#1e3a8a,#14b8a6);">
+    <h2 class="mb-0 fw-bold" aria-label="Dashboard Overview for Maria Montessori">📊 Dashboard Overview</h2>
+    <p class="mb-0">{{ school_name|default:"Maria Montessori Nursery, Pre and Primary School" }}</p>
+  </div>
+
+  <!-- Colorful Summary Cards -->
+  <div class="row g-3">
+    {% for card in summary_cards %}
+      <div class="col-md-3 col-sm-6">
+        <div class="card text-white text-center h-100 shadow-sm
+          {% if card.label == 'Students' %} bg-primary
+          {% elif card.label == 'Staff' %} bg-success
+          {% elif card.label == 'Books' %} bg-info
+          {% elif card.label == 'Invoices' %} bg-warning text-dark
+          {% else %} bg-secondary {% endif %}">
+          <div class="card-body py-4">
+            <h4 class="fw-bold">{{ card.count|intcomma }}</h4>
+            <p class="mb-0">{{ card.label }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Charts Section -->
+  <div class="row g-3 mt-3">
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white fw-bold" aria-label="Monthly Operations Chart">📈 Monthly Ops</div>
+        <div class="card-body"><canvas id="barChart" role="img" aria-label="Bar chart showing monthly operations data"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white fw-bold" aria-label="Students Trend Chart">📊 Students Trend</div>
+        <div class="card-body"><canvas id="lineChart" role="img" aria-label="Line chart showing student admission trends"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white fw-bold" aria-label="Current Composition Chart">📌 Current Composition</div>
+        <div class="card-body"><canvas id="pieChart" role="img" aria-label="Doughnut chart showing current school composition"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financials -->
+  <div class="row g-3 mt-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3" aria-label="Financial Summary">💰 Finance Summary</h5>
+          <p>Total Revenue: <strong class="text-success">TSh {{ total_revenue|intcomma }}</strong></p>
+          <p>Total Expenses: <strong class="text-danger">TSh {{ total_expenses|intcomma }}</strong></p>
+          <p>Balance: <strong class="text-primary">TSh {{ net_balance|intcomma }}</strong></p>
+        </div>
+      </div>
+    </div>
+
+    {% if low_raw or low_processed %}
+    <div class="col-md-6">
+      <div class="alert alert-warning shadow-sm" role="alert">
+        <strong>⚠️ Low Stock Alert:</strong>
+        {% if low_raw %} Raw – {{ low_raw|length }} item(s){% endif %}
+        {% if low_processed %} | Processed – {{ low_processed|length }} item(s){% endif %}
+        <a href="{% url 'stock_dashboard' %}" class="ms-2">Review Stock →</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Quick Links -->
+  <div class="card shadow-sm border-0 mt-4">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3" aria-label="Quick Navigation Links">🚀 Quick Navigation</h5>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'student-list' %}" class="btn btn-outline-primary" aria-label="View Students">🎓 Students</a>
+        <a href="{% url 'staff-list' %}" class="btn btn-outline-success" aria-label="View Staff">👥 Staff</a>
+        <a href="{% url 'invoice-list' %}" class="btn btn-outline-warning" aria-label="View Invoices">💳 Invoices</a>
+        <a href="{% url 'kitchen_dashboard' %}" class="btn btn-outline-info" aria-label="View Kitchen Dashboard">🍽️ Kitchen</a>
+        <a href="{% url 'stock_dashboard' %}" class="btn btn-outline-secondary" aria-label="View Stock Dashboard">🏪 Stock</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" integrity="sha384-XqE1mpM2Vza2QVtueTGX6je1ZUpV2/TQRHHG3Y3r4Y1s2T2T2T2T2T2T2T2T2T2T2" crossorigin="anonymous" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+      labels: {{ bar_labels|safe }},
+      datasets: [
+        { label: "Students", data: {{ bar_vals_students|safe }}, backgroundColor: "#6366f1" },
+        { label: "Staff", data: {{ bar_vals_staff|safe }}, backgroundColor: "#14b8a6" },
+        { label: "Invoices", data: {{ bar_vals_invoices|safe }}, backgroundColor: "#facc15" }
+      ]
+    },
+    options: { 
+      responsive: true, 
+      plugins: { legend: { position: 'top' } }, 
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+      labels: {{ line_labels|safe }},
+      datasets: [{
+        label: "New Admissions",
+        data: {{ line_vals|safe }},
+        borderColor: "#10b981",
+        backgroundColor: "rgba(20,184,166,0.1)",
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: { 
+      responsive: true, 
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  new Chart(document.getElementById("pieChart"), {
+    type: "doughnut",
+    data: {
+      labels: {{ pie_labels|safe }},
+      datasets: [{
+        data: {{ pie_vals|safe }},
+        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#6366f1"]
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: "70%",
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
+});
+</script>
+{% endblock %}

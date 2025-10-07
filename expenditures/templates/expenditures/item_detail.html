@@ -1,0 +1,74 @@
+
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ object.name }} Detail</h1>
+    {% if expenditures %}
+    <table class="table table-striped">
+        <thead class="bg-primary text-white"> <!-- Apply Bootstrap background and text color classes -->
+            <tr>
+                <th>Serial Number</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Attachment</th>
+                <th>Actions</th> <!-- Added Actions column -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for expenditure in expenditures %}
+            <tr>
+                <td>{{ forloop.counter }}</td> <!-- Assuming forloop.counter is your SN -->
+                <td>{{ expenditure.amount|intcomma }}</td>
+                <td>{{ expenditure.date|date:"F d, Y" }}</td>
+                <td>{{ expenditure.description }}</td>
+                <td>{{ expenditure.quantity }}</td>
+                <td>
+                    {% if expenditure.attachment %}
+                        <a href="{{ expenditure.attachment.url }}" class="attachment-link">Download Attachment</a>
+                    {% else %}
+                        No Attachment
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Add edit and delete links for each expenditure -->
+                    <a href="{% url 'expenditure_edit' expenditure.pk %}" class="text-primary"><i class="bi bi-pencil"></i> Edit</a>
+                    <a href="{% url 'expenditure_delete' expenditure.pk %}" class="text-danger"><i class="bi bi-trash"></i> Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7" style="text-align: right;"><strong>Total Amount:</strong> {{ total_amount|intcomma }}</td>
+            </tr>
+        </tfoot>
+    </table>
+    {% else %}
+    <p>No expenditures for this item.</p>
+    {% endif %}
+    
+    <!-- Print button -->
+    <button class="btn btn-primary print-btn" onclick="printPage()">Print</button>
+    <a href="{% url 'item_delete' object.pk %}" class="btn btn-danger"><i class="bi bi-trash"></i> Delete Item</a>
+</div>
+
+<script>
+function printPage() {
+    // Hide unnecessary elements before printing
+    var elementsToHide = document.querySelectorAll('.print-btn, .attachment-link');
+    elementsToHide.forEach(function(element) {
+        element.style.display = 'none';
+    });
+    // Print the page
+    window.print();
+    // Show the hidden elements after printing
+    elementsToHide.forEach(function(element) {
+        element.style.display = '';
+    });
+}
+</script>
+{% endblock %}

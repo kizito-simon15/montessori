@@ -1,0 +1,89 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-06-26 19:10+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: parents/templates/parents/parent_base.html:9
+msgid "Element lakezone pre & primary school"
+msgstr ""
+
+#: parents/templates/parents/parent_base.html:35
+msgid "Home"
+msgstr "Nyumbani"
+
+#: parents/templates/parents/parent_base.html:38
+msgid "Year:"
+msgstr "Mwaka"
+
+#: parents/templates/parents/parent_base.html:41
+msgid "Term:"
+msgstr "Muhula"
+
+#: parents/templates/parents/parent_base.html:48
+msgid "Admin"
+msgstr "Admnini"
+
+#: parents/templates/parents/parent_base.html:58
+msgid "Profile"
+msgstr "Wasifu"
+
+#: parents/templates/parents/parent_base.html:61
+msgid "Select Language"
+msgstr "Chagua lugha"
+
+#: parents/templates/parents/parent_base.html:65
+msgid "Sign out"
+msgstr "Ondoka"
+
+#: parents/templates/parents/parent_base.html:79
+msgid "Elements Lakezon pre & primary school"
+msgstr ""
+
+#: parents/templates/parents/parent_base.html:91
+#: parents/templates/parents/parent_base.html:96
+msgid "Pupils Details"
+msgstr "Taarifa za mwanafunzi"
+
+#: parents/templates/parents/parent_base.html:104
+#: parents/templates/parents/parent_base.html:109
+msgid "Student Details Chat Room"
+msgstr "Maoni ya taarifa za mwanafunzi"
+
+#: parents/templates/parents/parent_base.html:113
+msgid "Finance"
+msgstr "Malipo"
+
+#: parents/templates/parents/parent_base.html:117
+msgid "Pupil Payment Invoices"
+msgstr "Malipo ya ada"
+
+#: parents/templates/parents/parent_base.html:123
+msgid "Parent Invoices Chatroom"
+msgstr "Maoni ya malipo"
+
+#: parents/templates/parents/parent_base.html:126
+msgid "Results"
+msgstr "Matokeo"
+
+#: parents/templates/parents/parent_base.html:130
+msgid "Pupil Results Form"
+msgstr "Fomu za matokeo"
+
+#: parents/templates/parents/parent_base.html:136
+msgid "Results Chatroom"
+msgstr "Maoni ya matokeo"

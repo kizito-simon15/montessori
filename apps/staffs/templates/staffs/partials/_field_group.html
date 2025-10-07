@@ -1,0 +1,18 @@
+{#  one labelled input with icon, error block & help-text  #}
+{% with f=field %}
+<div class="form-group">
+   <label class="form-label" for="{{ f.id_for_label }}">{{ f.label }}</label>
+   <div class="input-group">
+        <span class="input-group-text">{{ icon|default:"✎" }}</span>
+        {{ f }}
+   </div>
+
+   {% if f.errors %}
+        <div class="text-danger">
+            {% for e in f.errors %}<p>{{ e }}</p>{% endfor %}
+        </div>
+   {% elif f.help_text %}
+        <small class="text-muted">{{ f.help_text }}</small>
+   {% endif %}
+</div>
+{% endwith %}

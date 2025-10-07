@@ -1,0 +1,97 @@
+<!-- apps/disprine/templates/disprine/action_form.html -->
+
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .form-container {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 700px;
+        margin: 0 auto;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    .form-header {
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+        animation: slideInFromTop 1s ease-in-out;
+    }
+
+    @keyframes slideInFromTop {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(0); }
+    }
+
+    .form-body {
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .btn-custom {
+        width: 100%;
+        padding: 10px;
+        font-size: 18px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-back {
+        margin-top: 20px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background-color: #6c757d;
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="form-container mt-5">
+    <div class="form-header">
+        <h2>Take Action for Issue #{{ issue.id }}</h2>
+    </div>
+    <div class="form-body">
+        {% if messages %}
+            <div class="alert alert-success" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="{{ form.action_description.id_for_label }}">{{ form.action_description.label }}</label>
+                {{ form.action_description|as_crispy_field }}
+            </div>
+            <div class="form-group mb-3">
+                <label for="{{ form.action_taker.id_for_label }}">{{ form.action_taker.label }}</label>
+                {{ form.action_taker|as_crispy_field }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-custom">Save</button>
+        </form>
+
+        <a href="{% url 'discipline_issue_detail' issue.student.id %}" class="btn btn-secondary btn-back mt-3">Back to Details</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,387 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information Form</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        @media print {
+            /* Hide all buttons when printing */
+            .print-button,
+            .back-button,
+            .save-button {
+                display: none;
+            }
+        }
+
+        /* Custom styles */
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+        }
+
+        .form-container {
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 30px;
+            background-color: #ffffff;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .form-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .form-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 28px;
+        }
+
+        .form-header p {
+            font-size: 16px;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #e9f7fd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-section-header {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #007bff;
+            font-size: 16px;
+        }
+
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+        .center-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .center-content strong {
+            font-size: 18px;
+        }
+
+        .alert-info {
+            background-color: #cce5ff;
+            border-color: #b8daff;
+            color: #004085;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        /* Enhanced animations */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" data-aos="fade-up" data-aos-duration="2000">
+        <div class="form-container">
+            <div class="form-header slide-in-left">
+                <h2>REPORT CARD</h2>
+                <p>ELEMENT LAKEZONE PRE & PRIMARY SCHOOL</p>
+            </div>
+            <h3 class="center-content fade-in"><strong>TAARIFA ZA MAENDELEO YA MWANAFUNZI</strong></h3>
+            <p class="center-content fade-in"><strong>Jina la mwanafunzi:</strong> <u>{{ student.surname }} {{ student.firstname }} {{ student.other_name }}</u></p>
+            <p class="center-content fade-in"><strong>Namba ya usajili:</strong> <u>{{ student.registration_number }}</u></p>
+
+            {% if message %}
+            <div class="alert alert-info center-content fade-in" role="alert" data-aos="fade-up" data-aos-duration="2000">
+                {{ message }}
+            </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" data-aos="fade-up" data-aos-duration="2000">
+                {% csrf_token %}
+                <div class="form-section fade-in">
+                    <div class="form-section-header slide-in-left">
+                        <h4>EVALUATION</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_session">Session:</label>
+                        {{ form.session }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_term">Term:</label>
+                        {{ form.term }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_exam">Exam Type:</label>
+                        {{ form.exam }}
+                    </div>
+                </div>
+
+                <div class="form-section fade-in">
+                    <div class="form-section-header slide-in-left">
+                        <h4>REMARKS</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_disprine">Discipline:</label>
+                        {{ form.disprine }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_sports">Sports:</label>
+                        {{ form.sports }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_care_of_property">Care of Property:</label>
+                        {{ form.care_of_property }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_collaborations">Collaborations:</label>
+                        {{ form.collaborations }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_date_of_closing">Date of Closing:</label>
+                        {{ form.date_of_closing }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_date_of_opening">Date of Opening:</label>
+                        {{ form.date_of_opening }}
+                    </div>
+                </div>
+
+                <div class="form-section fade-in">
+                    <div class="form-section-header slide-in-left">
+                        <h4>TEACHER'S NOTE</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_teacher_comments">Teacher Comments:</label>
+                        {{ form.teacher_comments }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_head_comments">Head Comments:</label>
+                        {{ form.head_comments }}
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col text-start fade-in">
+                        <button type="button" onclick="window.print()" class="btn btn-green print-button">Print</button>
+                    </div>
+                    <div class="col text-center fade-in">
+                        <button type="submit" class="btn btn-green save-button">Save</button>
+                    </div>
+                    <div class="col text-end fade-in">
+                        <button type="button" onclick="window.history.back()" class="btn btn-green back-button">Back</button>
+                    </div>
+                </div>
+            </form>
+
+            {% if form.errors %}
+            <div class="alert alert-danger fade-in" role="alert" data-aos="fade-up" data-aos-duration="2000">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const formControls = document.querySelectorAll('.form-control');
+            const textElements = document.querySelectorAll('.text-highlight');
+
+            formControls.forEach(function (control) {
+                control.addEventListener('focus', function () {
+                    this.classList.add('highlight');
+                });
+
+                control.addEventListener('blur', function () {
+                    this.classList.remove('highlight');
+                });
+            });
+
+            textElements.forEach(function (element) {
+                element.addEventListener('mouseover', function () {
+                    this.style.color = 'purple';
+                    this.style.fontSize = '1.1em';
+                });
+
+                element.addEventListener('mouseout', function () {
+                    this.style.color = '';
+                    this.style.fontSize = '';
+                });
+            });
+
+            const dateOfClosingInput = document.getElementById('id_date_of_closing');
+            const dateOfOpeningInput = document.getElementById('id_date_of_opening');
+            const sessionInput = document.getElementById('id_session');
+            const termInput = document.getElementById('id_term');
+            const examInput = document.getElementById('id_exam');
+
+            const currentSession = sessionInput.options[sessionInput.selectedIndex].text;
+            const currentTerm = termInput.options[termInput.selectedIndex].text;
+            const currentExam = examInput.options[examInput.selectedIndex].text;
+
+            const storageKey = `dates_${currentSession}_${currentTerm}_${currentExam}`;
+
+            const savedDates = JSON.parse(localStorage.getItem(storageKey));
+            if (savedDates) {
+                dateOfClosingInput.value = savedDates.date_of_closing;
+                dateOfOpeningInput.value = savedDates.date_of_opening;
+            } else {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                dateOfClosingInput.value = todayStr;
+
+                const nextMonth = new Date(today);
+                nextMonth.setMonth(nextMonth.getMonth() + 1);
+                const nextMonthStr = nextMonth.toISOString().split('T')[0];
+                dateOfOpeningInput.value = nextMonthStr;
+            }
+
+            dateOfClosingInput.addEventListener('change', function() {
+                const closingDate = new Date(dateOfClosingInput.value);
+                const openingDate = new Date(closingDate);
+                openingDate.setMonth(openingDate.getMonth() + 1);
+                dateOfOpeningInput.value = openingDate.toISOString().split('T')[0];
+
+                const dates = {
+                    date_of_closing: dateOfClosingInput.value,
+                    date_of_opening: dateOfOpeningInput.value
+                };
+                localStorage.setItem(storageKey, JSON.stringify(dates));
+            });
+
+            dateOfOpeningInput.addEventListener('change', function() {
+                const dates = {
+                    date_of_closing: dateOfClosingInput.value,
+                    date_of_opening: dateOfOpeningInput.value
+                };
+                localStorage.setItem(storageKey, JSON.stringify(dates));
+            });
+
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function() {
+                const dates = {
+                    date_of_closing: dateOfClosingInput.value,
+                    date_of_opening: dateOfOpeningInput.value
+                };
+                localStorage.setItem(storageKey, JSON.stringify(dates));
+            });
+
+            const formContainer = document.querySelector('.form-container');
+            formContainer.classList.add('visible');
+        });
+    </script>
+</body>
+</html>
+{% endblock content %}

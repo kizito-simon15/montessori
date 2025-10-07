@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report Card - St. John Paul II Kahama Secondary School</title>
+    <!-- AOS CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        /* General Styling */
+        body {
+            background: linear-gradient(to bottom, #eef2f3, #ffffff);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .form-header {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(to right, #2563eb, #1e40af);
+            color: #ffffff;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+
+        .form-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+
+        .form-header h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-section:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section-header {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: linear-gradient(to right, #2563eb, #1e40af);
+            color: #ffffff;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #1abc9c;
+            box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 30px;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-print {
+            background: linear-gradient(to right, #1dd1a1, #10ac84);
+        }
+
+        .btn-print:hover {
+            background: linear-gradient(to right, #10ac84, #1dd1a1);
+        }
+
+        .btn-save {
+            background: linear-gradient(to right, #3498db, #2980b9);
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+        }
+
+        .btn-back {
+            background: linear-gradient(to right, #ff6b6b, #ee5253);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(to right, #ee5253, #ff6b6b);
+        }
+
+        @media print {
+            @page {
+                size: portrait;
+                margin: 15mm;
+            }
+
+            body {
+                background: none;
+            }
+
+            .container {
+                box-shadow: none;
+                border: 2px solid #2563eb;
+                margin: 0;
+                padding: 15mm;
+                width: 100% !important;
+            }
+
+            .form-header {
+                border-bottom: 2px solid #2563eb;
+                margin-bottom: 15mm;
+            }
+
+            .form-header h1 {
+                font-size: 18pt;
+            }
+
+            .form-header h2 {
+                font-size: 16pt;
+            }
+
+            .form-header h3 {
+                font-size: 14pt;
+            }
+
+            .form-section {
+                border: 1px solid #000;
+                background: none;
+            }
+
+            .form-section-header {
+                font-size: 14pt;
+            }
+
+            .form-group label {
+                font-size: 12pt;
+            }
+
+            .form-control {
+                border: none;
+                border-bottom: 1px solid #000;
+                padding: 5px;
+                font-size: 12pt;
+                background: none;
+            }
+
+            .btn-container {
+                display: none !important;
+            }
+
+            .container::after {
+                content: "Printed on: May 25, 2025"; /* Updated to current date */
+                position: fixed;
+                bottom: 5mm;
+                right: 5mm;
+                font-size: 10pt;
+                color: #4b5563;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .btn-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                margin-bottom: 10px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container" data-aos="fade-up" data-aos-duration="1500">
+    <div class="form-header">
+        <h1>THE CATHOLIC DIOCESE OF KAHAMA</h1>
+        <h2>ST. JOHN PAUL II KAHAMA SECONDARY SCHOOL</h2>
+        <h3>TERMINAL EXAMINATION REPORT CARD JUNE 2025</h3>
+    </div>
+
+    <p><strong>Student Name:</strong> <u>{{ student.surname }} {{ student.firstname }} {{ student.other_name }}</u></p>
+    <p><strong>Registration Number:</strong> <u>{{ student.registration_number }}</u></p>
+
+    {% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-section">
+            <div class="form-section-header">Evaluation</div>
+            <div class="form-group">
+                <label for="id_session">Session:</label>
+                {{ form.session }}
+            </div>
+            <div class="form-group">
+                <label for="id_term">Term:</label>
+                {{ form.term }}
+            </div>
+            <div class="form-group">
+                <label for="id_exam">Exam Type:</label>
+                {{ form.exam }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-header">Behavior and Development</div>
+            <div class="form-group">
+                <label for="id_cooperation_with_peers">Cooperation with Peers:</label>
+                {{ form.cooperation_with_peers }}
+            </div>
+            <div class="form-group">
+                <label for="id_honesty">Honesty:</label>
+                {{ form.honesty }}
+            </div>
+            <div class="form-group">
+                <label for="id_hygiene">Personal and Environmental Hygiene:</label>
+                {{ form.hygiene }}
+            </div>
+            <div class="form-group">
+                <label for="id_willingness_to_work">Willingness to Work:</label>
+                {{ form.willingness_to_work }}
+            </div>
+            <div class="form-group">
+                <label for="id_respect">Respect for Parents, Teachers, and Others:</label>
+                {{ form.respect }}
+            </div>
+            <div class="form-group">
+                <label for="id_collaboration_in_work">Ability to Collaborate with Peers in Work:</label>
+                {{ form.collaboration_in_work }}
+            </div>
+            <div class="form-group">
+                <label for="id_love_for_work">Love for Work and Ability to Handle School Tasks:</label>
+                {{ form.love_for_work }}
+            </div>
+            <div class="form-group">
+                <label for="id_behavior_improvement">Improvement in Behavior and Student Development:</label>
+                {{ form.behavior_improvement }}
+            </div>
+            <div class="form-group">
+                <label for="id_effort">Effort:</label>
+                {{ form.effort }}
+            </div>
+            <div class="form-group">
+                <label for="id_date_of_closing">Date of Closing:</label>
+                {{ form.date_of_closing }}
+            </div>
+            <div class="form-group">
+                <label for="id_date_of_opening">Date of Opening:</label>
+                {{ form.date_of_opening }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-header">Head's Note</div>
+            <div class="form-group">
+                <label for="id_head_comments">Head Comments:</label>
+                {{ form.head_comments }}
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="submit" class="btn btn-save">Save</button>
+            <button type="button" class="btn btn-back" onclick="window.history.back()">Back</button>
+        </div>
+    </form>
+
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li>{{ field }}: {{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AOS JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init();
+
+    // Add JavaScript to enhance form fields
+    document.addEventListener('DOMContentLoaded', function () {
+        const formControls = document.querySelectorAll('.form-control');
+        const textElements = document.querySelectorAll('.text-highlight');
+
+        formControls.forEach(function (control) {
+            control.addEventListener('focus', function () {
+                this.classList.add('highlight');
+            });
+
+            control.addEventListener('blur', function () {
+                this.classList.remove('highlight');
+            });
+        });
+
+        textElements.forEach(function (element) {
+            element.addEventListener('mouseover', function () {
+                this.style.color = 'purple';
+                this.style.fontSize = '1.1em';
+            });
+
+            element.addEventListener('mouseout', function () {
+                this.style.color = '';
+                this.style.fontSize = '';
+            });
+        });
+
+        // Set default dates for date_of_closing and date_of_opening if they are not already set
+        const dateOfClosingInput = document.getElementById('id_date_of_closing');
+        const dateOfOpeningInput = document.getElementById('id_date_of_opening');
+        const sessionInput = document.getElementById('id_session');
+        const termInput = document.getElementById('id_term');
+        const examInput = document.getElementById('id_exam');
+
+        const currentSession = sessionInput.options[sessionInput.selectedIndex].text;
+        const currentTerm = termInput.options[termInput.selectedIndex].text;
+        const currentExam = examInput.options[examInput.selectedIndex].text;
+
+        const storageKey = `dates_${currentSession}_${currentTerm}_${currentExam}`;
+
+        // Load saved dates from localStorage if available
+        const savedDates = JSON.parse(localStorage.getItem(storageKey));
+        if (savedDates) {
+            dateOfClosingInput.value = savedDates.date_of_closing;
+            dateOfOpeningInput.value = savedDates.date_of_opening;
+        } else {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            dateOfClosingInput.value = todayStr;
+
+            const nextMonth = new Date(today);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            const nextMonthStr = nextMonth.toISOString().split('T')[0];
+            dateOfOpeningInput.value = nextMonthStr;
+        }
+
+        dateOfClosingInput.addEventListener('change', function() {
+            const closingDate = new Date(dateOfClosingInput.value);
+            const openingDate = new Date(closingDate);
+            openingDate.setMonth(openingDate.getMonth() + 1);
+            dateOfOpeningInput.value = openingDate.toISOString().split('T')[0];
+
+            // Save updated dates to localStorage
+            const dates = {
+                date_of_closing: dateOfClosingInput.value,
+                date_of_opening: dateOfOpeningInput.value
+            };
+            localStorage.setItem(storageKey, JSON.stringify(dates));
+        });
+
+        dateOfOpeningInput.addEventListener('change', function() {
+            // Save updated opening date to localStorage
+            const dates = {
+                date_of_closing: dateOfClosingInput.value,
+                date_of_opening: dateOfOpeningInput.value
+            };
+            localStorage.setItem(storageKey, JSON.stringify(dates));
+        });
+
+        // Form submission handler to ensure dates are saved
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function() {
+            const dates = {
+                date_of_closing: dateOfClosingInput.value,
+                date_of_opening: dateOfOpeningInput.value
+            };
+            localStorage.setItem(storageKey, JSON.stringify(dates));
+        });
+
+        // Reveal form container with animation
+        const formContainer = document.querySelector('.form-container');
+        if (formContainer) {
+            formContainer.classList.add('visible');
+        }
+    });
+</script>
+</body>
+</html>
+{% endblock %}

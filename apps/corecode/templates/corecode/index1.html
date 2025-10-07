@@ -1,0 +1,1184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Victory English Medium Pre- & Primary School in Biharamulo, Tanzania, offers high-quality holistic education since 2011 with modern facilities, transport, and boarding options. Check NECTA Standard 4 and 7 results here.">
+  <meta name="keywords" content="Victory School, English Medium School, Biharamulo, Kagera, Tanzania, Pre-Primary, Primary Education, Holistic Learning, Boarding School, NECTA Results, Standard 4, Standard 7">
+  <meta name="author" content="Victory English Medium School">
+  <meta name="robots" content="index, follow">
+  <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE">
+  <title>Victory English Medium Pre- & Primary School | Biharamulo, Tanzania</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary: #1e88e5;
+      --secondary: #ffb300;
+      --accent: #43a047;
+      --text-dark: #1a1a1a;
+      --text-light: #ffffff;
+      --bg-light: #f8f9fa;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Header Section */
+    .header {
+      background: linear-gradient(90deg, var(--primary), rgba(30, 136, 229, 0.7));
+      padding: 15px 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1030;
+      box-shadow: var(--shadow);
+      transition: padding 0.3s ease;
+    }
+
+    .header .navbar {
+      padding: 0;
+    }
+
+    .header .navbar-brand img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .header .navbar-brand .sitename {
+      font-family: 'Raleway', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-light);
+    }
+
+    .header .nav-link {
+      color: var(--text-light) !important;
+      font-size: 16px;
+      font-weight: 500;
+      margin-left: 15px;
+      transition: color 0.3s ease;
+    }
+
+    .header .nav-link:hover,
+    .header .nav-link.active {
+      color: var(--secondary) !important;
+    }
+
+    .navbar-toggler {
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-light);
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: none;
+    }
+
+    /* Offcanvas Menu */
+    .offcanvas {
+      background: var(--bg-light);
+    }
+
+    .offcanvas .nav-link {
+      color: var(--text-dark) !important;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+
+    .offcanvas .nav-link:hover {
+      background: rgba(30, 136, 229, 0.1);
+      color: var(--primary) !important;
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      padding-top: 70px;
+    }
+
+    .hero .swiper {
+      height: 100%;
+      width: 100%;
+    }
+
+    .hero .swiper-slide {
+      background-size: cover;
+      background-position: center; /* Ensure images are centered */
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    .hero .swiper-slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+
+    .hero .swiper-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      text-align: center;
+      color: var(--text-light);
+      padding: 20px;
+      width: 100%;
+    }
+
+    .hero h1 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero .btn {
+      font-size: 1rem;
+      padding: 12px 30px;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .hero .btn-primary {
+      background: var(--secondary);
+      border: none;
+    }
+
+    .hero .btn-primary:hover {
+      background: var(--primary);
+      transform: scale(1.05);
+    }
+
+    /* Login Portal Section */
+    .login-portal {
+      padding: 40px 0;
+      background: var(--bg-light);
+      text-align: center;
+    }
+
+    .login-portal h2 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .login-portal .login-form {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-portal .form-control {
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+
+    .login-portal .btn-primary {
+      background: var(--secondary);
+      border: none;
+      width: 100%;
+    }
+
+    .login-portal .btn-primary:hover {
+      background: var(--primary);
+    }
+
+    /* Sections */
+    .section {
+      padding: 60px 0;
+    }
+
+    .section-title h2 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .section-title p {
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* About Section */
+    .about .row > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .about img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .about h3 {
+      color: var(--secondary);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .about .core-values-heading {
+      color: var(--accent);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .about ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Services Section */
+    .services .card {
+      border: none;
+      transition: transform 0.3s ease;
+    }
+
+    .services .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .services .card-img-top {
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .services .card-body h4 {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    /* Team Section */
+    .team .card {
+      border: none;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .team .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .team .card-img-top {
+      width: 150px;
+      height: 200px;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+    }
+
+    .team .card-body h4 {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .team .social a {
+      color: var(--text-dark);
+      margin: 0 5px;
+      font-size: 1.2rem;
+    }
+
+    .team .social a:hover {
+      color: var(--secondary);
+    }
+
+    /* Curriculum Section */
+    .curriculum .card-img-top {
+      height: 120px;
+      object-fit: cover;
+    }
+
+    .curriculum .card-body h4 {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    /* Gallery Section */
+    .gallery .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 0 15px;
+    }
+
+    .gallery .gallery-item {
+      overflow: hidden;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery .gallery-item:hover {
+      transform: scale(1.05);
+    }
+
+    .gallery .gallery-item img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    /* Testimonials Section */
+    .testimonials .card {
+      border: none;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .testimonials .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .testimonials .card-img-top {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+    }
+
+    .testimonials .card-body i {
+      color: var(--primary);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .testimonials .card-body h4 {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    /* Contact Section */
+    .contact .card {
+      border: none;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .contact .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .contact .card-img-top {
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .contact .card-body h4 {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .contact form {
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .contact .form-control {
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+
+    .contact .btn-primary {
+      background: var(--secondary);
+      border: none;
+    }
+
+    .contact .btn-primary:hover {
+      background: var(--primary);
+    }
+
+    /* News & Events Section */
+    .news-events {
+      padding: 60px 0;
+      background: var(--bg-light);
+    }
+
+    .news-events .card {
+      border: none;
+      transition: transform 0.3s ease;
+    }
+
+    .news-events .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .news-events .card-body h4 {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .news-events .badge {
+      background-color: var(--primary);
+      color: var(--text-light);
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      margin-right: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    /* Footer Section */
+    .footer {
+      background: var(--text-dark);
+      color: var(--text-light);
+      padding: 40px 0 20px;
+    }
+
+    .footer .footer-top {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-bottom: 20px;
+    }
+
+    .footer .footer-about .logo img {
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+    }
+
+    .footer .footer-about .sitename {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .footer .footer-contact p {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer .footer-contact strong {
+      color: var(--secondary);
+    }
+
+    .footer .social-links a {
+      color: var(--text-light);
+      font-size: 1.2rem;
+      margin-right: 15px;
+      transition: color 0.3s ease;
+    }
+
+    .footer .social-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer .footer-links h4,
+    .footer .footer-newsletter h4 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--secondary);
+    }
+
+    .footer .footer-links ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer .footer-links a {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer .newsletter-form input[type="email"] {
+      padding: 8px;
+      border: 1px solid var(--secondary);
+      border-radius: 5px;
+      width: 70%;
+      font-size: 0.9rem;
+    }
+
+    .footer .newsletter-form .btn {
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      border-radius: 5px;
+      background: var(--secondary);
+      border: none;
+    }
+
+    .footer .newsletter-form .btn:hover {
+      background: var(--primary);
+    }
+
+    .footer .copyright {
+      text-align: center;
+      font-size: 0.8rem;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer .copyright a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Scroll Top Button */
+    .scroll-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      transition: background 0.3s ease;
+      z-index: 1030;
+    }
+
+    .scroll-top:hover {
+      background: var(--secondary);
+    }
+
+    .scroll-top i {
+      color: var(--text-light);
+      font-size: 1.2rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 991px) {
+      .hero h1 { font-size: 2.5rem; }
+      .hero p { font-size: 1rem; }
+      .gallery .gallery-item img { height: 150px; }
+      .footer .footer-top { grid-template-columns: 1fr; text-align: center; }
+      .footer .social-links { justify-content: center; }
+      .navbar-brand .sitename { font-size: 20px; }
+      .nav-link { font-size: 14px; margin-left: 10px; }
+      .about .row { flex-direction: column; }
+      .news-events .card { margin-bottom: 20px; }
+    }
+
+    @media (max-width: 768px) {
+      .hero { height: 80vh; padding-top: 60px; }
+      .hero h1 { font-size: 2rem; }
+      .hero p { font-size: 0.9rem; }
+      .services .card-img-top, .team .card-img-top, .testimonials .card-img-top, .contact .card-img-top { height: 150px; }
+      .gallery .gallery-item img { height: 120px; }
+      .contact .row { flex-direction: column; }
+      .contact .col-md-6 { width: 100%; }
+      .news-events .row { flex-direction: column; }
+    }
+
+    @media (max-width: 576px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero p { font-size: 0.8rem; }
+      .hero .btn { font-size: 0.8rem; padding: 8px 15px; }
+      .section-title h2 { font-size: 2rem; }
+      .section-title p { font-size: 1rem; }
+      .services .card-img-top, .team .card-img-top, .testimonials .card-img-top { height: 120px; }
+      .curriculum .card-img-top { height: 100px; }
+      .gallery .gallery-item img { height: 100px; }
+      .contact .card-img-top { height: 120px; }
+      .footer .footer-about .logo img { width: 25px; height: 25px; }
+      .footer .footer-about .sitename { font-size: 1.2rem; }
+      .footer .footer-links h4, .footer .footer-newsletter h4 { font-size: 1rem; }
+      .footer .footer-links a, .footer .footer-contact p { font-size: 0.8rem; }
+      .news-events .card-body { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="navbar navbar-expand-lg container">
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+        <img src="{% static 'img/logo.jpg' %}" alt="Victory School Logo" class="img-fluid rounded-circle">
+        <span class="sitename">Victory School</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1">
+            <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+            <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+            <li class="nav-item"><a class="nav-link" href="#curriculum">Curriculum</a></li>
+            <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
+            <li class="nav-item"><a class="nav-link" href="#news-events">News & Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'custom_login' %}">Login</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section id="hero" class="hero">
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          {% for slide in slides %}
+            <div class="swiper-slide" style="background-image: url('{% static slide.image %}');">
+              <div class="swiper-content">
+                <h1 data-aos="fade-up" data-aos-delay="100">{{ slide.title }}</h1>
+                <p data-aos="fade-up" data-aos-delay="200">{{ slide.text }}</p>
+                <div class="d-flex justify-content-center gap-3" data-aos="zoom-in" data-aos-delay="300">
+                  <a href="#about" class="btn btn-primary">Discover More</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </section>
+    <section id="about" class="about section bg-light">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>About Us</h2>
+          <p>Our Commitment to Excellence</p>
+        </div>
+        <div class="row gy-4 align-items-center">
+          <div class="col-lg-6" data-aos="fade-right">
+            <img src="{% static 'img/about-victory.JPG' %}" alt="Victory School Campus" class="img-fluid rounded-4 mb-4">
+            <h3>About Victory English Medium</h3>
+            <p>Established on January 5, 2011, in Biharamulo, Kagera, Tanzania, Victory English Medium Pre- & Primary School began with one pre-primary class of 13 students. Today, with 467 students across seven classes, we deliver a holistic, English-medium education aligned with Tanzania’s national curriculum, fostering academic excellence, moral values, and life skills.</p>
+            <p>Our conducive environment includes modern facilities like computer labs, a library, safe dormitories, and a dining hall with nutritious meals. We provide reliable school buses for day students, clean water, and annual health check-ups at a local hospital.</p>
+            <p><strong>Vision:</strong> To be a leading institution in Tanzania, shaping future leaders through quality education.</p>
+            <p><strong>Mission:</strong> To provide affordable, high-quality education that nurtures intellectual, social, and emotional growth.</p>
+          </div>
+          <div class="col-lg-6" data-aos="fade-left">
+            <div class="content">
+              <img src="{% static 'img/about-2.JPG' %}" alt="Victory School Students" class="img-fluid rounded-4 mb-4">
+              <h3 class="core-values-heading">Our Core Values</h3>
+              <ul class="list-unstyled">
+                <li data-aos="fade-up" data-aos-delay="100"><i class="bi bi-check-circle-fill text-primary"></i> Excellence: Striving for academic and personal growth.</li>
+                <li data-aos="fade-up" data-aos-delay="200"><i class="bi bi-check-circle-fill text-primary"></i> Integrity: Upholding honesty and ethics.</li>
+                <li data-aos="fade-up" data-aos-delay="300"><i class="bi bi-check-circle-fill text-primary"></i> Respect: Valuing diversity and inclusion.</li>
+                <li data-aos="fade-up" data-aos-delay="400"><i class="bi bi-check-circle-fill text-primary"></i> Community: Fostering collaboration and support.</li>
+                <li data-aos="fade-up" data-aos-delay="500"><i class="bi bi-check-circle-fill text-primary"></i> Innovation: Embracing creativity and technology.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="services section">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Our Services</h2>
+          <p>Comprehensive Educational Offerings</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/services/teachers.JPG' %}" alt="Competent Teachers" class="card-img-top">
+              <div class="card-body text-center">
+                <h4>Competent Teachers</h4>
+                <p>Our 20 certified teachers deliver quality education with weekly tests and free tuition.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/services/holistic-learning.JPG' %}" alt="Holistic Learning" class="card-img-top">
+              <div class="card-body text-center">
+                <h4>Holistic Learning</h4>
+                <p>Balanced curriculum with academics, sports, arts, and digital literacy.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/services/modern-facilities.jpg' %}" alt="Modern Facilities" class="card-img-top">
+              <div class="card-body text-center">
+                <h4>Modern Facilities</h4>
+                <p>State-of-the-art labs, library, and playground with clean water.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/services/boarding-day.JPG' %}" alt="Boarding & Day Options" class="card-img-top">
+              <div class="card-body text-center">
+                <h4>Boarding & Day Options</h4>
+                <p>Safe dormitories and reliable bus transport for students.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/services/digital-literacy.jpg' %}" alt="Digital Literacy" class="card-img-top">
+              <div class="card-body text-center">
+                <h4>Digital Literacy</h4>
+                <p>STEM-focused programs for a digital future.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="600">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/services/extracurricular.jpg' %}" alt="Extracurricular Activities" class="card-img-top">
+              <div class="card-body text-center">
+                <h4>Extracurricular Activities</h4>
+                <p>Sports, music, and clubs for creativity and teamwork.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="team" class="team section bg-light">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Our Team</h2>
+          <p>Dedicated Leadership and Staff</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-12 text-center mb-4" data-aos="fade-up">
+            <img src="{% static 'img/staff/group-staff.JPG' %}" alt="Our Dedicated Staff Team" class="img-fluid rounded-4">
+            <h4 style="color: var(--primary);">Our Dedicated Staff Team</h4>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/staff/manager.JPG' %}" alt="Dr. James Mushi" class="card-img-top">
+              <div class="card-body">
+                <h4>Dr. James Mushi</h4>
+                <p class="text-muted">School Manager</p>
+                <div class="social d-flex justify-content-center">
+                  <a href="https://instagram.com/drjamesmushi" target="_blank"><i class="bi bi-instagram" style="color: #8a3ab9;">📸</i></a>
+                  <a href="https://wa.me/255767123456" target="_blank"><i class="bi bi-whatsapp" style="color: #25d366;">💬</i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/staff/bursar.JPG' %}" alt="Maria Kweka" class="card-img-top">
+              <div class="card-body">
+                <h4>Maria Kweka</h4>
+                <p class="text-muted">Bursar</p>
+                <div class="social d-flex justify-content-center">
+                  <a href="https://instagram.com/mariakweka" target="_blank"><i class="bi bi-instagram" style="color: #8a3ab9;">📸</i></a>
+                  <a href="https://wa.me/255757123456" target="_blank"><i class="bi bi-whatsapp" style="color: #25d366;">💬</i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/staff/headmaster.JPG' %}" alt="John Nyondo" class="card-img-top">
+              <div class="card-body">
+                <h4>John Nyondo</h4>
+                <p class="text-muted">Headmaster</p>
+                <div class="social d-flex justify-content-center">
+                  <a href="https://instagram.com/johnnyondo" target="_blank"><i class="bi bi-instagram" style="color: #8a3ab9;">📸</i></a>
+                  <a href="https://wa.me/255787123456" target="_blank"><i class="bi bi-whatsapp" style="color: #25d366;">💬</i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/staff/second-master.JPG' %}" alt="Peter Mwita" class="card-img-top">
+              <div class="card-body">
+                <h4>Peter Mwita</h4>
+                <p class="text-muted">Second Master</p>
+                <div class="social d-flex justify-content-center">
+                  <a href="https://instagram.com/petermwita" target="_blank"><i class="bi bi-instagram" style="color: #8a3ab9;">📸</i></a>
+                  <a href="https://wa.me/255717123456" target="_blank"><i class="bi bi-whatsapp" style="color: #25d366;">💬</i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/staff/academic-master.JPG' %}" alt="Anna Mushi" class="card-img-top">
+              <div class="card-body">
+                <h4>Anna Mushi</h4>
+                <p class="text-muted">Academic Master</p>
+                <div class="social d-flex justify-content-center">
+                  <a href="https://instagram.com/annamushi" target="_blank"><i class="bi bi-instagram" style="color: #8a3ab9;">📸</i></a>
+                  <a href="https://wa.me/255737123456" target="_blank"><i class="bi bi-whatsapp" style="color: #25d366;">💬</i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="curriculum" class="curriculum section">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Curriculum</h2>
+          <p>Core Subjects for Holistic Development</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/courses/course-1.jpeg' %}" alt="English Language" class="card-img-top" style="height: 120px;">
+              <div class="card-body text-center">
+                <h4>English Language</h4>
+                <p>Strong communication skills with ample resources.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/courses/course-2.png' %}" alt="Mathematics" class="card-img-top" style="height: 120px;">
+              <div class="card-body text-center">
+                <h4>Mathematics</h4>
+                <p>Logical thinking with regular assessments.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/courses/course-3.png' %}" alt="Science" class="card-img-top" style="height: 120px;">
+              <div class="card-body text-center">
+                <h4>Science</h4>
+                <p>Hands-on experiments in equipped labs.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+            <div class="card h-100 shadow-sm">
+              <img src="{% static 'img/courses/course-4.webp' %}" alt="Computer Skills" class="card-img-top" style="height: 120px;">
+              <div class="card-body text-center">
+                <h4>Computer Skills</h4>
+                <p>Essential digital literacy training.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="gallery section bg-light">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Gallery</h2>
+          <p>Mixtures of School Life</p>
+        </div>
+        <div class="gallery-grid">
+          <a href="{% static 'img/gallery/mix-1.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="100"><img src="{% static 'img/gallery/mix-1.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-2.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="150"><img src="{% static 'img/gallery/mix-2.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-3.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="200"><img src="{% static 'img/gallery/mix-3.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-4.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="250"><img src="{% static 'img/gallery/mix-4.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-5.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="300"><img src="{% static 'img/gallery/mix-5.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-6.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="350"><img src="{% static 'img/gallery/mix-6.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-7.jpg' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="400"><img src="{% static 'img/gallery/mix-7.jpg' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-8.png' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="450"><img src="{% static 'img/gallery/mix-8.png' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-9.jpg' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="500"><img src="{% static 'img/gallery/mix-9.jpg' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-10.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="550"><img src="{% static 'img/gallery/mix-10.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-11.JPG' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="600"><img src="{% static 'img/gallery/mix-11.JPG' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-12.jpg' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="650"><img src="{% static 'img/gallery/mix-12.jpg' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-13.jpg' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="700"><img src="{% static 'img/gallery/mix-13.jpg' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-14.jpg' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="750"><img src="{% static 'img/gallery/mix-14.jpg' %}" alt="School Life"></a>
+          <a href="{% static 'img/gallery/mix-15.jpg' %}" class="gallery-item glightbox" data-glightbox="title: School Life" data-aos="fade-up" data-aos-delay="800"><img src="{% static 'img/gallery/mix-15.jpg' %}" alt="School Life"></a>
+        </div>
+      </div>
+    </section>
+
+    <section id="news-events" class="news-events section">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>News & Events</h2>
+          <p>Latest Updates and Achievements</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h4>PSLE Results 2022 <span class="badge">New</span></h4>
+                <p>Check the official NECTA Standard 7 results for 2022 at Victory English Medium School.</p>
+                <a href="https://onlinesys.necta.go.tz/results/2022/psle/results/shl_ps0501088.htm" target="_blank" class="btn btn-primary btn-sm">View Results</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h4>PSLE Results 2023 <span class="badge">Updated</span></h4>
+                <p>View the latest NECTA Standard 7 results for 2023 from Victory English Medium School.</p>
+                <a href="https://onlinesys.necta.go.tz/results/2023/psle/results/shl_ps0501088.htm" target="_blank" class="btn btn-primary btn-sm">View Results</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h4>PSLE Results 2024 <span class="badge">Latest</span></h4>
+                <p>Explore the most recent NECTA Standard 7 results for 2024 at Victory English Medium School.</p>
+                <a href="https://onlinesys.necta.go.tz/results/2024/psle/results/shl_ps0501088.htm" target="_blank" class="btn btn-primary btn-sm">View Results</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact section bg-light">
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Contact</h2>
+          <p>Get in Touch</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="row g-3">
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 shadow-sm text-center p-3">
+                  <img src="{% static 'img/contact/address.jpg' %}" alt="Address" class="card-img-top" style="height: 150px;">
+                  <h4>Address <span style="color: #ff5733;">📍</span></h4>
+                  <p>Rukaragata St, Biharamulo, Kagera, Tanzania</p>
+                </div>
+              </div>
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 shadow-sm text-center p-3">
+                  <img src="{% static 'img/contact/call.jpg' %}" alt="Call Us" class="card-img-top" style="height: 150px;">
+                  <h4>Call Us <span style="color: #33ff57;">📞</span></h4>
+                  <p><a href="tel:+255767123456" class="text-decoration-none">+255 767 123 456</a></p>
+                </div>
+              </div>
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 shadow-sm text-center p-3">
+                  <img src="{% static 'img/contact/whatsapp.jpg' %}" alt="WhatsApp" class="card-img-top" style="height: 150px;">
+                  <h4>WhatsApp <span style="color: #25d366;">💬</span></h4>
+                  <p><a href="https://wa.me/255767123456" class="text-decoration-none">+255 767 123 456</a></p>
+                </div>
+              </div>
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="card h-100 shadow-sm text-center p-3">
+                  <img src="{% static 'img/contact/email.jpg' %}" alt="Email Us" class="card-img-top" style="height: 150px;">
+                  <h4>Email Us <span style="color: #5733ff;">✉️</span></h4>
+                  <p><a href="mailto:info@victoryschool.ac.tz" class="text-decoration-none">info@victoryschool.ac.tz</a></p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4" data-aos="fade-up" data-aos-delay="500">
+              <h4>Location Map <span style="color: #ff5733;">🗺️</span></h4>
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d990.123456!2d31.9756!3d-3.6061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0000000000000000%3A0x0000000000000000!2zVsOhY3RvcnkgRW5nbGlzaCBNZWRpdW0gU2Nob29s!5e0!3m2!1sen!2stz!4v1623456789!5m2!1sen!2stz" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+          </div>
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
+            <form method="POST" class="p-4 shadow-sm bg-white rounded-3">
+              {% csrf_token %}
+              <div class="mb-3">
+                <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+              </div>
+              <div class="mb-3">
+                <input type="email" name="email" class="form-control" placeholder="Your Email" required>
+              </div>
+              <div class="mb-3">
+                <input type="text" name="subject" class="form-control" placeholder="Subject" required>
+              </div>
+              <div class="mb-3">
+                <textarea name="message" class="form-control" placeholder="Message" rows="5" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="container footer-top" data-aos="fade-up">
+      <div class="footer-about">
+        <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+          <img src="{% static 'img/logo.jpg' %}" alt="Victory School Logo" class="img-fluid rounded-circle">
+          <span class="sitename">Victory School</span>
+        </a>
+        <div class="footer-contact mt-3">
+          <p>Rukaragata St, Biharamulo, Kagera, Tanzania</p>
+          <p><strong>Phone:</strong> <span>+255 767 123 456</span></p>
+          <p><strong>WhatsApp:</strong> <span><a href="https://wa.me/255767123456" class="text-decoration-none">+255 767 123 456</a></span></p>
+          <p><strong>Email:</strong> <span><a href="mailto:info@victoryschool.ac.tz" class="text-decoration-none">info@victoryschool.ac.tz</a></span></p>
+        </div>
+        <div class="social-links d-flex mt-3">
+          <a href="https://x.com/victoryschooltz" target="_blank"><i class="bi bi-twitter-x"></i></a>
+          <a href="https://facebook.com/victoryschooltz" target="_blank"><i class="bi bi-facebook"></i></a>
+          <a href="https://instagram.com/victoryschooltz" target="_blank"><i class="bi bi-instagram" style="color: #8a3ab9;">📸</i></a>
+          <a href="https://linkedin.com/company/victoryschooltz" target="_blank"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Useful Links</h4>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#curriculum">Curriculum</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#news-events">News & Events</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="{% url 'custom_login' %}">Login</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Our Programs</h4>
+        <ul>
+          <li><a href="#fees">Pre-Primary</a></li>
+          <li><a href="#fees">Std 1-3</a></li>
+          <li><a href="#fees">Std 4-7</a></li>
+          <li><a href="#fees">Boarding</a></li>
+        </ul>
+      </div>
+      <div class="footer-newsletter">
+        <h4>Our Newsletter</h4>
+        <p>Subscribe for updates on school events!</p>
+        <form method="POST" class="d-flex">
+          {% csrf_token %}
+          <input type="email" name="email" placeholder="Your Email" class="form-control me-2" required>
+          <button type="submit" class="btn btn-secondary">Subscribe</button>
+        </form>
+      </div>
+    </div>
+    <div class="copyright" data-aos="fade-up" data-aos-delay="200">
+      <p>© 2025 <span class="sitename">Victory English Medium School</span> All Rights Reserved | Developed by <a href="https://www.kizitasoft.co.tz" target="_blank">Kizita Soft Ltd</a></p>
+    </div>
+  </footer>
+
+  <a href="#" id="scroll-top" class="scroll-top"><i class="bi bi-arrow-up"></i></a>
+
+  <!-- JavaScript Files -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/js/glightbox.min.js"></script>
+  <script>
+    // AOS Initialization
+    AOS.init({ duration: 1000, once: true });
+
+    // Lightbox Initialization
+    const lightbox = GLightbox({
+      touchNavigation: true,
+      loop: true,
+      zoomable: true
+    });
+
+    // Swiper Initialization
+    const swiper = new Swiper('.swiper', {
+      loop: true,
+      autoplay: { delay: 3500, disableOnInteraction: false },
+      pagination: { el: '.swiper-pagination', clickable: true },
+      speed: 1000
+    });
+
+    // Scroll to Top Functionality
+    const scrollTop = document.querySelector('#scroll-top');
+    window.addEventListener('scroll', () => {
+      scrollTop.style.display = (window.scrollY > 300) ? 'flex' : 'none';
+    });
+
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Mobile Menu Toggle and Navigation
+    document.querySelector('.navbar-toggler').addEventListener('click', () => {
+      const offcanvas = document.getElementById('offcanvasNavbar');
+      offcanvas.addEventListener('show.bs.offcanvas', () => {
+        document.body.style.overflow = 'hidden';
+      });
+      offcanvas.addEventListener('hidden.bs.offcanvas', () => {
+        document.body.style.overflow = 'auto';
+      });
+    });
+
+    // Close offcanvas and handle navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href.startsWith('#')) {
+          e.preventDefault();
+          const targetSection = document.querySelector(href);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+            const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasNavbar'));
+            if (offcanvas) {
+              offcanvas.hide();
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

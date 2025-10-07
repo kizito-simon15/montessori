@@ -1,0 +1,119 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load humanize %}
+
+{% block content-header %}
+<div class="card-header" data-aos="fade-down" data-aos-duration="1000">
+  <div class="card-tools">
+    <button type="button" class="btn btn-primary" id="printButton">Print</button>
+    <a href="{% url 'bursor-invoice-update' object.id %}" class="btn btn-primary">
+      <i class="fas fa-edit"></i> Edit
+    </a>
+    <a href="{% url 'bursor-invoice-delete' object.id %}" class="btn btn-danger">
+      <i class="fas fa-times"></i> Delete
+    </a>
+  </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<div class="container mt-4" data-aos="fade-up" data-aos-duration="1000">
+  <div class="row">
+    <div class="col-sm-4">
+      <h3>{{ object }} </h3>
+      <h5>{{ object.session }} </h5>
+      <h5>{{ object.installment }} </h5>
+      <h5>{{ object.class_for }} </h5>
+      <h6>Status: {{ object.get_status_display }} </h6>
+      <hr>
+      <div>
+        <h4>Expected Balance: {{ object.balance | intcomma }}</h4>
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <table class="table table-sm table-bordered">
+        Invoice Breakdown</br>
+        <thead class="thead-light">
+          <tr>
+            <th>S/N</th>
+            <th>Description</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ forloop.counter }} </td>
+            <td>{{ item.description }} </td>
+            <td>{{ item.amount }} </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td>Total Amount this installment</td>
+            <td>{{ object.amount_payable | intcomma}}</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Balance from previous installment</td>
+            <td>{{ object.balance_from_previous_install | intcomma }}</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Total Amount Payable</td>
+            <td>{{ object.total_amount_payable | intcomma}}</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Total Amount Paid</td>
+            <td>{{ object.total_amount_paid | intcomma}}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <hr>
+
+  <h5>Payment History</h5>
+  <table class="table table-bordered table-sm">
+    <thead class="thead-light">
+      <tr>
+        <th>S/N</th>
+        <th>Amount Paid</th>
+        <th>Date Paid</th>
+        <th>Comment Paid</th>
+        <th>Payment Method</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for receipt in receipts %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ receipt.amount_paid}}</td>
+        <td>{{ receipt.date_paid}}</td>
+        <td>{{ receipt.comment}}</td>
+        <td>{{ receipt.payment_method }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+<script>
+  // Function to handle printing
+  function handlePrint() {
+    window.print();
+  }
+
+  // Add click event listener to the print button
+  document.getElementById("printButton").addEventListener("click", handlePrint);
+
+  // Initialize AOS
+  AOS.init();
+</script>
+
+{% endblock content %}

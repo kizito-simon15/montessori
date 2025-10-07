@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Confirm Delete
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="alert alert-warning" role="alert">
+    <h4 class="alert-heading">Confirm Deletion</h4>
+    <p>Are you sure you want to delete all results that match the current filters?</p>
+    <hr>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="class_select" value="{{ class_select }}">
+      <input type="hidden" name="subject_select" value="{{ subject_select }}">
+      <input type="hidden" name="student_name" value="{{ student_name }}">
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'edit-results' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock content %}

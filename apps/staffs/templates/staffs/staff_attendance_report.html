@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+    <h2>Staff Attendance Report</h2>
+    {% for date, records in grouped_attendance.items %}
+        <h4 class="mt-4">{{ date }}</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Time of Arrival</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for record in records %}
+                <tr class="{{ record.tick_color }}">
+                    <td>{{ record.user.username }}</td>
+                    <td>{{ record.is_present|yesno:"Present,Absent" }}</td>
+                    <td>{{ record.time_of_arrival|default:"No Arrival Time" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% empty %}
+    <p>No attendance records found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

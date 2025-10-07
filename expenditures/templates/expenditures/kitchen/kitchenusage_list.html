@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+{% include "expenditures/partials/_kitchen_css.html" %}
+
+<div class="card">
+  <div class="card-header">
+    <h2>🍴 Kitchen Usage</h2>
+    <a href="{% url 'kitchenusage_create' %}" class="btn btn-primary">➕ Record use</a>
+  </div>
+
+  <div class="card-body">
+    <form class="filter-bar" method="get">
+      <select name="product">
+        <option value="">— All products —</option>
+        {% for p in products %}
+          <option value="{{ p.pk }}" {% if request.GET.product == p.pk|stringformat:"s" %}selected{% endif %}>
+            {{ p.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary">Filter</button>
+      <a class="btn btn-secondary" href="{% url 'kitchenusage_list' %}">Reset</a>
+    </form>
+
+    <p class="stat">Total used: <span>{{ total_used|floatformat:2|intcomma }}</span></p>
+
+    <div style="overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th><th>Date</th><th>Product</th>
+            <th style="text-align:right;">Qty used</th>
+            <th style="width:110px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in rows %}
+            <tr>
+              <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+              <td>{{ u.date }}</td>
+              <td>{{ u.product.name }}</td>
+              <td style="text-align:right;">{{ u.quantity_used|floatformat:2 }} {{ u.product.unit }}</td>
+              <td>
+                <a href="{% url 'kitchenusage_update' u.pk %}" class="btn btn-primary">✏️</a>
+                <a href="{% url 'kitchenusage_delete' u.pk %}" class="btn btn-danger">🗑️</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5">No usage recorded.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+      {% include "expenditures/partials/_pager.html" %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

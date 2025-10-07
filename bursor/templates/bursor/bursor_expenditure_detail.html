@@ -1,0 +1,104 @@
+{% extends "bursor/bursor_base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenditure Detail</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: hwb(210 72% 21%);
+        }
+        p {
+            margin-bottom: 10px;
+        }
+        strong {
+            font-weight: bold;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px; /* Add margin between tables */
+        }
+        th, td {
+            border: 1px solid #add8e6;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: teal;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expenditure Detail</h1>
+        <!-- Iterate over each item and display its details -->
+        {% for item, expenditures in item_expenditures.items %}
+            <h2>{{ item }}</h2> <!-- Display item name as a heading -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Quantity</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Attachment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Iterate over each expenditure for the current item -->
+                    {% for expenditure in expenditures %}
+                        <tr>
+                            <td>{{ expenditure.amount }}</td>
+                            <td>{{ expenditure.quantity }}</td>
+                            <td>{{ expenditure.date }}</td>
+                            <td>{{ expenditure.description }}</td>
+                            <td>
+                                {% if expenditure.attachment %}
+                                    {% if expenditure.attachment.name|lower|slice:'-4:' == '.jpg' or expenditure.attachment.name|lower|slice:'-5:' == '.jpeg' or expenditure.attachment.name|lower|slice:'-4:' == '.png' %}
+                                        <img src="{{ expenditure.attachment.url }}" alt="Attachment">
+                                    {% elif expenditure.attachment.name|lower|slice:'-4:' == '.pdf' %}
+                                        <a href="{{ expenditure.attachment.url }}">View PDF</a>
+                                    {% elif expenditure.attachment.name|lower|slice:'-4:' == '.doc' or expenditure.attachment.name|lower|slice:'-5:' == '.docx' %}
+                                        <a href="{{ expenditure.attachment.url }}">View Word Document</a>
+                                    {% else %}
+                                        <a href="{{ expenditure.attachment.url }}">Download Attachment</a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

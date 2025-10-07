@@ -1,0 +1,15 @@
+{% extends 'bursor/bursor_base.html' %}
+
+{% block title %}Expenditure Invoice Detail{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Expenditure Invoice Detail</h1>
+    <p><strong>Date:</strong> {{ invoice.date }}</p>
+    <p><strong>Depositor Name:</strong> {{ invoice.depositor_name }}</p>
+    <p><strong>Initial Balance:</strong> {{ invoice.initial_balance }}</p>
+    <!-- Add delete and edit links -->
+    <a href="{% url 'bursor-expenditure-invoice-edit' invoice.pk %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'bursor-expenditure-invoice-delete' invoice.pk %}" class="btn btn-danger">Delete</a>
+</div>
+{% endblock content %}

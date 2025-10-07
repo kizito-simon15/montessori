@@ -1,0 +1,87 @@
+{% extends "base.html" %}{% load humanize %}
+{% block title %}Kitchen · Daily Consumption{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{--indigo:#1e40af;--bg:#f8fafc;--card:#fff;--rad:22px}
+html,body{margin:0;background:var(--bg);font-family:Inter,sans-serif}
+.card{background:var(--card);border-radius:0 0 18px 18px;
+      box-shadow:0 4px 14px rgba(0,0,0,.08);opacity:0;transform:translateY(28px);
+      transition:.5s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.head{padding:.7rem 1.3rem;border-bottom:1px solid #e2e8f0;
+      display:flex;justify-content:space-between;align-items:center}
+.head h2{margin:0;font-size:1.35rem;font-weight:700;color:var(--indigo)}
+.body{padding:1rem 1.3rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.85rem}
+.tbl th,.tbl td{padding:.45rem .7rem;border-bottom:1px solid #e5e7eb}
+.tbl thead{background:var(--indigo);color:#fff}
+.tbl tbody tr:nth-child(even){background:#f1f5ff}
+.tbl tbody tr:hover{background:#e0e7ff}
+.text-end{text-align:right}
+.kpi{font-size:.9rem;font-weight:600;margin-bottom:.6rem}
+.kpi span{color:var(--indigo)}
+.spark{height:120px!important}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelector(".card").classList.add("show");
+
+  new Chart("trend",{type:"bar",
+    data:{labels:{{ chart_labels|safe }},
+          datasets:[{data:{{ chart_series|safe }},
+            backgroundColor:"rgba(30,64,175,.6)"}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},
+             scales:{x:{display:false},y:{display:false}}}});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <!-- heading -->
+  <div class="head">
+    <h2>🗓️ Daily Consumption</h2>
+    <a href="{% url 'dailyconsumption_create' %}" class="btn btn-indigo">➕ New</a>
+  </div>
+
+  <div class="body">
+    <!-- KPI -->
+    <p class="kpi">Total used:
+       <span>{{ total_used|floatformat:2|intcomma }}</span></p>
+
+    <!-- 30-day trend bar -->
+    <div style="height:120px;margin-bottom:1rem">
+      <canvas id="trend" class="spark"></canvas>
+    </div>
+
+    <!-- table -->
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr><th>#</th><th>Date</th><th>Product</th>
+              <th class="text-end">Qty</th><th>Recorded by</th><th>Remarks</th></tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.product.name }}</td>
+            <td class="text-end">{{ row.quantity_used|floatformat:2 }}</td>
+            <td>{{ row.recorded_by|default:"—" }}</td>
+            <td>{{ row.remarks|default:"—" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6">No consumption rows yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

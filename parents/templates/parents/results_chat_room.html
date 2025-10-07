@@ -1,0 +1,164 @@
+{% extends "parents/parent_base.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results Chat Room</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message {
+            max-width: 60%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message.question {
+            background-color: #e0f7fa;
+            align-self: flex-start;
+        }
+
+        .chat-message.answered {
+            background-color: #f1f8e9;
+            align-self: flex-end;
+        }
+
+        .chat-status {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .new-status {
+            color: green;
+        }
+
+        .old-status {
+            color: gray;
+        }
+
+        .answered-status {
+            color: blue;
+        }
+
+        .chat-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-text {
+            margin-bottom: 5px;
+        }
+
+        .chat-text p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .chat-text small {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .update-action {
+            color: green;
+            text-decoration: none;
+        }
+
+        .delete-action {
+            color: red;
+            text-decoration: none;
+        }
+
+        .satisfied-action {
+            color: blue;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container" data-aos="fade-up" data-aos-duration="2000">
+    <h2>Results Chat Room</h2>
+    <div class="chat-container">
+        {% for comment in comments %}
+        <div class="chat-message question">
+            <div class="chat-status">
+                {% if comment.date_commented == comment.date_updated_comments %}
+                <span class="new-status">New</span>
+                {% else %}
+                <span class="old-status">Old</span>
+                {% endif %}
+            </div>
+            <div class="chat-content">
+                <div class="chat-text">
+                    <p>{{ comment.comment }}</p>
+                    <small>{{ comment.date_commented }}</small>
+                </div>
+                <div class="chat-actions">
+                    <a href="{% url 'edit_comment' comment.id %}" class="update-action">
+                        <i class="fas fa-edit"></i> Update
+                    </a>
+                    <a href="{% url 'delete_result_comment' comment.id %}" class="delete-action">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                    {% if not comment.mark_comment %}
+                    <a href="{% url 'mark_satisfied' comment.id %}" class="satisfied-action">
+                        <i class="fas fa-thumbs-up"></i> Satisfied
+                    </a>
+                    {% else %}
+                    <i class="fas fa-thumbs-up" style="color: green;"></i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="chat-message answered">
+            <div class="chat-status">
+                <span class="answered-status">Answered</span>
+            </div>
+            <div class="chat-content">
+                <div class="chat-text">
+                    <p>Answer from the department goes here...</p>
+                    <small>{{ comment.date_updated_comments }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

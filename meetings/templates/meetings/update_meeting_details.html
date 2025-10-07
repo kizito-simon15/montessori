@@ -1,0 +1,120 @@
+<!-- update_meeting_details.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Update Meeting Details</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Meeting Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">Meeting Details</div>
+            <div class="card-body">
+                {{ meeting_form.as_p }}
+            </div>
+        </div>
+
+        <!-- Agendas Formset -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">Agendas</div>
+            <div class="card-body">
+                {{ agenda_formset.management_form }}
+                {% for form in agenda_formset %}
+                    <div class="agenda-item border rounded p-2 mb-2">
+                        {{ form.as_p }}
+                        {% if form.instance.pk %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    {{ form.DELETE }} Remove this agenda
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="button" class="btn btn-outline-secondary" onclick="addForm(this, 'agenda')">Add Agenda</button>
+            </div>
+        </div>
+
+        <!-- Participants Formset -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">Participants</div>
+            <div class="card-body">
+                {{ participant_formset.management_form }}
+                {% for form in participant_formset %}
+                    <div class="participant-item border rounded p-2 mb-2">
+                        {{ form.as_p }}
+                        {% if form.instance.pk %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    {{ form.DELETE }} Remove this participant
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="button" class="btn btn-outline-secondary" onclick="addForm(this, 'participant')">Add Participant</button>
+            </div>
+        </div>
+
+        <!-- Notifications Formset -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">Notifications</div>
+            <div class="card-body">
+                {{ notification_formset.management_form }}
+                {% for form in notification_formset %}
+                    <div class="notification-item border rounded p-2 mb-2">
+                        {{ form.as_p }}
+                        {% if form.instance.pk %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    {{ form.DELETE }} Remove this notification
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="button" class="btn btn-outline-secondary" onclick="addForm(this, 'notification')">Add Notification</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-4">Save Changes</button>
+    </form>
+</div>
+
+<script>
+    // JavaScript to dynamically add form fields for each formset
+    function addForm(button, formType) {
+        const formCount = document.getElementById('id_' + formType + '-TOTAL_FORMS');
+        const currentCount = parseInt(formCount.value);
+        const newForm = document.querySelector('.' + formType + '-item').cloneNode(true);
+        newForm.querySelectorAll('input, select, textarea').forEach((input) => {
+            input.name = input.name.replace('-' + (currentCount - 1) + '-', '-' + currentCount + '-');
+            input.id = input.id.replace('-' + (currentCount - 1) + '-', '-' + currentCount + '-');
+            if (input.type !== 'hidden') input.value = '';
+        });
+        formCount.value = currentCount + 1;
+        button.insertAdjacentElement('beforebegin', newForm);
+    }
+</script>
+
+<style>
+    .container {
+        max-width: 900px;
+        background-color: #f9f9f9;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    .card {
+        border-radius: 10px;
+    }
+    .btn-outline-secondary, .btn-primary {
+        font-weight: 500;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

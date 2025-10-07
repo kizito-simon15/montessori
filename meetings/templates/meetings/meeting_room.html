@@ -1,0 +1,110 @@
+{% extends base_template %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Meeting Room: {{ meeting.title }}</h2>
+    <p>Welcome, {{ participant.user.username }}! You are now in the meeting room.</p>
+
+    <!-- Participants Grid -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Active Participants (with Jitsi) -->
+        {% for active in active_participants %}
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    {{ active.user.username }}
+                </div>
+                <div class="card-body" style="height: 300px;">
+                    {% if active.user == participant.user %}
+                    <!-- Jitsi Meet Embed for current user -->
+                    <div id="jitsi-container" style="height: 100%;"></div>
+                    {% else %}
+                    <div class="text-center">
+                        <h5>Video stream for {{ active.user.username }}</h5>
+                        <p class="text-muted">Talking, laughing, and exchanging feelings</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Absent Participants (placeholder) -->
+        {% for absent in absent_participants %}
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    {{ absent.user.username }}
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <h4 class="text-muted">Absent</h4>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Jitsi Script for Current User -->
+{% if participant.has_video %}
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const domain = "meet.jit.si";
+        const options = {
+            roomName: "{{ room_name }}",
+            width: '100%',
+            height: 300,
+            parentNode: document.getElementById('jitsi-container'),
+            userInfo: {
+                displayName: "{{ participant.user.username }}"
+            },
+            configOverwrite: {
+                prejoinPageEnabled: false, 
+                startWithAudioMuted: false,
+                startWithVideoMuted: false,
+                enableWelcomePage: false,
+            },
+            interfaceConfigOverwrite: {
+                TILE_VIEW_MAX_COLUMNS: 3,
+                SHOW_JITSI_WATERMARK: false,
+                SHOW_WATERMARK_FOR_GUESTS: false,
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'hangup', 'tileview', 'fullscreen',
+                    'chat', 'raisehand'
+                ],
+            }
+        };
+        new JitsiMeetExternalAPI(domain, options);
+    });
+</script>
+{% endif %}
+
+<style>
+    .container {
+        max-width: 1000px;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    h2 {
+        font-weight: 700;
+        color: #007aff;
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .card-header {
+        font-weight: 600;
+    }
+    .card-body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+{% endblock %}

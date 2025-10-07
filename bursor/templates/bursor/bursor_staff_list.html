@@ -1,0 +1,226 @@
+{% extends 'bursor/bursor_base.html' %}
+
+{% block title %}Staff List{% endblock title %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background: linear-gradient(to right, #f0f9ff, #e6f7ff); border-radius: 12px;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2 class="mb-4 text-primary fw-bold" data-aos="fade-down" data-aos-duration="1000">
+      <i class="fas fa-users"></i> Staff List
+    </h2>
+    <!-- Three Dots Menu -->
+    <div class="dropdown">
+      <button class="btn btn-light btn-sm rounded-circle dropdown-toggle shadow-sm" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background: white; color: #2575fc; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="menuDropdown">
+        <li data-aos="fade-in" data-aos-duration="500">
+          <a class="dropdown-item" href="{% url 'bursor-staff-list' %}">
+            <i class="fas fa-users me-2"></i>Staff List
+          </a>
+        </li>
+        <li data-aos="fade-in" data-aos-duration="500" data-aos-delay="200">
+          <a class="dropdown-item" href="{% url 'bursor_details' %}">
+            <i class="fas fa-info-circle me-2"></i>Bursor Details
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="card p-4 shadow-lg mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #ffffff, #e3f2fd);">
+    <div class="row g-4 align-items-center">
+      <!-- Occupation Dropdown -->
+      <div class="col-md-4">
+        <label for="occupationSelect" class="form-label text-secondary"><i class="fas fa-briefcase"></i> Filter by Occupation:</label>
+        <select id="occupationSelect" class="form-select bg-light border-primary">
+          <option value="">All</option>
+          <option value="teacher">Teacher</option>
+          <option value="administrator">Administrator</option>
+          <option value="support_staff">Support Staff</option>
+        </select>
+      </div>
+
+      <!-- Search Field -->
+      <div class="col-md-6">
+        <label for="searchInput" class="form-label text-secondary"><i class="fas fa-search"></i> Search Staff:</label>
+        <input type="text" id="searchInput" class="form-control border-primary" placeholder="Search by keyword...">
+      </div>
+
+      <!-- Filter Button -->
+      <div class="col-md-2">
+        <button onclick="filterStaff()" class="btn btn-primary w-100">
+          <i class="fas fa-filter"></i> Apply Filter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="card shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #e3f2fd, #f0f9ff);">
+    <div class="card-header bg-gradient-primary text-white">
+      <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Staff Summary</h5>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th><i class="fas fa-male"></i> Total Male Staff</th>
+            <th><i class="fas fa-female"></i> Total Female Staff</th>
+            <th><i class="fas fa-users"></i> Total Staff</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="maleCount">0</td>
+            <td id="femaleCount">0</td>
+            <td id="totalCount">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Staff List Table -->
+  <div class="card shadow-lg" style="border-radius: 16px; background: linear-gradient(to bottom, #ffffff, #e6f7ff);">
+    <div class="card-header bg-gradient-success text-white">
+      <h5 class="mb-0"><i class="fas fa-users"></i> Staff Details</h5>
+    </div>
+    <div class="card-body" style="overflow-x: auto; white-space: nowrap;">
+      <table id="stafftable" class="table table-hover table-bordered">
+        <thead class="table-success">
+          <tr>
+            <th>#</th>
+            <th><i class="fas fa-user"></i> Fullname <span class="sort-arrow" onclick="sortTable(1, 'string', 'asc')">&#9650;</span><span class="sort-arrow" onclick="sortTable(1, 'string', 'desc')">&#9660;</span></th>
+            <th><i class="fas fa-venus-mars"></i> Gender <span class="sort-arrow" onclick="sortTable(2, 'string', 'asc')">&#9650;</span><span class="sort-arrow" onclick="sortTable(2, 'string', 'desc')">&#9660;</span></th>
+            <th><i class="fas fa-phone"></i> Mobile Phone</th>
+            <th><i class="fas fa-briefcase"></i> Occupation</th>
+            <th><i class="fas fa-user-check"></i> Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for staff in object_list %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ staff.firstname }} {{ staff.middle_name }} {{ staff.surname }}</td>
+            <td>{{ staff.get_gender_display }}</td>
+            <td>{{ staff.mobile_number }}</td>
+            <td>{{ staff.occupation }}</td>
+            <td>
+              {% if staff.get_current_status_display == "Active" %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  // Filter staff by occupation
+  function filterStaff() {
+    const selectedOccupation = document.getElementById("occupationSelect").value.toLowerCase();
+    const rows = document.querySelectorAll("#stafftable tbody tr");
+    rows.forEach(row => {
+      const occupation = row.cells[4].innerText.toLowerCase();
+      row.style.display = selectedOccupation === "" || selectedOccupation === occupation ? "" : "none";
+    });
+    updateSummary();
+    resetSerialNumbers();
+  }
+
+  // Update staff summary
+  function updateSummary() {
+    const rows = Array.from(document.querySelectorAll("#stafftable tbody tr"));
+    let maleCount = 0, femaleCount = 0;
+    rows.forEach(row => {
+      if (row.style.display !== "none") {
+        const gender = row.cells[2].innerText.toLowerCase();
+        if (gender === "male") maleCount++;
+        if (gender === "female") femaleCount++;
+      }
+    });
+    document.getElementById("maleCount").innerText = maleCount;
+    document.getElementById("femaleCount").innerText = femaleCount;
+    document.getElementById("totalCount").innerText = maleCount + femaleCount;
+  }
+
+  // Reset serial numbers
+  function resetSerialNumbers() {
+    const rows = document.querySelectorAll("#stafftable tbody tr:not([style*='display: none'])");
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+    });
+  }
+
+  // Sort table columns
+  function sortTable(colIndex, type, order) {
+    const table = document.getElementById("stafftable");
+    const rows = Array.from(table.rows).slice(1);
+    rows.sort((a, b) => {
+      let valA = a.cells[colIndex].innerText.trim();
+      let valB = b.cells[colIndex].innerText.trim();
+      return order === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    });
+    rows.forEach(row => table.appendChild(row));
+    resetSerialNumbers();
+  }
+
+  // Initialize functions
+  document.addEventListener("DOMContentLoaded", () => {
+    updateSummary();
+    resetSerialNumbers();
+  });
+</script>
+
+<style>
+  .card-header {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .table-container::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .table-container::-webkit-scrollbar-thumb {
+    background: #d1d1d1;
+    border-radius: 10px;
+  }
+
+  .table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .form-select,
+  .form-control {
+    border-radius: 8px;
+  }
+
+  .btn {
+    border-radius: 8px;
+  }
+
+  .sort-arrow {
+    cursor: pointer;
+    color: gray;
+    padding-left: 5px;
+  }
+</style>
+{% endblock morejs %}

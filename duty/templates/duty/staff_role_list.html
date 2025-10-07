@@ -1,0 +1,270 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e0e6ef;
+    }
+
+    h2 {
+        color: #333;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        background-color: #007aff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .on-duty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .tick {
+        display: inline-block;
+        margin-left: 8px;
+        width: 18px;
+        height: 18px;
+        background-color: #34c759; /* iOS-like green */
+        border-radius: 50%;
+        position: relative;
+    }
+
+    .tick::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 10px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .btn-filter {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px;
+        border: none;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+        color: #fff;
+        transition: background-color 0.3s;
+        background-color: #007aff;
+    }
+
+    .btn-filter:hover {
+        background-color: #0063cc;
+    }
+
+    .table-section {
+        display: none;
+    }
+
+    .btn-filter.active {
+        background-color: #34c759;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    table th, table td {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    table th {
+        background-color: #007aff;
+        color: #ffffff;
+    }
+
+    table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    table tr:hover {
+        background-color: #eaf4ff;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 5px 15px;
+        border: none;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        text-align: center;
+        color: #fff;
+        transition: background-color 0.3s;
+        margin: 0 5px;
+    }
+
+    .btn-update {
+        background-color: #4CAF50; /* Green */
+    }
+
+    .btn-update:hover {
+        background-color: #45a049;
+    }
+
+    .btn-delete {
+        background-color: #f44336; /* Red */
+    }
+
+    .btn-delete:hover {
+        background-color: #d32f2f;
+    }
+
+    .btn-assign {
+        background-color: #34c759; /* iOS-like green */
+        margin-top: 20px;
+    }
+
+    .btn-assign:hover {
+        background-color: #28a745;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2>Staff Role Management</h2>
+
+    <!-- Display Staff on Duty -->
+    <div class="on-duty">
+        <span>Staff on Duty:</span>
+        {% if staff_on_duty %}
+            <span>{{ staff_on_duty.staff }}<span class="tick"></span></span>
+        {% else %}
+            <span>No staff on duty currently.</span>
+        {% endif %}
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="text-center">
+        <button id="btn-staff-roles" class="btn-filter active">Staff Roles</button>
+        <button id="btn-class-teachers" class="btn-filter">Class Teachers</button>
+    </div>
+
+    <!-- Staff Roles Section -->
+    <div id="staff-roles-section" class="table-section" style="display: block;">
+        {% for class_info in class_roles.values %}
+            <h3>Class: {{ class_info.class_name }}</h3>
+            <table class="table mb-4">
+                <thead>
+                    <tr>
+                        <th>Staff Name</th>
+                        <th>Class</th>
+                        <th>Subject</th>
+                        <th>Date Assigned</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for role in class_info.roles %}
+                        <tr>
+                            <td>{{ role.staff }}</td>
+                            <td>{{ role.assigned_class }}</td>
+                            <td>
+                                {% if role.subject %}
+                                    {{ role.subject.name }}
+                                {% else %}
+                                    Class teacher
+                                {% endif %}
+                            </td>
+                            <td>{{ role.date_assigned }}</td>
+                            <td>
+                                <a href="{% url 'update-staff-role' role.id %}" class="btn btn-update">Update</a>
+                                <a href="{% url 'delete-staff-role' role.id %}" class="btn btn-delete">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+
+    <!-- Class Teachers Section -->
+    <div id="class-teachers-section" class="table-section">
+        <h3>Class Teachers List</h3>
+        <table class="table mb-4">
+            <thead>
+                <tr>
+                    <th>Teacher Name</th>
+                    <th>Class</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in class_teachers %}
+                    <tr>
+                        <td>{{ teacher.staff }}</td>
+                        <td>{{ teacher.assigned_class }}</td>
+                        <td>
+                            <a href="{% url 'update-class-teacher' teacher.id %}" class="btn btn-update">Update</a>
+                            <a href="{% url 'delete-class-teacher' teacher.id %}" class="btn btn-delete">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">No class teachers available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'assign-staff-role' %}" class="btn btn-assign">Assign New Staff Role</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnStaffRoles = document.getElementById('btn-staff-roles');
+        const btnClassTeachers = document.getElementById('btn-class-teachers');
+        const staffRolesSection = document.getElementById('staff-roles-section');
+        const classTeachersSection = document.getElementById('class-teachers-section');
+
+        btnStaffRoles.addEventListener('click', function() {
+            btnStaffRoles.classList.add('active');
+            btnClassTeachers.classList.remove('active');
+            staffRolesSection.style.display = 'block';
+            classTeachersSection.style.display = 'none';
+        });
+
+        btnClassTeachers.addEventListener('click', function() {
+            btnClassTeachers.classList.add('active');
+            btnStaffRoles.classList.remove('active');
+            classTeachersSection.style.display = 'block';
+            staffRolesSection.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

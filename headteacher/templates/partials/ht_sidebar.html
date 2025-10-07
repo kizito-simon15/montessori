@@ -1,0 +1,69 @@
+{% load static %}
+<div class="d-flex flex-column h-100">
+
+  <!-- brand / logo -->
+  <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom border-secondary">
+    <div class="d-flex align-items-center gap-2">
+      <img src="{% static 'images/logo.jpg' %}" alt="logo"
+           class="rounded-circle shadow-sm" width="40" height="40">
+      <span class="fw-bold text-white small">Victory School</span>
+    </div>
+    <button id="vsClose" class="icon-btn d-lg-none">❌</button>
+  </div>
+
+  <!-- nav links -->
+  <nav class="list-group list-group-flush flex-grow-1 mt-3">
+    <a href="{% url 'headteacher_dashboard' %}"
+       class="list-group-item list-group-item-action d-flex align-items-center gap-2
+              {% if request.path == '/headteacher/dashboard/' %}active{% endif %}"
+       style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;">
+      📊 <span>Overview</span>
+    </a>
+
+    <a href="{% url 'headteacher_student_list' %}"
+       class="list-group-item list-group-item-action d-flex align-items-center gap-2
+              {% if request.path == '/headteacher/students/' %}active{% endif %}"
+       style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;">
+      🧑‍🎓 <span>Students</span>
+    </a>
+
+    <a href="{% url 'headteacher_assign_term' %}"
+       class="list-group-item list-group-item-action d-flex align-items-center gap-2
+              {% if request.path == '/headteacher/assign-term/' %}active{% endif %}"
+       style="background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#fff;">
+      📅 <span>Assign Term</span>
+    </a>
+
+    <a href="{% url 'staff-list' %}"
+       class="list-group-item list-group-item-action d-flex align-items-center gap-2
+              {% if request.path == '/staff/' %}active{% endif %}"
+       style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;">
+      👥 <span>Staff</span>
+    </a>
+
+    <a href="{% url 'send_sms_form' %}"
+       class="list-group-item list-group-item-action d-flex align-items-center gap-2
+              {% if request.path == '/sms/send/' %}active{% endif %}"
+       style="background:linear-gradient(135deg,#06b6d4,#0284c7);color:#fff;">
+      ✉️ <span>Send SMS</span>
+    </a>
+
+    <a href="{% url 'sms_history' %}"
+       class="list-group-item list-group-item-action d-flex align-items-center gap-2
+              {% if request.path == '/sms/history/' %}active{% endif %}"
+       style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;">
+      📜 <span>SMS History</span>
+    </a>
+  </nav>
+
+  <!-- footer (optional quick link) -->
+  <div class="mt-auto p-3 border-top border-secondary small text-white-50">
+    &copy; {{ now|date:"Y" }} Victory Schools
+  </div>
+</div>
+
+<script>
+document.getElementById('vsClose')?.addEventListener('click',()=>{
+  document.getElementById('sbToggle').click();
+});
+</script>

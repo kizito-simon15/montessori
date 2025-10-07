@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parent User List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMX13k6A2MSOaMEbE4X5KuYy5/z/1JOQ2QsF6s9" crossorigin="anonymous">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-update {
+            background-color: #4CAF50;
+        }
+        .btn-delete {
+            background-color: #f44336;
+        }
+        .btn-view-password {
+            background-color: #2196F3;
+        }
+        .btn i {
+            margin-right: 5px;
+        }
+    </style>
+    <script>
+        function togglePasswordVisibility(passwordId) {
+            var passwordField = document.getElementById(passwordId);
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+            } else {
+                passwordField.type = "password";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Parent User List</h1>
+    <a href="{% url 'create_parent_user' %}" class="btn btn-create">Create Parent User</a>
+    <table>
+        <thead>
+            <tr>
+                <th>S/N</th>
+                <th>Parent Name</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in parent_users %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ user.parent_first_name }} {{ user.parent_middle_name }} {{ user.parent_last_name }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        <input type="password" id="password-{{ forloop.counter }}" value="{{ user.password }}" readonly>
+                        <button class="btn btn-view-password" onclick="togglePasswordVisibility('password-{{ forloop.counter }}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                    <td class="actions">
+                        <a href="{% url 'update_parent_user' user.pk %}" class="btn btn-update">
+                            <i class="fas fa-edit"></i> Update
+                        </a>
+                        <a href="{% url 'delete_parent_user' user.pk %}" class="btn btn-delete">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+{% endblock content %}

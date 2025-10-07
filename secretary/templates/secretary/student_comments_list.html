@@ -1,0 +1,408 @@
+{% extends 'secretary/base_secretary.html' %}
+{% load static %}
+
+{% block content-header %}
+<div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+  <h4 class="mb-0">Manage Student Comments</h4>
+  <button class="btn btn-outline-light btn-sm" onclick="printPage()">Print</button>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<style>
+  /* Global Styling */
+  body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  }
+
+  /* Filter Input Styling */
+  .filter-select, .filter-input {
+    border-radius: 15px;
+    border: 2px solid #1e90ff;
+    color: #1e90ff;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 8px rgba(30, 144, 255, 0.1);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .filter-input:focus, .filter-select:focus {
+    box-shadow: 0px 0px 10px rgba(30, 144, 255, 0.2);
+    border-color: #1e90ff;
+    outline: none;
+  }
+
+  /* Table Styling */
+  .table thead th {
+    background-color: #1e90ff;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: bold;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .table tbody td {
+    background-color: #ffffff;
+    border-radius: 10px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .table tbody tr:hover td {
+    background-color: #f1f1f1;
+  }
+
+  /* New Comment and Icon Styling */
+  .new-comment {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 20px;
+    margin-left: 10px;
+  }
+
+  .thumb-icon {
+    cursor: pointer;
+    color: #1e90ff;
+    margin-left: 10px;
+  }
+
+  .blue-tick {
+    color: blue;
+    margin-left: 10px;
+  }
+
+  /* Date and Form Styling */
+  .comment-dates, .answer-dates {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+  }
+
+  .answer-form {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(30, 144, 255, 0.1);
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+
+  .answer-form:hover {
+    box-shadow: 0 0 15px rgba(30, 144, 255, 0.2);
+    background-color: #e6f7ff;
+  }
+
+  /* Button Styling */
+  .answer-update-btn {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .answer-update-btn.btn-warning {
+    background-color: #ffcc00;
+    color: #fff;
+  }
+
+  .answer-update-btn.btn-warning:hover {
+    background-color: #e6b800;
+    transform: scale(1.05);
+  }
+
+  .answer-update-btn.btn-primary {
+    background-color: #1e90ff;
+    color: #fff;
+  }
+
+  .answer-update-btn.btn-primary:hover {
+    background-color: #006bb3;
+    transform: scale(1.05);
+  }
+
+  .answer-update-btn i {
+    margin-right: 5px;
+  }
+
+  /* Record Button Styling */
+  .record-btn {
+    margin-top: 5px;
+    background-color: #1e90ff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .record-btn:hover {
+    background-color: #006bb3;
+  }
+
+  .recording-indicator {
+    color: red;
+    font-weight: bold;
+    display: none;
+  }
+
+  .audio-preview {
+    margin-top: 10px;
+    display: none;
+  }
+
+  .audio-upload-input {
+    margin-top: 10px;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .container {
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .table-responsive {
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .filter-select, .answer-form, .filter-input {
+    animation: fadeIn 1.5s ease-in-out;
+  }
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <h2 class="text-primary text-center mb-4">Student Comments</h2>
+
+  <div class="filters mb-3">
+    <div class="row justify-content-center">
+      <div class="col-md-4 mb-2">
+        <input type="text" id="studentFilter" class="form-control filter-input" placeholder="Filter by student name...">
+      </div>
+      <div class="col-md-4 mb-2">
+        <input type="text" id="classFilter" class="form-control filter-input" placeholder="Filter by student class...">
+      </div>
+    </div>
+  </div>
+
+  {% if student_comments %}
+    <div class="table-responsive" data-aos="fade-up" data-aos-duration="1000">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>S/N</th>
+            <th>Student Name</th>
+            <th>Student Class</th>
+            <th>Comments</th>
+            <th>Secretary Answer</th>
+          </tr>
+        </thead>
+        <tbody id="commentsTableBody">
+          {% for comment in student_comments %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td class="student-name">{{ comment.student.firstname }} {{ comment.student.middle_name }} {{ comment.student.surname }}</td>
+            <td class="student-class">{{ comment.student.current_class.name }}</td>
+            <td>
+              {% if comment.comment %}
+                <p>{{ comment.comment }}</p>
+              {% endif %}
+              {% if comment.audio_comment %}
+                <audio controls class="audio-player">
+                  <source src="{{ comment.audio_comment.url }}" type="audio/mpeg">
+                  Your browser does not support the audio element.
+                </audio>
+              {% endif %}
+              <div class="comment-dates">
+                <span>Commented on: {{ comment.date_commented|date:"d M Y, H:i" }}</span>
+                <span>Updated on: {{ comment.date_updated_comments|date:"d M Y, H:i" }}</span>
+              </div>
+              {% if not comment.mark_student_comment %}
+                <span class="new-comment">N</span>
+                <a href="{% url 'mark_comment_as_read' comment.id %}" class="thumb-icon">
+                  <i class="fas fa-thumbs-up"></i>
+                </a>
+              {% else %}
+                <span class="blue-tick">
+                  <i class="fas fa-check-circle"></i>
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              {% if comment.secretary_answer %}
+                <p>{{ comment.secretary_answer.answer }}</p>
+                {% if comment.secretary_answer.audio_answer %}
+                  <audio controls class="audio-player">
+                    <source src="{{ comment.secretary_answer.audio_answer.url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                  </audio>
+                {% endif %}
+                <div class="answer-dates">
+                  <span>Answered on: {{ comment.secretary_answer.date_commented|date:"d M Y, H:i" }}</span>
+                  <span>Last updated on: {{ comment.secretary_answer.date_updated_comments|date:"d M Y, H:i" }}</span>
+                </div>
+                <button type="button" class="btn btn-warning answer-update-btn show-answer-form">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <form method="post" enctype="multipart/form-data" action="{% url 'save_secretary_answer' %}" class="answer-form" style="display:none;">
+                  {% csrf_token %}
+                  <textarea name="answer" class="form-control" rows="3">{{ comment.secretary_answer.answer }}</textarea>
+                  <div class="audio-recorder mt-2">
+                    <button type="button" class="record-btn" onclick="startRecording(this)">Start Recording</button>
+                    <button type="button" class="record-btn" style="display:none;" onclick="stopRecording(this)">Stop Recording</button>
+                    <span class="recording-indicator">Recording...</span>
+                    <audio id="recorded-audio" controls class="audio-preview"></audio>
+                    <input type="file" name="audio_answer" accept="audio/*" class="form-control audio-upload-input mt-2">
+                  </div>
+                  <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                  <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Save
+                  </button>
+                </form>
+              {% else %}
+                <form method="post" enctype="multipart/form-data" action="{% url 'save_secretary_answer' %}" class="answer-form">
+                  {% csrf_token %}
+                  <textarea name="answer" class="form-control" rows="3"></textarea>
+                  <div class="audio-recorder mt-2">
+                    <button type="button" class="record-btn" onclick="startRecording(this)">Start Recording</button>
+                    <button type="button" class="record-btn" style="display:none;" onclick="stopRecording(this)">Stop Recording</button>
+                    <span class="recording-indicator">Recording...</span>
+                    <audio id="recorded-audio" controls class="audio-preview"></audio>
+                    <input type="file" name="audio_answer" accept="audio/*" class="form-control audio-upload-input mt-2">
+                  </div>
+                  <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save
+                  </button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-danger">No comments found for the selected criteria.</p>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show the form when the update button is clicked and hide the update button
+    document.querySelectorAll('.show-answer-form').forEach(function(button) {
+      button.addEventListener('click', function() {
+        const form = this.nextElementSibling;
+        form.style.display = 'block';
+        this.style.display = 'none';
+      });
+    });
+
+    // Filter by student name
+    function filterCommentsByStudent() {
+      const filter = document.getElementById('studentFilter').value.toLowerCase();
+      const rows = document.querySelectorAll('#commentsTableBody tr');
+
+      rows.forEach(row => {
+        const studentName = row.querySelector('.student-name').textContent.toLowerCase();
+        if (studentName.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Filter by student class
+    function filterCommentsByClass() {
+      const filter = document.getElementById('classFilter').value.toLowerCase();
+      const rows = document.querySelectorAll('#commentsTableBody tr');
+
+      rows.forEach(row => {
+        const studentClass = row.querySelector('.student-class').textContent.toLowerCase();
+        if (studentClass.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    document.getElementById('studentFilter').addEventListener('input', filterCommentsByStudent);
+    document.getElementById('classFilter').addEventListener('input', filterCommentsByClass);
+  });
+
+  let mediaRecorder;
+  let audioChunks = [];
+
+  function startRecording(button) {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+
+        audioChunks = [];
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audioPlayer = button.parentElement.querySelector('.audio-preview');
+          audioPlayer.src = audioUrl;
+          audioPlayer.style.display = 'block';
+
+          const fileInput = button.parentElement.querySelector('input[type="file"]');
+          const audioFile = new File([audioBlob], "recorded-audio.mp3", {
+            type: 'audio/mpeg',
+            lastModified: Date.now()
+          });
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(audioFile);
+          fileInput.files = dataTransfer.files;
+
+          button.style.display = 'inline-block';
+          button.nextElementSibling.style.display = 'none';
+          button.parentElement.querySelector('.recording-indicator').style.display = 'none';
+        });
+
+        button.style.display = 'none';
+        button.nextElementSibling.style.display = 'inline-block';
+        button.parentElement.querySelector('.recording-indicator').style.display = 'inline';
+      })
+      .catch(error => {
+        console.error("Error accessing microphone: ", error);
+        alert("Microphone access is required to record audio.");
+      });
+  }
+
+  function stopRecording(button) {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
+  }
+</script>
+
+{% endblock content %}

@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% load static %}
+
+{% block title %}Create Signature{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #ffe6e6, #e0f7fa);
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        margin-top: 50px;
+        background: #ffffffcc;
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        animation: fadeIn 0.6s ease-in-out;
+        max-width: 700px;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    h2 .emoji {
+        font-size: 2rem;
+    }
+
+    form {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        animation: slideIn 0.5s ease-in-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #444;
+    }
+
+    .form-group input[type="text"] {
+        border-radius: 50px;
+        border: 1px solid #ccc;
+        width: 100%;
+        padding: 10px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input[type="text"]:focus {
+        border-color: #478ed1;
+        outline: none;
+        box-shadow: 0 0 5px rgba(71,142,209,0.3);
+    }
+
+    .signature-pad {
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        background-color: white;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .signature-pad:hover {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+        font-size: 1.2em;
+        color: teal;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    /* Upload Input */
+    #signature-upload {
+        display: block;
+        margin: 0 auto;
+        cursor: pointer;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 8px;
+        background-color: #fff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #signature-upload:hover {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0,123,255,0.3);
+    }
+
+    /* Color Picker */
+    .color-picker {
+        display: flex;
+        gap: 10px;
+    }
+
+    .color-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .color-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .color-btn[style*="border"] {
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    /* Mode Buttons */
+    .btn-mode {
+        border: 1px solid #007bff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 50px;
+        transition: transform 0.3s ease;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+
+    .btn-mode:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-mode.btn-primary {
+        background-color: #478ed1;
+        color: #fff;
+    }
+
+    .btn-mode.btn-light {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    /* Action Buttons */
+    #clear-button, [type="submit"] {
+        border-radius: 50px;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+        margin: 0 10px;
+    }
+
+    #clear-button:hover, [type="submit"]:hover {
+        transform: scale(1.05);
+    }
+
+    #clear-button {
+        background-color: #ffc107;
+        border: none;
+        color: white;
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.5);
+    }
+
+    [type="submit"] {
+        background-color: #28a745;
+        border: none;
+        color: white;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.5);
+    }
+
+    .d-flex {
+        display: flex !important;
+    }
+
+    .justify-content-center {
+        justify-content: center !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+    <h2 class="mb-4 text-center text-primary">
+        <span class="emoji">🖋️</span> Create Signature
+    </h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group mb-4">
+            {{ form.name.label_tag }}
+            {{ form.name|add_class:"form-control shadow-sm" }}
+        </div>
+
+        <div class="mb-4 text-center">
+            <label for="signature-pad" class="form-label">
+                Signature:
+            </label>
+            <canvas id="signature-pad" class="signature-pad" width="600" height="300"></canvas>
+            <input type="hidden" name="signature_data" id="signature_data">
+        </div>
+
+        <!-- Upload Signature Option -->
+        <div class="text-center mb-4">
+            <label for="signature-upload" class="form-label">
+                Or Upload Your Signature:
+            </label>
+            <input type="file" id="signature-upload" accept="image/*">
+        </div>
+
+        <!-- Color Picker -->
+        <div class="d-flex justify-content-center mb-4" style="align-items: center;">
+            <label style="font-size: 1.2em; font-weight: bold; margin-right: 10px;">Choose Color:</label>
+            <div class="color-picker">
+                <button type="button" class="color-btn" data-color="black" style="background-color: black;"></button>
+                <button type="button" class="color-btn" data-color="blue" style="background-color: blue;"></button>
+                <button type="button" class="color-btn" data-color="red" style="background-color: red;"></button>
+                <button type="button" class="color-btn" data-color="green" style="background-color: green;"></button>
+                <button type="button" class="color-btn" data-color="orange" style="background-color: orange;"></button>
+                <button type="button" class="color-btn" data-color="deepskyblue" style="background-color: deepskyblue;"></button>
+            </div>
+        </div>
+
+        <!-- Toggle Drawing Mode Icons -->
+        <div class="d-flex justify-content-center mb-4">
+            <button type="button" class="btn-mode btn-primary" id="freehand-button" title="Freehand Drawing">
+                <i class="fas fa-pencil-alt"></i> Freehand
+            </button>
+            <button type="button" class="btn-mode btn-light" id="straightline-button" title="Straight Line Drawing">
+                <i class="fas fa-ruler-horizontal"></i> Straight Line
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn" id="clear-button">
+                Clear
+            </button>
+            <button type="submit" class="btn">
+                <i class="fas fa-save"></i> Save Signature
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var canvas = document.getElementById('signature-pad');
+    var context = canvas.getContext('2d');
+    var isDrawing = false;
+    var startX = 0, startY = 0;
+    var isStraightLineMode = false;
+    var currentColor = 'black';  // Default color is black
+    var snapshot;
+
+    // Initialize cursor
+    canvas.addEventListener('mouseenter', function() {
+        canvas.style.cursor = "url('https://img.icons8.com/color/30/000000/pencil.png'), auto";
+    });
+
+    // Change cursor back to default when leaving the canvas
+    canvas.addEventListener('mouseleave', function() {
+        canvas.style.cursor = "auto";
+    });
+
+    // Start drawing
+    canvas.addEventListener('mousedown', function(event) {
+        isDrawing = true;
+        startX = event.offsetX;
+        startY = event.offsetY;
+        if (!isStraightLineMode) {
+            context.strokeStyle = currentColor;
+            context.beginPath();
+            context.moveTo(startX, startY);
+        }
+    });
+
+    // Draw as the mouse moves
+    canvas.addEventListener('mousemove', function(event) {
+        if (isDrawing) {
+            if (isStraightLineMode) {
+                context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                context.putImageData(snapshot, 0, 0); // Restore the saved image
+                context.beginPath();
+                context.moveTo(startX, startY);
+                context.lineTo(event.offsetX, event.offsetY);
+                context.strokeStyle = currentColor;
+                context.stroke();
+            } else {
+                context.lineTo(event.offsetX, event.offsetY);
+                context.strokeStyle = currentColor;
+                context.stroke();
+            }
+        }
+    });
+
+    // Stop drawing
+    canvas.addEventListener('mouseup', function() {
+        isDrawing = false;
+        snapshot = context.getImageData(0, 0, canvas.width, canvas.height); // Save the current image
+    });
+
+    // Clear the canvas
+    document.getElementById('clear-button').addEventListener('click', function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    // Save the signature as a base64 string when the form is submitted
+    document.querySelector('form').addEventListener('submit', function (event) {
+        // Check if canvas is empty
+        var pixelData = context.getImageData(0, 0, canvas.width, canvas.height).data;
+        var isEmpty = true;
+        for (var i = 0; i < pixelData.length; i += 4) {
+            // Check if any pixel is not transparent
+            if (pixelData[i+3] !== 0) {
+                isEmpty = false;
+                break;
+            }
+        }
+        if (isEmpty) {
+            alert('Please provide a signature first.');
+            event.preventDefault();
+        } else {
+            var dataUrl = canvas.toDataURL();
+            document.getElementById('signature_data').value = dataUrl;
+        }
+    });
+
+    // Upload an image and draw it on the canvas
+    document.getElementById('signature-upload').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    snapshot = context.getImageData(0, 0, canvas.width, canvas.height);
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please upload a valid image file.');
+        }
+    });
+
+    // Toggle between freehand and straight-line mode
+    document.getElementById('freehand-button').addEventListener('click', function () {
+        isStraightLineMode = false;
+        this.classList.remove('btn-light');
+        this.classList.add('btn-primary');
+        document.getElementById('straightline-button').classList.remove('btn-primary');
+        document.getElementById('straightline-button').classList.add('btn-light');
+    });
+
+    document.getElementById('straightline-button').addEventListener('click', function () {
+        isStraightLineMode = true;
+        snapshot = context.getImageData(0, 0, canvas.width, canvas.height); // Save the current image
+        this.classList.remove('btn-light');
+        this.classList.add('btn-primary');
+        document.getElementById('freehand-button').classList.remove('btn-primary');
+        document.getElementById('freehand-button').classList.add('btn-light');
+    });
+
+    // Change color based on the selected button
+    var colorButtons = document.querySelectorAll('.color-btn');
+    colorButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            currentColor = this.getAttribute('data-color');
+            colorButtons.forEach(btn => btn.style.border = 'none');
+            this.style.border = '2px solid #007bff';
+        });
+    });
+
+    // Initialize with black color selected
+    document.querySelector('.color-btn[data-color="black"]').style.border = '2px solid #007bff';
+</script>
+{% endblock content %}

@@ -1,0 +1,239 @@
+{% extends 'bursor/bursor_base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .results-table {
+                page-break-after: always;
+            }
+            .rankings-table {
+                page-break-before: always;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        table {
+            border-collapse: collapse;
+            border: 2px solid #000000;
+        }
+        th, td {
+            border: 2px solid #000000;
+            padding: 8px;
+        }
+        .form-select {
+            width: 100%; /* Increase the width of the search fields */
+            color: darkblue;
+        }
+        .filters .col-md-4 {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .form-label {
+            color: green;
+        }
+        .serial-number, .subject-position, .position {
+            color: gray;
+        }
+        .student-name, .subject-column {
+            color: blue;
+        }
+        .subject-name {
+            color: chocolate;
+        }
+        .score, .average {
+            color: darkgreen;
+        }
+        .student-class {
+            color: deepskyblue;
+        }
+        .total {
+            color: darkblue;
+        }
+        .overall-average {
+            color: dodgerblue;
+        }
+        .overall-status-header {
+            color: mediumseagreen;
+        }
+        .status-pass {
+            color: darkgreen;
+        }
+        .status-fail {
+            color: red;
+        }
+        .subject-average {
+            color: darkgoldenrod;
+        }
+        .subject-grade {
+            color: orchid;
+        }
+        .subject-gpa {
+            color: slateblue;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <!-- Filters -->
+    <div class="filters mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="sessionFilter" class="form-label">Select Session:</label>
+                    <select id="sessionFilter" class="form-select" onchange="filterResults()">
+                        <option value="">All Sessions</option>
+                        {% for session in sessions %}
+                        <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>{{ session }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="termFilter" class="form-label">Select Term:</label>
+                    <select id="termFilter" class="form-select" onchange="filterResults()">
+                        <option value="">All Terms</option>
+                        {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>{{ term }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="examFilter" class="form-label">Select Exam Type:</label>
+                    <select id="examFilter" class="form-select" onchange="filterResults()">
+                        <option value="">All Exam Types</option>
+                        {% for exam in exams %}
+                        <option value="{{ exam.id }}" {% if exam.id == current_exam.id %}selected{% endif %}>{{ exam }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for session_term_exam_data in data %}
+    <div class="results-section" data-session="{{ session_term_exam_data.session.id }}" data-term="{{ session_term_exam_data.term.id }}" data-exam="{{ session_term_exam_data.exam.id }}">
+        <h2 class="text-center" style="color:brown;"><u>ELEMENT LAKEZONE PRE &amp PRIMARY SCHOOL</u></h2>
+        <h2 class="text-center" style="color:brown;"><u>THE RESULTS OF {{ session_term_exam_data.session }}-{{ session_term_exam_data.term }}</u></h2>
+        <h2 class="text-center" style="color:brown;"><u>The {{ session_term_exam_data.exam }} results</u></h2>
+        <h3 class="text-center" style="color:brown;"><u>Class: {{ selected_class }}</u></h3>
+
+        <div class="results-table">
+            <table class="table table-bordered table-success">
+                <thead class="table-success">
+                <tr>
+                    <th class="serial-number">Serial Number</th>
+                    <th class="student-name">Student</th>
+                    <th class="student-class">Student Class</th>
+                    {% for subject in subjects %}
+                    <th class="subject-name">{{ subject }}</th>
+                    {% endfor %}
+                    <th class="total">Total</th>
+                    <th class="overall-average">Overall Average</th>
+                    <th class="overall-status-header">Overall Status</th>
+                    <th class="position">Position</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student_data in session_term_exam_data.results %}
+                <tr>
+                    <td class="serial-number">{{ forloop.counter }}</td>
+                    <td class="student-name"><a class="text-decoration-none">{{ student_data.student }}</a></td>
+                    <td class="student-class">{{ student_data.student_class }}</td>
+                    {% for subject, subject_data in student_data.subjects.items %}
+                    <td class="average">{{ subject_data.average|default:"None" }}</td>
+                    {% endfor %}
+                    <td class="total">{{ student_data.total }}</td>
+                    <td class="overall-average">{{ student_data.overall_average|floatformat:"2" }}</td>
+                    <td class="{% if student_data.overall_status == 'PASS' %}status-pass{% else %}status-fail{% endif %}">{{ student_data.overall_status }}</td>
+                    <td class="position">{{ student_data.position }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rankings-table">
+            <p><u>Subjects Rankings:</u></p>
+            <table class="table table-bordered table-success">
+                <thead class="table-success">
+                <tr>
+                    <th class="subject-position">Subject Position</th>
+                    <th class="subject-column">Subject</th>
+                    <th class="subject-average">Subject Average</th>
+                    <th class="subject-grade">Subject Grade</th>
+                    <th class="subject-gpa">Subject GPA</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subject_data in session_term_exam_data.subject_data %}
+                <tr>
+                    <td class="subject-position">{{ forloop.counter }}</td>
+                    <td class="subject-column">{{ subject_data.subject }}</td>
+                    <td class="subject-average">{{ subject_data.average|floatformat:"2" }}</td>
+                    <td class="subject-grade">{{ subject_data.grade }}</td>
+                    <td class="subject-gpa">{{ subject_data.gpa|floatformat:"3" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="no-print">
+        <button type="button" class="btn btn-success btn-lg me-2" onclick="window.print()">Print</button>
+        <a href="{% url 'class-list' %}" class="btn btn-success btn-lg" role="button">Back</a>
+    </div>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+function filterResults() {
+    var sessionFilter = document.getElementById('sessionFilter').value;
+    var termFilter = document.getElementById('termFilter').value;
+    var examFilter = document.getElementById('examFilter').value;
+
+    var sections = document.querySelectorAll('.results-section');
+    sections.forEach(function(section) {
+        var session = section.getAttribute('data-session');
+        var term = section.getAttribute('data-term');
+        var exam = section.getAttribute('data-exam');
+
+        if ((sessionFilter === "" || sessionFilter === session) &&
+            (termFilter === "" || termFilter === term) &&
+            (examFilter === "" || examFilter === exam)) {
+            section.style.display = '';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var selects = document.querySelectorAll('.form-select');
+    selects.forEach(function(select) {
+        select.style.backgroundColor = '#f0f8ff';
+        select.style.border = '2px solid #0000cd';
+        select.style.borderRadius = '5px';
+        select.style.padding = '5px';
+        select.style.color = 'darkblue';
+    });
+
+    // Trigger the filter function to apply the initial filter based on current session, term, and exam
+    filterResults();
+});
+</script>
+</body>
+</html>
+{% endblock %}

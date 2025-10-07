@@ -1,0 +1,126 @@
+{# ================== budgetline_form.html ================== #}
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root {
+  --primary: #1e3a8a;
+  --secondary: #d97706;
+  --bg: #f1f5f9;
+  --danger: #dc2626;
+  --radius: 25px;
+}
+body {
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+.card {
+  background: #fff;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.card-header {
+  background: #fff;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.card-header h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  font-weight: 700;
+  color: var(--primary);
+}
+.card-body {
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+.form-control {
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  width: 100%;
+  background: #f9fafb;
+}
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+  outline: none;
+}
+.text-danger {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background: #6b7280;
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .card {
+    border-radius: 10px;
+  }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const card = document.querySelector('.card');
+  if (card) {
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 80);
+  }
+});
+</script>
+<div class="card">
+  <div class="card-header">
+    <h2>{% if form.instance.pk %}✏️ Badili Budget Line{% else %}➕ Ongeza Budget Line{% endif %}</h2>
+  </div>
+  <div class="card-body">
+    <form method="post">{% csrf_token %}
+      <div style="margin-bottom: 0.6rem;">
+        <label class="form-label" for="id_name">Jina la Budget Line</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <div class="text-danger">{{ form.name.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+        <button type="submit" class="btn btn-primary">💾 Hifadhi</button>
+        <a href="{% url 'budgetline_list' %}" class="btn btn-secondary">❌ Ghairi</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

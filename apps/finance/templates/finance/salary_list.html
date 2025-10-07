@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load humanize finance_tags %}
+
+{% block title %}Salary Ledger{% endblock %}
+
+{% block extra_css %}
+<style>
+/* —— palette —— */
+:root{
+  --indigo:#4f46e5; --rose:#ef4444; --emerald:#10b981; --amber:#f59e0b;
+  --purple:#7c3aed; --slate:#64748b; --paper:#f9fafb;
+}
+/* —— base —— */
+body{font-family:Inter,system-ui,sans-serif;background:var(--paper);color:#111827}
+h1{font-size:1.8rem;font-weight:700;margin:1.2rem 0 .6rem}
+a{transition:.15s}
+.btn{display:inline-flex;align-items:center;gap:.38rem;padding:.55rem 1.4rem;
+     font-size:.85rem;font-weight:700;border:none;border-radius:26px;color:#fff;cursor:pointer}
+.btn-indigo{background:var(--indigo)}.btn-slate{background:var(--slate)}
+.btn:hover{filter:brightness(.93)} .btn:focus{outline:none}
+/* —— KPI tiles —— */
+.kpi-wrap{display:grid;gap:.9rem;margin:1.1rem 0;
+          grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kpi{background:hsla(0,0%,100%,.55);backdrop-filter:blur(26px);
+     border:1px solid rgba(255,255,255,.38);border-top-width:5px;border-radius:18px;
+     padding:1rem 1.15rem;box-shadow:0 6px 22px rgba(0,0,0,.06);transition:.18s}
+.kpi:hover{transform:translateY(-3px) scale(1.03)}
+.kpi h4{margin:0 0 .3rem;font-size:.78rem;font-weight:700;color:#475569}
+.kpi p{margin:0;font-size:1.2rem;font-weight:800;line-height:1.1}
+/* —— filters —— */
+.filters{display:flex;flex-wrap:wrap;gap:.65rem;margin-bottom:1.3rem}
+.filters input{border:1px solid #cbd5e1;border-radius:24px;background:#fff;
+               padding:.55rem 1rem;font-size:.8rem}
+.filters input[type="text"]{flex:1 1 230px}
+/* —— buckets —— */
+details{margin-bottom:1rem;border:1px solid #e5e7eb;border-radius:18px;
+        background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+summary{cursor:pointer;padding:.9rem 1.2rem;font-weight:700;
+        display:flex;justify-content:space-between;align-items:center}
+summary span{font-size:.8rem;font-weight:600;color:#64748b}
+summary::-webkit-details-marker{display:none}
+/* —— table —— */
+.tbl-box{overflow-x:auto}
+table{width:100%;min-width:980px;border-collapse:collapse;font-size:.8rem}
+thead{background:#f1f5f9} th,td{padding:.58rem .95rem;white-space:nowrap;text-align:left}
+tbody tr:nth-child(even){background:#fafafa} tbody tr:hover{background:#eef2ff}
+td.net{font-weight:700;color:var(--emerald)}
+td.ded{font-weight:600;color:var(--rose)}
+/* —— action icons —— */
+.act a{margin:0 .22rem;font-size:1.25rem;line-height:1}
+.act a.view  {color:var(--indigo)}
+.act a.edit  {color:var(--amber)}
+.act a.del   {color:var(--rose)}
+.act a:hover{opacity:.8;transform:scale(1.1)}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>💰 Salary Ledger</h1>
+<a href="{% url 'salary-invoice-create' %}" class="btn btn-indigo mb-2">➕ New Slip</a>
+
+{#──── KPI tiles ────#}
+<div class="kpi-wrap">
+  <div class="kpi" style="border-color:var(--indigo)">
+    <h4>Allocated</h4><p style="color:var(--indigo)">{{ budget_total_allocated|dec }}</p>
+  </div>
+  <div class="kpi" style="border-color:var(--rose)">
+    <h4>Used</h4><p style="color:var(--rose)">{{ budget_total_used|dec }}</p>
+  </div>
+  <div class="kpi" style="border-color:var(--emerald)">
+    <h4>Remaining</h4>
+    <p style="color:{% if budget_total_remaining|lt:0 %}var(--rose){% else %}var(--emerald){% endif %}">
+      {{ budget_total_remaining|dec }}
+    </p>
+  </div>
+  <div class="kpi" style="border-color:var(--amber)">
+    <h4>P/L</h4><p style="color:var(--amber)">{{ budget_profit_loss|dec }}</p>
+  </div>
+  <div class="kpi hidden lg:block" style="border-color:var(--purple)">
+    <h4>P/L %</h4><p style="color:var(--purple)">{{ budget_profit_loss_pct|floatformat:1 }}%</p>
+  </div>
+</div>
+
+{#──── filters ────#}
+<form method="get" class="filters">
+  <input type="text"  name="q"    placeholder="Search staff…" value="{{ q }}">
+  <input type="month" name="from" value="{{ from_m }}" title="From">
+  <input type="month" name="to"   value="{{ to_m }}"   title="To">
+  <button class="btn btn-indigo">Apply</button>
+  {% if q or from_m or to_m %}
+    <a href="{% url 'salary-invoice-list' %}" class="btn btn-slate">Clear</a>
+  {% endif %}
+</form>
+
+{#──── chart stubs (optional) ────#}
+<div id="charts" class="grid gap-4 md:grid-cols-2 mb-5">
+  <div class="bg-white rounded-2xl shadow p-4"><canvas id="barChart"></canvas></div>
+  <div class="bg-white rounded-2xl shadow p-4"><canvas id="profitChart"></canvas></div>
+</div>
+
+{#──── month buckets ────#}
+{% for b in buckets %}
+  {% widthratio b.net_tot b.gross_tot 100 as pct %}
+  <details {% if forloop.first %}open{% endif %}>
+    <summary>
+      {{ b.month|date:"F Y" }}
+      <span>Gross {{ b.gross_tot|dec }} • Net {{ b.net_tot|dec }} ({{ pct|floatformat:0 }}%)</span>
+    </summary>
+    <div class="tbl-box">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Staff</th><th class="text-right">Basic</th>
+            <th class="text-right">Taxable</th><th class="text-right">NSSF</th>
+            <th class="text-right">WCF</th><th class="text-right">HELSB</th>
+            <th class="text-right">PAYE</th><th class="text-right">Extra Ded.</th>
+            <th class="text-right">Net</th><th class="text-center"> </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for inv in b.invoices %}
+          <tr>
+            <td>{{ inv.staff.staff_id }}</td>
+            <td>{{ inv.staff.firstname }} {{ inv.staff.surname }}</td>
+            <td class="text-right">{{ inv.basic_salary|dec }}</td>
+            <td class="text-right">{{ inv.taxable_gross|dec }}</td>
+            <td class="text-right">{{ inv.nssf_amount|dec }}</td>
+            <td class="text-right">{{ inv.wcf_amount|dec }}</td>
+            <td class="text-right">{{ inv.helsb_amount|dec }}</td>
+            <td class="text-right">{{ inv.paye_amount|dec }}</td>
+            <td class="ded text-right">{{ inv.extra_ded_total|dec }}</td>
+            <td class="net text-right">{{ inv.net_salary|dec }}</td>
+            <td class="act text-center">
+              <a href="{% url 'salary-invoice-detail' inv.pk %}" class="view"  title="Detail">👁️‍🗨️</a>
+              <a href="{% url 'salary-invoice-update' inv.pk %}" class="edit"  title="Edit">✏️</a>
+              <a href="{% url 'salary-invoice-delete' inv.pk %}" class="del"   title="Delete"
+                 onclick="return confirm('Delete this slip?')">🗑️</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+{% empty %}
+  <p class="text-gray-500">No salary slips found.</p>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+/* ----- helper ----- */
+const comma = v => Number(v).toLocaleString();
+
+/* ----- stacked bar (gross vs net) ----- */
+new Chart(document.getElementById("barChart"), {
+  type:"bar",
+  data:{
+    labels: {{ bar_labels|safe }},
+    datasets:[
+      {label:"Gross", data: {{ bar_gross|safe }},
+       backgroundColor:"rgba(79,70,229,.85)"},
+      {label:"Net",   data: {{ bar_net|safe }},
+       backgroundColor:"rgba(16,185,129,.85)"}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:"index",intersect:false},
+    scales:{x:{stacked:true,grid:{display:false}},
+            y:{stacked:true,beginAtZero:true,ticks:{callback:comma}}},
+    plugins:{legend:{position:"bottom"},tooltip:{callbacks:{label:ctx=>{
+      return ctx.dataset.label+": "+comma(ctx.parsed.y);
+    }}}}
+  }
+});
+
+/* ----- profit line ----- */
+new Chart(document.getElementById("profitChart"),{
+  type:"line",
+  data:{
+    labels: {{ ledger_labels|safe }},
+    datasets:[{
+      label:"Profit",data: {{ ledger_profit_series|safe }},
+      borderColor:"var(--emerald)",backgroundColor:"rgba(16,185,129,.18)",
+      borderWidth:2,fill:true,tension:.25
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,ticks:{callback:comma}}}
+  }
+});
+</script>
+{% endblock %}

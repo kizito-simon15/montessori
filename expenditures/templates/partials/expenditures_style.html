@@ -1,0 +1,122 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root {
+  --primary: #1e3a8a;
+  --secondary: #d97706;
+  --bg: #f1f5f9;
+  --danger: #dc2626;
+  --warning: #ca8a04;
+  --success: #16a34a;
+  --radius: 25px;
+}
+body {
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+.card {
+  background: #fff;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.card-header {
+  background: #fff;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+.card-header.sticky {
+  position: sticky;
+  top: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+}
+.card-header h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card-body {
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.table thead {
+  background: var(--primary);
+  color: #fff;
+}
+.table th,
+.table td {
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+.table tbody tr:nth-child(odd) {
+  background: #f8fafc;
+}
+.table tbody tr:hover {
+  background: #e2e8f0;
+}
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+}
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background: #6b7280;
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .table th,
+  .table td {
+    padding: 0.3rem;
+  }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const card = document.querySelector('.card');
+  if (card) {
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 80);
+  }
+});
+</script>

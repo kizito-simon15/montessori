@@ -1,0 +1,175 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        @media print {
+            /* Hide all buttons when printing */
+            .print-button,
+            .back-button,
+            .save-button {
+                display: none;
+            }
+        }
+
+        /* Custom styles */
+        input[type="text"], input[type="email"], input[type="password"], textarea {
+            color: blue;
+        }
+
+        .btn-green {
+            background-color: green;
+            color: white;
+        }
+
+        /* Center align contents */
+        .center-content {
+            text-align: center;
+        }
+
+        /* Center align Save button */
+        .save-button {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Smaller Save button */
+        .btn-save {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Increase size of dropdown menus */
+        select.form-control {
+            font-size: 1.2rem;
+            padding: 0.5rem;
+        }
+
+        /* Full width for specific dropdown menus */
+        .session-dropdown, .term-dropdown, .exam-type-dropdown {
+            width: 100%;
+            background-color: purple; /* Purple background color */
+        }
+
+        /* Background color for specific dropdown menus */
+        .disprine, .collaborations, .care_of_property, .sports {
+            background-color: aquamarine; /* Aquamarine background color */
+        }
+
+        /* Background color for date fields */
+        .date_of_closing, .date_of_opening {
+            background-color: red; /* Red background color */
+        }
+    </style>
+</head>
+<body>
+<div class="container" data-aos="fade-up" data-aos-duration="2000">
+    <h1 class="center-content" data-aos="fade-up" data-aos-duration="2000"><u style="color: blue;">TAARIFA ZA MAENDELEO YA MWANAFUNZI</u></h1>
+    <h2 class="center-content" data-aos="fade-up" data-aos-duration="2000">
+    <p class="center-content" data-aos="fade-up" data-aos-duration="2000"><strong>Jina la mwanafunzi:</strong><u style="color:blueviolet;">{{ student.surname }} {{ student.firstname }} {{ student.other_name }}</u></p>
+    <p class="center-content" data-aos="fade-up" data-aos-duration="2000"><strong>Namba ya usajili:</strong> <u style="color:blueviolet;">{{ student.registration_number }}</u></p>
+    </h2>
+    {% if messages %}
+    <div class="alert alert-info center-content" role="alert" data-aos="fade-up" data-aos-duration="2000">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" data-aos="fade-up" data-aos-duration="2000">
+        {% csrf_token %}
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="row mb-3">
+                    <div class="col-md-4 text-center">
+                        <strong>Session:</strong>
+                        <span class="form-control session-dropdown">{{ form.session }}</span>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <strong>Term:</strong>
+                        <span class="form-control term-dropdown">{{ form.term }}</span>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <strong>Exam Type:</strong>
+                        <span class="form-control exam-type-dropdown">{{ form.exam }}</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 text-center">
+                        <strong>Discipline:</strong>
+                        <span class="form-control disprine">{{ form.disprine }}</span>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <strong>Sports:</strong>
+                        <span class="form-control sports">{{ form.sports }}</span>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <strong>Care of Property:</strong>
+                        <span class="form-control care_of_property">{{ form.care_of_property }}</span>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <strong>Collaborations:</strong>
+                        <span class="form-control collaborations">{{ form.collaborations }}</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6 text-center">
+                        <strong>Date of Closing:</strong>
+                        <span class="form-control date_of_closing">{{ form.date_of_closing }}</span>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <strong>Date of Opening:</strong>
+                        <span class="form-control date_of_opening">{{ form.date_of_opening }}</span>
+                    </div>
+                </div>
+                <p class="text-center"><strong>Teacher Comments:</strong> {{ form.teacher_comments }}</p>
+                <p class="text-center"><strong>Head Comments:</strong> {{ form.head_comments }}</p>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col text-start">
+                <button onclick="window.print()" class="btn btn-green print-button">Print</button>
+            </div>
+            <div class="col text-center">
+                <button type="submit" class="btn btn-green">Save</button>
+            </div>
+            <div class="col text-end">
+                <button onclick="window.history.back()" class="btn btn-green back-button">Back</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Display form errors if any -->
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert" data-aos="fade-up" data-aos-duration="2000">
+        <ul>
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li>{{ field }}: {{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AOS JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+</body>
+</html>
+{% endblock content %}

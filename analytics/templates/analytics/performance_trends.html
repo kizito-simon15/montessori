@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Class Performance Trends - St. John Paul II Secondary School
+{% endblock title %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #00b7eb;
+        --secondary: #5856d6;
+        --success: #34c759;
+        --danger: #ff3b30;
+        --warning: #ff9500;
+        --info: #5ac8fa;
+        --light: #f2f2f7;
+        --dark: #1c2526;
+        --background: #e6f7ff;
+        --section-bg: #ffffff;
+        --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+        font-family: var(--font-family);
+        color: #000000;
+        background: var(--background);
+        padding: 0;
+        margin: 0;
+    }
+
+    .dark-mode {
+        background: var(--dark);
+        color: #ffffff;
+    }
+
+    .dark-mode .dashboard-header,
+    .dark-mode .shadow-card {
+        background: #2c2c2e;
+    }
+
+    .dark-mode .dashboard-section-title {
+        color: var(--primary);
+    }
+
+    .dark-mode .text-muted {
+        color: #d1d5db;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary), #0095c7);
+        color: #ffffff;
+        text-align: center;
+        padding: 1rem;
+        margin: 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-header h1 {
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .dashboard-header .lead {
+        font-size: 0.9rem;
+        margin: 0.3rem 0 0;
+    }
+
+    .dashboard-section-title {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-emoji {
+        font-size: 1.3rem;
+    }
+
+    .shadow-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(15px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeIn 0.8s ease forwards;
+    }
+
+    .shadow-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .chart-container img {
+        max-width: 100%;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .chart-container img:hover {
+        transform: scale(1.02);
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+    }
+
+    .col-md-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0 0.5rem;
+        box-sizing: border-box;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .dashboard-section-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>📈 Class Performance Trends</h1>
+    <p class="lead mb-0">
+        St. John Paul II Secondary School<br>
+        <small>Overall Average: {{ overall_avg|floatformat:1 }}%</small>
+    </p>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if message %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="shadow-card">
+                <p class="text-muted">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+{% else %}
+    {% for class_name, data in graphs.items %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="shadow-card">
+                    <h3 class="dashboard-section-title">
+                        <span class="section-emoji">📊</span> {{ class_name }} (Latest: {{ data.latest_average|floatformat:1 }}%)
+                        {% if data.latest_average < overall_avg %}
+                            <span style="color: var(--danger); font-size: 0.9rem; margin-left: 0.5rem;">
+                                (Below Avg by {{ overall_avg|floatformat:1|subtract:data.latest_average }}%)
+                            </span>
+                        {% elif data.latest_average > overall_avg %}
+                            <span style="color: var(--success); font-size: 0.9rem; margin-left: 0.5rem;">
+                                (Above Avg by {{ data.latest_average|floatformat:1|subtract:overall_avg }}%)
+                            </span>
+                        {% endif %}
+                    </h3>
+                    {% if data.graph %}
+                        <div class="chart-container">
+                            <img src="data:image/png;base64,{{ data.graph }}" alt="Class Performance Trend for {{ class_name }}">
+                        </div>
+                        <p class="text-muted">{{ data.comments_and_advice }}</p>
+                    {% else %}
+                        <p class="text-muted">No performance data available for {{ class_name }}.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

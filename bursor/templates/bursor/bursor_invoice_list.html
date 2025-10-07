@@ -1,0 +1,302 @@
+{% extends 'bursor/bursor_base.html' %}
+{% load humanize %}
+
+{% block title %}Invoices{% endblock title %}
+
+{% block breadcrumb %}
+<a class="btn btn-primary" href="{% url 'bursor-invoice-create' %}"><i class="fas fa-plus"></i> New Invoice</a>
+<a class="btn btn-primary" href="{% url 'bursor-bulk-invoice' %}"><i class="fas fa-upload"></i> Bulk Invoice</a>
+<a class="btn btn-secondary" href="{% url 'bursor_uniform_list' %}"><i class="fas fa-tshirt"></i> Uniform List</a>
+{% endblock breadcrumb %}
+
+{% block content %}
+<style>
+/* Styling for the filter section */
+.filters {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters .form-control {
+  border-radius: 4px;
+}
+
+/* Styling for the table */
+.table-container {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+.table th, .table td {
+  white-space: nowrap;
+  padding: 10px;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.table tfoot {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+/* Styling for the scrollbar container */
+#scrolling-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #2e2e2e;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+}
+
+/* Styling for the custom scrollbar */
+#scrolling-bar {
+  width: 70%;
+  height: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: #2e2e2e;
+}
+
+#scrolling-bar::-webkit-scrollbar {
+  height: 8px;
+}
+
+#scrolling-bar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+#scrolling-bar::-webkit-scrollbar-track {
+  background: #2e2e2e;
+}
+
+/* General styles */
+.text-blue {
+  color: #007bff;
+}
+
+.text-green {
+  color: #28a745;
+}
+
+.magenta-header {
+  color: magenta;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+</style>
+
+<div class="container" data-aos="fade-up" data-aos-duration="1000">
+  <div class="filters mb-3">
+    <div class="row">
+      <div class="col-md-4 mb-2">
+        <select id="filterSession" class="form-control text-green">
+          <option value="">Filter by Session</option>
+          {% for session in sessions %}
+          <option value="{{ session.name }}">{{ session.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4 mb-2">
+        <select id="filterInstallment" class="form-control text-green">
+          <option value="">Filter by Installment</option>
+          {% for installment in installments %}
+          <option value="{{ installment.name }}">{{ installment.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4 mb-2">
+        <select id="filterClass" class="form-control text-green">
+          <option value="">Filter by Class</option>
+          {% for student_class in classes %}
+          <option value="{{ student_class.name }}">{{ student_class.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-2">
+        <input type="text" id="filterStudent" placeholder="Filter by Student Name" class="form-control text-green">
+      </div>
+      <div class="col-md-4 mb-2">
+        <select id="filterTotalPaid" class="form-control text-green">
+          <option value="">Filter by Total Paid</option>
+          <option value="full_paid">Full Paid</option>
+          <option value="half_paid">Half Paid</option>
+          <option value="not_paid">Not Paid</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="table-container" class="table-container" data-aos="fade-up" data-aos-duration="1000">
+    <table id="invoicetable" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Invoice</th>
+          <th>Session</th>
+          <th>Installment</th>
+          <th>Class</th>
+          <th>Total Payable</th>
+          <th>Total Paid</th>
+          <th>Balance</th>
+          <th>Create Payments</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in invoices %}
+        <tr class='clickable-row' data-href="{% url 'bursor-invoice-detail' invoice.id %}" data-aos="fade-up" data-aos-duration="1000">
+          <td class="magenta-header">{{ forloop.counter }}</td>
+          <td>{{ invoice }}</td>
+          <td>{{ invoice.session }}</td>
+          <td>{{ invoice.installment }}</td>
+          <td>{{ invoice.class_for }}</td>
+          <td>{{ invoice.total_amount_payable | intcomma }}</td>
+          <td>{{ invoice.total_amount_paid | intcomma }}</td>
+          <td>{{ invoice.balance | intcomma }}</td>
+          <td><a class="btn btn-success btn-sm" href="{% url 'bursor-receipt-create' %}?invoice={{ invoice.id }}">Add new receipt</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5" style="text-align: right;">Totals</th>
+          <th id="totalPayable" class="text-blue">Total Payable: 0</th>
+          <th id="totalPaid" class="text-blue">Total Paid: 0</th>
+          <th id="totalBalance" class="text-blue">Total Balance: 0</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div id="scrolling-container">
+  <div id="scrolling-bar"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const filterSession = document.getElementById('filterSession');
+    const filterInstallment = document.getElementById('filterInstallment');
+    const filterClass = document.getElementById('filterClass');
+    const filterStudent = document.getElementById('filterStudent');
+    const filterTotalPaid = document.getElementById('filterTotalPaid');
+    const table = document.getElementById('invoicetable').getElementsByTagName('tbody')[0];
+    const totalPayable = document.getElementById('totalPayable');
+    const totalPaid = document.getElementById('totalPaid');
+    const totalBalance = document.getElementById('totalBalance');
+    const scrollingBar = document.getElementById('scrolling-bar');
+    const tableContainer = document.getElementById('table-container');
+
+    function updateSerialNumbers() {
+      let serialNumber = 1;
+      for (let row of table.rows) {
+        if (row.style.display !== 'none') {
+          row.cells[0].textContent = serialNumber;
+          serialNumber++;
+        }
+      }
+    }
+
+    function updateTotals() {
+      let totalPayableValue = 0;
+      let totalPaidValue = 0;
+      let totalBalanceValue = 0;
+
+      for (let row of table.rows) {
+        if (row.style.display !== 'none') {
+          totalPayableValue += parseInt(row.cells[5].innerText.replace(/,/g, '')) || 0;
+          totalPaidValue += parseInt(row.cells[6].innerText.replace(/,/g, '')) || 0;
+          totalBalanceValue += parseInt(row.cells[7].innerText.replace(/,/g, '')) || 0;
+        }
+      }
+
+      totalPayable.innerText = `Total Payable: ${totalPayableValue.toLocaleString()}`;
+      totalPaid.innerText = `Total Paid: ${totalPaidValue.toLocaleString()}`;
+      totalBalance.innerText = `Total Balance: ${totalBalanceValue.toLocaleString()}`;
+    }
+
+    function filterTable() {
+      const sessionValue = filterSession.value.toLowerCase();
+      const installmentValue = filterInstallment.value.toLowerCase();
+      const classValue = filterClass.value.toLowerCase();
+      const studentValue = filterStudent.value.toLowerCase();
+      const totalPaidValue = filterTotalPaid.value;
+
+      for (let row of table.rows) {
+        const sessionText = row.cells[2].innerText.toLowerCase();
+        const installmentText = row.cells[3].innerText.toLowerCase();
+        const classText = row.cells[4].innerText.toLowerCase();
+        const studentText = row.cells[1].innerText.toLowerCase();
+        const payableAmount = parseInt(row.cells[5].innerText.replace(/,/g, '')) || 0;
+        const paidAmount = parseInt(row.cells[6].innerText.replace(/,/g, '')) || 0;
+        const balanceAmount = parseInt(row.cells[7].innerText.replace(/,/g, '')) || 0;
+
+        let paidCondition = (totalPaidValue === "" ||
+          (totalPaidValue === "full_paid" && balanceAmount === 0) ||
+          (totalPaidValue === "half_paid" && paidAmount > 0 && balanceAmount > 0) ||
+          (totalPaidValue === "not_paid" && paidAmount === 0));
+
+        if ((sessionValue === "" || sessionText.includes(sessionValue)) &&
+            (installmentValue === "" || installmentText.includes(installmentValue)) &&
+            (classValue === "" || classText.includes(classValue)) &&
+            (studentValue === "" || studentText.includes(studentValue)) &&
+            paidCondition) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      }
+      updateSerialNumbers();
+      updateTotals();
+    }
+
+    filterSession.addEventListener('change', filterTable);
+    filterInstallment.addEventListener('change', filterTable);
+    filterClass.addEventListener('change', filterTable);
+    filterStudent.addEventListener('input', filterTable);
+    filterTotalPaid.addEventListener('change', filterTable);
+
+    updateSerialNumbers(); // Initialize serial numbers
+    updateTotals(); // Calculate totals initially
+
+    // Sync scrolling between table container and custom scrollbar
+    const syncScroll = (source, target) => {
+      target.scrollLeft = source.scrollLeft;
+    };
+
+    // Attach scroll event listeners
+    tableContainer.addEventListener('scroll', () => syncScroll(tableContainer, scrollingBar));
+    scrollingBar.addEventListener('scroll', () => syncScroll(scrollingBar, tableContainer));
+
+    // Create a fake content inside scrolling-bar to make it scrollable
+    const fakeContent = document.createElement('div');
+    fakeContent.style.width = tableContainer.scrollWidth + 'px';
+    fakeContent.style.height = '1px'; // Just to make it visible
+    scrollingBar.appendChild(fakeContent);
+  });
+</script>
+{% endblock content %}

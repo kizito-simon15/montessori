@@ -1,0 +1,114 @@
+{# ──────────────────────────────────────────────────────────────────────
+   Seasonal product  ·  add / edit  •  08 Jul 2025
+──────────────────────────────────────────────────────────────────────── #}
+{% extends "base.html" %}
+{% load widget_tweaks %} 
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#1e3a8a;--amber:#fbbf24;--rose:#e11d48;
+  --slate:#1e293b;--muted:#64748b;--paper:#f1f5f9;--card:#ffffff;--rad:24px
+}
+html,body{margin:0;background:var(--paper);font-family:Inter,sans-serif;color:var(--slate)}
+.card{background:var(--card);border-radius:var(--rad);box-shadow:0 6px 18px rgba(0,0,0,.06);
+      opacity:0;transform:translateY(34px);transition:.45s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.header{padding:.9rem 1.4rem;border-bottom:1px solid #e2e8f0}
+h2{margin:0;font-size:clamp(1.25rem,4vw,1.55rem);font-weight:700}
+.form-wrap{padding:1.2rem 1.4rem}
+.grid{display:grid;gap:1rem}
+@media(min-width:720px){.cols-2{grid-template-columns:1fr 1fr}}
+.label{font-size:.85rem;font-weight:600;margin-bottom:.25rem}
+.star{color:var(--rose);margin-left:.1rem}
+.form-control,.form-select{width:100%;padding:.55rem 1rem;font-size:.9rem;
+  border:1px solid #cbd5e1;border-radius:var(--rad);background:#fff}
+.form-control:focus,.form-select:focus{border-color:var(--indigo);
+  box-shadow:0 0 0 3px rgba(30,64,175,.15);outline:none}
+.text-danger{color:var(--rose);font-size:.8rem;margin-top:.25rem}
+.actions{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.3rem}
+.btn{border:none;border-radius:var(--rad);padding:.5rem 1.3rem;font-weight:600;font-size:.9rem;
+     cursor:pointer;transition:background .15s,transform .15s}
+.btn-primary{background:var(--indigo);color:#fff}
+.btn-primary:hover{filter:brightness(.93);transform:translateY(-2px)}
+.btn-secondary{background:#6b7280;color:#fff}
+.btn-secondary:hover{filter:brightness(.93);transform:translateY(-2px)}
+/* switch slider ----------------------------------------------------*/
+.switch{position:relative;display:inline-block;width:50px;height:28px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+        background:#e5e7eb;border-radius:28px;transition:.2s}
+.slider:before{position:absolute;content:"";height:22px;width:22px;left:3px;top:3px;
+               background:#fff;border-radius:50%;transition:.2s}
+input:checked + .slider{background:#4ade80}
+input:checked + .slider:before{transform:translateX(22px)}
+/*------------------------------------------------------------------*/
+.help{font-size:.78rem;color:var(--muted);margin-top:.25rem}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const c=document.querySelector(".card");
+  if(c) setTimeout(()=>c.classList.add("show"),80);
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <!-- heading -->
+  <div class="header">
+    <h2>{% if form.instance.pk %}✏️ Edit Seasonal Product
+        {% else %}➕ Add Seasonal Product{% endif %}</h2>
+  </div>
+
+  <div class="form-wrap">
+  {% if form.non_field_errors %}
+    <div class="text-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <form method="post">{% csrf_token %}
+    <!-- name & unit -->
+    <div class="grid cols-2">
+      <div>
+        <label class="label" for="id_name">Name <span class="star">✶</span></label>
+        {{ form.name|add_class:"form-control" }}
+        {% if form.name.errors %}<div class="text-danger">{{ form.name.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div>
+        <label class="label" for="id_unit">Unit (kg, bag …) <span class="star">✶</span></label>
+        {{ form.unit|add_class:"form-select" }}
+        {% if form.unit.errors %}<div class="text-danger">{{ form.unit.errors.0 }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- processable switch -->
+    <div style="margin-top:1rem">
+      <label class="label" for="id_processable">Processable&nbsp;commodity?</label><br>
+      <label class="switch">
+        {{ form.processable.as_widget }}<span class="slider"></span>
+      </label>
+      <span class="help">
+        Check if this raw product can be milled, pressed or otherwise converted
+        into another product (e.g.&nbsp;maize → flour, sunflower → oil).<br>
+        Leave unchecked for items that are **sold / consumed as-is** (beans, salt …).
+      </span>
+      {% if form.processable.errors %}
+        <div class="text-danger">{{ form.processable.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- actions -->
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">💾 Save</button>
+      <a href="{% url 'seasonalproduct_list' %}" class="btn btn-secondary">❌ Cancel</a>
+    </div>
+  </form>
+  </div>
+</div>
+{% endblock %}

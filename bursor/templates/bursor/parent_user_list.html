@@ -1,0 +1,207 @@
+{% extends "bursor/bursor_base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent User List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMX13k6A2MSOaMEbE4X5KuYy5/z/1JOQ2QsF6s9" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff4500; /* Orange Red */
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .btn-create {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #32cd32; /* Lime Green */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .btn-create:hover {
+            background-color: #2e8b57; /* Sea Green */
+        }
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .filters input {
+            width: 48%;
+            padding: 10px;
+            border: 2px solid #ff69b4; /* Hot Pink */
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fffaf0; /* Floral White */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #ff6347; /* Tomato */
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        td {
+            background-color: #f5fffa; /* Mint Cream */
+        }
+        tr:hover td {
+            background-color: #ffe4e1; /* Misty Rose */
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-update {
+            background-color: #ffd700; /* Gold */
+        }
+        .btn-update:hover {
+            background-color: #daa520; /* Goldenrod */
+        }
+        .btn-delete {
+            background-color: #dc143c; /* Crimson */
+        }
+        .btn-delete:hover {
+            background-color: #b22222; /* Firebrick */
+        }
+        .btn-view-password {
+            background-color: #1e90ff; /* Dodger Blue */
+        }
+        .btn-view-password:hover {
+            background-color: #4682b4; /* Steel Blue */
+        }
+        .btn i {
+            margin-right: 5px;
+        }
+    </style>
+    <script>
+        function togglePasswordVisibility(passwordId) {
+            var passwordField = document.getElementById(passwordId);
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+            } else {
+                passwordField.type = "password";
+            }
+        }
+
+        function filterTable() {
+            const studentNameInput = document.getElementById('studentNameFilter').value.toLowerCase();
+            const studentClassInput = document.getElementById('studentClassFilter').value.toLowerCase();
+            const table = document.querySelector('table tbody');
+            const rows = table.getElementsByTagName('tr');
+
+            Array.from(rows).forEach(row => {
+                const studentName = row.cells[2].textContent.toLowerCase();  // Updated index to 2 for Student Name
+                const studentClass = row.cells[3].textContent.toLowerCase();  // Updated index to 3 for Student Class
+
+                if (studentName.includes(studentNameInput) && studentClass.includes(studentClassInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Parent User List</h1>
+        <a href="{% url 'bursor_create_parent_user' %}" class="btn btn-create">
+            <i class="fas fa-plus"></i> Create Parent User
+        </a>
+        <div class="filters">
+            <input type="text" id="studentNameFilter" placeholder="Search by Student Name" onkeyup="filterTable()">
+            <input type="text" id="studentClassFilter" placeholder="Search by Student Class" onkeyup="filterTable()">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Parent Name</th>
+                    <th>Student Name</th>
+                    <th>Student Class</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in parent_users %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.parent_first_name }} {{ user.parent_middle_name }} {{ user.parent_last_name }}</td>
+                        <td>{{ user.student.firstname }} {{ user.student.middle_name }} {{ user.student.surname }}</td>
+                        <td>{{ user.student.current_class.name }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            <input type="password" id="password-{{ forloop.counter }}" value="{{ user.password }}" readonly>
+                            <button class="btn btn-view-password" onclick="togglePasswordVisibility('password-{{ forloop.counter }}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                        <td class="actions">
+                            <a href="{% url 'bursor_update_parent_user' user.pk %}" class="btn btn-update">
+                                <i class="fas fa-edit"></i> Update
+                            </a>
+                            <a href="{% url 'bursor_delete_parent_user' user.pk %}" class="btn btn-delete">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+{% endblock content %}

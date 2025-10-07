@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Invite Participants to {{ meeting.title }}</h2>
+
+    <form method="post" action="{% url 'invite_participants' meeting.id %}">
+        {% csrf_token %}
+
+        <!-- Main "Select All Users" Checkbox -->
+        <div class="form-check mb-4 text-center">
+            <input type="checkbox" id="selectAllUsers" class="form-check-input">
+            <label for="selectAllUsers" class="form-check-label font-weight-bold">Select All Users</label>
+        </div>
+
+        <!-- ParentUser Table -->
+        <div class="mb-5 section-card">
+            <h4 class="section-header">Parents</h4>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="checkAllParents" class="form-check-input select-all-section">
+                <label for="checkAllParents" class="form-check-label">Select All Parents</label>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Select</th>
+                            <th>Parent Name</th>
+                            <th>Child's Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parent in parents %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_users" value="{{ parent.id }}" class="form-check-input parent-checkbox"></td>
+                            <td>{{ parent.parent_first_name }} {{ parent.parent_last_name }}</td>
+                            <td>{{ parent.student.current_class }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TeacherUser Table -->
+        <div class="mb-5 section-card">
+            <h4 class="section-header">Teachers</h4>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="checkAllTeachers" class="form-check-input select-all-section">
+                <label for="checkAllTeachers" class="form-check-label">Select All Teachers</label>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Select</th>
+                            <th>Teacher Name</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_users" value="{{ teacher.id }}" class="form-check-input teacher-checkbox"></td>
+                            <td>{{ teacher.staff.firstname }} {{ teacher.staff.surname }}</td>
+                            <td>{{ teacher.staff.occupation|title }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- BursorUser Table -->
+        <div class="mb-5 section-card">
+            <h4 class="section-header">Bursars</h4>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="checkAllBursors" class="form-check-input select-all-section">
+                <label for="checkAllBursors" class="form-check-label">Select All Bursars</label>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Select</th>
+                            <th>Bursar Name</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bursor in bursors %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_users" value="{{ bursor.id }}" class="form-check-input bursor-checkbox"></td>
+                            <td>{{ bursor.staff.firstname }} {{ bursor.staff.surname }}</td>
+                            <td>{{ bursor.staff.occupation|title }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SecretaryUser Table -->
+        <div class="mb-5 section-card">
+            <h4 class="section-header">Secretaries</h4>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="checkAllSecretaries" class="form-check-input select-all-section">
+                <label for="checkAllSecretaries" class="form-check-label">Select All Secretaries</label>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Select</th>
+                            <th>Secretary Name</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for secretary in secretaries %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_users" value="{{ secretary.id }}" class="form-check-input secretary-checkbox"></td>
+                            <td>{{ secretary.staff.firstname }} {{ secretary.staff.surname }}</td>
+                            <td>{{ secretary.staff.occupation|title }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AcademicUser Table -->
+        <div class="mb-5 section-card">
+            <h4 class="section-header">Academic Staff</h4>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="checkAllAcademics" class="form-check-input select-all-section">
+                <label for="checkAllAcademics" class="form-check-label">Select All Academic Staff</label>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Select</th>
+                            <th>Academic Staff Name</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for academic in academics %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_users" value="{{ academic.id }}" class="form-check-input academic-checkbox"></td>
+                            <td>{{ academic.staff.firstname }} {{ academic.staff.surname }}</td>
+                            <td>{{ academic.staff.occupation|title }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Invite Button -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-invite">Invite Selected Participants</button>
+        </div>
+    </form>
+</div>
+
+<!-- Custom styles for an enhanced, iPhone-like look -->
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        background-color: #f8f9fd;
+        color: #333;
+    }
+
+    .container {
+        max-width: 900px;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #007aff;
+    }
+
+    .section-card {
+        padding: 20px;
+        background-color: #f9fafb;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
+    }
+
+    .section-header {
+        font-weight: 600;
+        font-size: 1.2em;
+        color: #495057;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #007aff;
+    }
+
+    .table {
+        margin-top: 20px;
+        background-color: #ffffff;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e3f2fd;
+    }
+
+    .table-primary th {
+        background-color: #e1f5fe;
+        color: #007aff;
+        font-weight: 600;
+    }
+
+    .form-check-label {
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    .btn-primary {
+        background-color: #007aff;
+        border: none;
+        font-weight: 500;
+        padding: 12px 20px;
+        border-radius: 12px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-size: 1.1em;
+    }
+
+    .btn-primary:hover {
+        background-color: #005bb5;
+        transform: scale(1.05);
+    }
+
+    .btn-invite {
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<!-- JavaScript for "Select All" functionality -->
+<script>
+    document.getElementById('selectAllUsers').addEventListener('click', function() {
+        const selectAllSectionCheckboxes = document.querySelectorAll('.select-all-section');
+        selectAllSectionCheckboxes.forEach(checkbox => checkbox.checked = this.checked);
+        selectAllSectionCheckboxes.forEach(checkbox => checkbox.dispatchEvent(new Event('click')));
+    });
+
+    document.getElementById('checkAllParents').addEventListener('click', function() {
+        document.querySelectorAll('.parent-checkbox').forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    document.getElementById('checkAllTeachers').addEventListener('click', function() {
+        document.querySelectorAll('.teacher-checkbox').forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    document.getElementById('checkAllBursors').addEventListener('click', function() {
+        document.querySelectorAll('.bursor-checkbox').forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    document.getElementById('checkAllSecretaries').addEventListener('click', function() {
+        document.querySelectorAll('.secretary-checkbox').forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    document.getElementById('checkAllAcademics').addEventListener('click', function() {
+        document.querySelectorAll('.academic-checkbox').forEach(checkbox => checkbox.checked = this.checked);
+    });
+</script>
+{% endblock %}

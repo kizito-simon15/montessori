@@ -1,0 +1,252 @@
+{% extends "teachers/base_teacher.html" %}
+{% load static %}
+
+{% block title %}Completed Pupils{% endblock title %}
+
+{% block content %}
+<div class="container mt-5 p-4" style="background: linear-gradient(to bottom, #e3f2fd, #ffffff); border-radius: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+    <h2 class="text-center mb-4" style="color: #2c3e50; font-weight: bold;">
+        <i class="fas fa-users" style="color: #3498db;"></i> Completed Pupils
+    </h2>
+
+    <!-- Class Filter -->
+    <div class="mb-4">
+        <label for="classSelect" class="form-label" style="color: #16a085; font-weight: bold;">
+            <i class="fas fa-chalkboard-teacher"></i> Select Class:
+        </label>
+        <select id="classSelect" class="form-select" style="padding: 10px; border: 2px solid #16a085; border-radius: 10px; color: #16a085; font-size: 1.1rem;">
+            <option value="">All</option>
+            {% for student_class in student_classes %}
+            <option value="{{ student_class.name }}">{{ student_class.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Filter Button -->
+    <button onclick="filterStudents()" class="btn btn-success mb-4" style="border-radius: 30px; padding: 10px 30px; font-weight: bold;">
+        <i class="fas fa-filter"></i> Filter
+    </button>
+
+    <!-- Search Field -->
+    <div class="input-group mb-4">
+        <span class="input-group-text" id="searchIcon" style="background-color: #16a085; color: white;">
+            <i class="fas fa-search"></i>
+        </span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search..." style="border: 2px solid #16a085; border-radius: 10px;">
+    </div>
+
+    <!-- Summary Table -->
+    <table class="table table-bordered table-hover" style="border-radius: 15px; overflow: hidden;">
+        <thead class="thead-teal" style="background: teal; color: white; font-size: 1.1rem;">
+            <tr>
+                <th scope="col"><i class="fas fa-male"></i> Total Male Pupils</th>
+                <th scope="col"><i class="fas fa-female"></i> Total Female Pupils</th>
+                <th scope="col"><i class="fas fa-users"></i> Total Pupils</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="maleCount" style="color: #16a085; font-size: 1.2rem;">0</td>
+                <td id="femaleCount" style="color: #c0392b; font-size: 1.2rem;">0</td>
+                <td id="totalCount" style="color: #2980b9; font-size: 1.2rem;">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Student List Table -->
+    <table id="studenttable" class="table table-bordered table-hover" style="margin-top: 20px; border-radius: 15px;">
+        <thead class="thead-teal" style="background: #16a085; color: white; font-size: 1.1rem;">
+            <tr>
+                <th scope="col">S/N</th>
+                <th scope="col">Reg. Number <i class="fas fa-sort" onclick="sortTable(1, 'number', 'asc')"></i></th>
+                <th scope="col">Full Name <i class="fas fa-sort" onclick="sortTable(2, 'string', 'asc')"></i></th>
+                <th scope="col">Current Class</th>
+                <th scope="col">Gender <i class="fas fa-sort" onclick="sortTable(4, 'gender', 'asc')"></i></th>
+                <th scope="col">Father's Mobile</th>
+                <th scope="col">Mother's Mobile</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr class="clickable-row" data-href="#">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ student.registration_number }}</td>
+                <td>{{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</td>
+                <td>{{ student.current_class }}</td>
+                <td>{{ student.get_gender_display }}</td>
+                <td>{{ student.father_mobile_number }}</td>
+                <td>{{ student.mother_mobile_number }}</td>
+                <td>
+                    {% if student.current_status == "active" %}
+                    <i class="fas fa-check-circle" style="color: #16a085;"></i>
+                    {% else %}
+                    <i class="fas fa-times-circle" style="color: #c0392b;"></i>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // JS logic remains unchanged
+    <script>
+  // Function to update the summary table
+  function updateSummary() {
+    const rows = document.getElementById("studenttable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    let maleCount = 0;
+    let femaleCount = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].style.display !== "none") {
+        const gender = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
+        if (gender === "male") {
+          maleCount++;
+        } else if (gender === "female") {
+          femaleCount++;
+        }
+      }
+    }
+
+    document.getElementById("maleCount").innerText = maleCount;
+    document.getElementById("femaleCount").innerText = femaleCount;
+    document.getElementById("totalCount").innerText = maleCount + femaleCount;
+  }
+
+  // Function to filter students based on selected class
+  function filterStudents() {
+    const selectedClass = document.getElementById("classSelect").value;
+    const rows = document.getElementById("studenttable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (let i = 0; i < rows.length; i++) {
+      const currentClass = rows[i].getElementsByTagName("td")[3].innerText;
+      if (selectedClass === "" || selectedClass === currentClass) {
+        rows[i].style.display = "";
+      } else {
+        rows[i].style.display = "none";
+      }
+    }
+    updateSummary();
+    resetSerialNumbers();
+  }
+
+  // Function to reset serial numbers after filtering
+  function resetSerialNumbers() {
+    const visibleRows = document.querySelectorAll("#studenttable tbody tr:not([style*='display: none'])");
+    for (let i = 0; i < visibleRows.length; i++) {
+      visibleRows[i].getElementsByTagName("td")[0].innerText = i + 1;
+    }
+  }
+
+  // Function to filter students based on search input
+  document.getElementById("searchInput").addEventListener("keyup", function() {
+    const filter = this.value.toUpperCase();
+    const rows = document.getElementById("studenttable").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (let i = 0; i < rows.length; i++) {
+      const cells = rows[i].getElementsByTagName("td");
+      let found = false;
+      for (let j = 0; j < cells.length; j++) {
+        const textValue = cells[j].textContent || cells[j].innerText;
+        if (textValue.toUpperCase().indexOf(filter) > -1) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        rows[i].style.display = "";
+      } else {
+        rows[i].style.display = "none";
+      }
+    }
+    updateSummary();
+    resetSerialNumbers();
+  });
+
+  // Initial update of the summary table and serial numbers on page load
+  document.addEventListener("DOMContentLoaded", function() {
+    updateSummary();
+    resetSerialNumbers();
+  });
+
+  // Make rows clickable
+  document.addEventListener("DOMContentLoaded", function() {
+    const rows = document.querySelectorAll(".clickable-row");
+    rows.forEach(row => {
+      row.addEventListener("click", () => {
+        window.location.href = row.getAttribute("data-href");
+      });
+    });
+  });
+
+  // Function to sort the table
+  function sortTable(columnIndex, type, order) {
+    const table = document.getElementById("studenttable");
+    const rows = Array.from(table.rows).slice(1); // Exclude header row
+
+    rows.sort((a, b) => {
+      let cellA = a.cells[columnIndex].innerText.trim();
+      let cellB = b.cells[columnIndex].innerText.trim();
+
+      if (type === 'number') {
+        cellA = parseInt(cellA.split('/').pop(), 10);
+        cellB = parseInt(cellB.split('/').pop(), 10);
+      } else if (type === 'gender') {
+        if (order === 'asc') {
+          return cellA.localeCompare(cellB);
+        } else {
+          return cellB.localeCompare(cellA);
+        }
+      }
+
+      if (order === 'asc') {
+        return cellA > cellB ? 1 : cellA < cellB ? -1 : 0;
+      } else {
+        return cellA < cellB ? 1 : cellA > cellB ? -1 : 0;
+      }
+    });
+
+    rows.forEach(row => table.appendChild(row));
+    resetSerialNumbers();
+  }
+</script>
+<script src="{% static 'js/animations/animations.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // Initialize AOS
+  AOS.init();
+</script>
+
+</script>
+
+<!-- FontAwesome Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+
+<style>
+    .thead-teal {
+        background-color: teal !important;
+        color: white;
+    }
+
+    .clickable-row {
+        cursor: pointer;
+    }
+
+    .clickable-row:hover {
+        background-color: #f4f4f4;
+    }
+
+    table {
+        overflow: hidden;
+        border-radius: 15px;
+    }
+
+    .sort-arrow {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

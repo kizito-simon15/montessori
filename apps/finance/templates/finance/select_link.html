@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load humanize static %}
+
+{# ─────────────────────────────────────────────────────────────
+   Finance Dashboard  –  compact modern UI
+   Blocks expected by base.html: title / extra_css / content / extra_js
+───────────────────────────────────────────────────────────── #}
+
+{% block title %}Finance Dashboard{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-ooOy4jSgjmF5h+ZB+IhW+lE7O0dGp0U7PuvB4zMP1S5CFxg4FtDjB4RxylmnbZpD6Fcz4Cw+nMkzN4Hc7D9BLg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root{
+      --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-700:#374151;
+      --primary:#6366f1;--primary-dark:#4f46e5;
+    }
+    /* Scope every rule to .finance-dash so it never leaks */
+    .finance-dash{font-family:"Inter",system-ui,sans-serif;padding:1.25rem;}
+    .finance-dash h2.section-title{font-size:1.35rem;font-weight:600;margin:0 0 1rem;color:var(--gray-700);display:flex;align-items:center;gap:.5rem}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
+    .kpi-card{background:#fff;border:1px solid var(--gray-200);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;gap:.7rem;transition:.25s box-shadow}
+    .kpi-card:hover{box-shadow:0 6px 16px rgba(0,0,0,.06)}
+    .kpi-card i{font-size:1.65rem;color:var(--primary)}
+    .kpi-metric{display:flex;flex-direction:column}
+    .kpi-value{font-size:1.4rem;font-weight:700;line-height:1}
+    .kpi-label{font-size:.85rem;color:var(--gray-700)}
+
+    /* Controls */
+    .controls{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.5rem}
+    .controls .search-wrapper{position:relative;flex:1 1 240px}
+    .controls input, .controls select, .controls button{font-size:.95rem;border:1px solid var(--gray-300);border-radius:25px;padding:.55rem .9rem;outline:none;background:#fff;color:var(--gray-700)}
+    .controls input{padding-left:2.5rem;width:100%}
+    .controls .search-wrapper i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--gray-700)}
+    .controls button{display:flex;align-items:center;gap:.4rem;cursor:pointer;background:var(--primary);color:#fff;border-color:var(--primary-dark)}
+    .controls button:hover{background:var(--primary-dark)}
+
+    /* Card grid */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem}
+    .card-link{background:linear-gradient(135deg,#36d1dc,#5b86e5);border-radius:12px;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-decoration:none;transition:transform .25s,box-shadow .25s}
+    .card-link i{font-size:2rem;margin-bottom:.6rem}
+    .card-link span{font-weight:600;line-height:1.2}
+    .card-link:hover{transform:translateY(-6px);box-shadow:0 10px 22px rgba(0,0,0,.18)}
+    /* Individual palette tweaks */
+    .card-payment   {background:linear-gradient(135deg,#36d1dc,#5b86e5)}
+    .card-salary    {background:linear-gradient(135deg,#56ab2f,#a8e063)}
+    .card-fees      {background:linear-gradient(135deg,#ff796f,#ff5e62)}
+    .card-uniform   {background:linear-gradient(135deg,#7f00ff,#e100ff)}
+    .card-unipays   {background:linear-gradient(135deg,#11998e,#38ef7d)}
+    .card-utypes    {background:linear-gradient(135deg,#1a2980,#26d0ce)}
+
+    /* Dark‑mode patch (if base adds .dark-mode on body) */
+    body.dark-mode .finance-dash .kpi-card{background:#1f2937;border-color:#374151}
+    body.dark-mode .finance-dash .controls input,
+    body.dark-mode .finance-dash .controls select{background:#374151;color:#e5e7eb;border-color:#475569}
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="finance-dash">
+  <h2 class="section-title"><i class="fas fa-chart-pie"></i>Finance Dashboard</h2>
+
+  <!-- KPI SECTION -->
+  <div class="kpi-grid">
+    <div class="kpi-card" data-aos="fade-up"><i class="fas fa-file-invoice"></i><div class="kpi-metric"><span class="kpi-value">{{ total_invoices|intcomma }}</span><span class="kpi-label">Total Invoices</span></div></div>
+    <div class="kpi-card" data-aos="fade-up" data-aos-delay="100"><i class="fas fa-money-bill-wave"></i><div class="kpi-metric"><span class="kpi-value">{{ salary_invoices|intcomma }}</span><span class="kpi-label">Salary Invoices</span></div></div>
+    <div class="kpi-card" data-aos="fade-up" data-aos-delay="200"><i class="fas fa-wallet"></i><div class="kpi-metric"><span class="kpi-value">{{ expenditures|floatformat:0|intcomma }}</span><span class="kpi-label">Expenditures (TZS)</span></div></div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="fdSearch" placeholder="Search sections…" onkeyup="fdFilter()"></div>
+    <select id="fdFilter" onchange="fdFilter()">
+      <option value="All">All Categories</option>
+      <option value="Invoices">Invoices</option>
+      <option value="Finance">Finance</option>
+      <option value="Uniform">Uniform</option>
+    </select>
+    <button id="fdSortBtn" onclick="fdSort()"><i class="fas fa-sort-alpha-down"></i><span>Sort A–Z</span></button>
+  </div>
+
+  <!-- NAVIGATION CARDS -->
+  <div class="cards-grid" id="fdCards">
+    <a href="{% url 'invoice-list' %}"         class="card-link card-payment"  data-title="Payment Invoices"  data-cat="Invoices"><i class="fas fa-file-invoice-dollar"></i><span>Payment Invoices</span></a>
+    <a href="{% url 'salary-invoice-list' %}"  class="card-link card-salary"   data-title="Salary Invoices"   data-cat="Invoices"><i class="fas fa-money-check-dollar"></i><span>Salary Invoices</span></a>
+    <a href="{% url 'school-fees-list' %}"     class="card-link card-fees"     data-title="School Fees"       data-cat="Finance"><i class="fas fa-school"></i><span>School Fees</span></a>
+    <a href="{% url 'uniform_list' %}"         class="card-link card-uniform"  data-title="Uniform Overview"  data-cat="Uniform"><i class="fas fa-shirt"></i><span>Uniform Overview</span></a>
+    <a href="{% url 'student-uniform-list' %}" class="card-link card-unipays"  data-title="Student Uniforms"  data-cat="Uniform"><i class="fas fa-user-check"></i><span>Student Uniforms</span></a>
+    <a href="{% url 'uniformtype_list' %}"     class="card-link card-utypes"   data-title="Uniform Types"     data-cat="Uniform"><i class="fas fa-tags"></i><span>Uniform Types</span></a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  /* live search + filter */
+  function fdFilter(){const q=document.getElementById('fdSearch').value.toLowerCase();const cat=document.getElementById('fdFilter').value;document.querySelectorAll('#fdCards a').forEach(el=>{const t=el.dataset.title.toLowerCase();const c=el.dataset.cat;el.style.display=(t.includes(q)&&(cat==='All'||c===cat))?'flex':'none';});}
+  /* sort */
+  let fdAsc=true;function fdSort(){const wrap=document.getElementById('fdCards');const list=[...wrap.querySelectorAll('a')].filter(el=>el.style.display!=='none');list.sort((a,b)=>{const ta=a.dataset.title.toLowerCase(),tb=b.dataset.title.toLowerCase();return fdAsc?ta.localeCompare(tb):tb.localeCompare(ta);});list.forEach(el=>wrap.appendChild(el));fdAsc=!fdAsc;const btn=document.getElementById('fdSortBtn');btn.querySelector('i').classList.toggle('fa-sort-alpha-down');btn.querySelector('i').classList.toggle('fa-sort-alpha-down-alt');btn.querySelector('span').textContent=fdAsc?'Sort A–Z':'Sort Z–A';}
+</script>
+{% endblock %}

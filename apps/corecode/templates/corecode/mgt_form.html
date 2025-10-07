@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+  {{ title }}
+{% endblock title %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #edf2fc, #e0f7fa);
+    }
+
+    .form-container {
+        background: #ffffffcc;
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        max-width: 600px;
+        margin: 50px auto;
+    }
+
+    .form-container h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .form-container h2 .emoji {
+        font-size: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #444;
+    }
+
+    .form-control {
+        border-radius: 50px;
+        transition: border-color 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #478ed1;
+        box-shadow: 0 0 5px rgba(71,142,209,0.3);
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group-text {
+        border-radius: 50px 0 0 50px;
+        border: none;
+        background: #eaf7ff;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #478ed1;
+    }
+
+    .invalid-feedback {
+        font-size: 0.85rem;
+    }
+
+    .btn-primary {
+        background-color: #478ed1;
+        border-color: #478ed1;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #3569a5;
+        border-color: #3569a5;
+        transform: scale(1.03);
+    }
+
+    .text-muted {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    @media (max-width: 575.98px) {
+        .form-container {
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .form-container h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <h2><span class="emoji">📱</span> {{ title }}</h2>
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-pen"></i></span>
+                        {{ field|add_class:"form-control"|add_error_class:"is-invalid" }}
+                    </div>
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }} 😊</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="invalid-feedback">
+                            {{ field.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> {{ submit_text }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

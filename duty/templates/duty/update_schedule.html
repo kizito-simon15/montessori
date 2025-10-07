@@ -1,0 +1,273 @@
+{% extends "academic/academic_base.html" %}
+
+{% block content %}
+<style>
+    /* Styling for a modern, user-friendly, iPhone-like interface */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f0f4f8;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        color: #333;
+    }
+
+    h2, h3, h4 {
+        color: #007aff;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 15px;
+        background-color: #f0f4f8;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-row, .class-schedule-entry {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .form-group, .field-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        color: #007aff;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    input, select, .form-control {
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #d1d1d1;
+        background-color: #f9f9f9;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        font-size: 14px;
+        color: #333;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 20px;
+        text-align: center;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s;
+        color: #ffffff;
+    }
+
+    .btn-primary {
+        background-color: #34c759;
+    }
+
+    .btn-primary:hover {
+        background-color: #28a745;
+    }
+
+    .btn-secondary {
+        background-color: #007aff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #005bb5;
+    }
+
+    .btn-remove {
+        background-color: #ff3b30;
+        color: #ffffff;
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-remove:hover {
+        background-color: #d32f2f;
+    }
+
+    .class-schedule-container {
+        background-color: #f8fbff;
+        border: 1px solid #e0e7f1;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .class-schedule-entry {
+        gap: 10px;
+        align-items: center;
+        position: relative;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+
+    .hidden-field {
+        display: none;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2>Update Weekly Schedule</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Daily Schedule Form -->
+        <h3>Daily Schedule</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_day">Day</label>
+                {{ daily_form.day }}
+            </div>
+            <div class="form-group">
+                <label for="id_start_time">Start Time</label>
+                {{ daily_form.start_time }}
+            </div>
+            <div class="form-group">
+                <label for="id_end_time">End Time</label>
+                {{ daily_form.end_time }}
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Class Schedules Formset -->
+        {% for student_class, formset in formsets.items %}
+        <h4>{{ student_class.name }}</h4>
+        <div class="class-schedule-container" id="class-schedule-container-{{ student_class.id }}">
+            {{ formset.management_form }}
+            <div class="formset-entries">
+                {% for form in formset %}
+                <div class="class-schedule-entry">
+                    <!-- Include the hidden ID field for each form in the formset to identify existing entries -->
+                    {{ form.id }}
+                    <div class="field-container">
+                        {{ form.start_time.label_tag }} {{ form.start_time }}
+                    </div>
+                    <div class="field-container">
+                        {{ form.end_time.label_tag }} {{ form.end_time }}
+                    </div>
+                    <div class="field-container">
+                        {{ form.activity_type.label_tag }} 
+                        {{ form.activity_type }}
+                    </div>
+                    <div class="field-container subject-field hidden-field">
+                        {{ form.subject.label_tag }} {{ form.subject }}
+                    </div>
+                    <div class="field-container staff-field hidden-field">
+                        {{ form.staff.label_tag }} {{ form.staff }}
+                    </div>
+                    <div class="field-container description-field hidden-field">
+                        {{ form.description.label_tag }} {{ form.description }}
+                    </div>
+                    <button type="button" class="btn-remove" onclick="removeEntry(this)">X</button>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn btn-secondary add-entry" data-class-id="{{ student_class.id }}">+ Add More</button>
+        </div>
+        <hr>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary mt-4">Update Schedule</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to add a new entry in the formset
+    document.querySelectorAll('.add-entry').forEach(button => {
+        button.addEventListener('click', function() {
+            const classId = this.getAttribute('data-class-id');
+            const container = document.querySelector(`#class-schedule-container-${classId} .formset-entries`);
+            const totalFormsInput = document.querySelector(`#id_class_${classId}-TOTAL_FORMS`);
+            let totalForms = parseInt(totalFormsInput.value);
+
+            // Clone the last entry in the formset
+            const newEntry = container.lastElementChild.cloneNode(true);
+
+            // Update the form index for all inputs in the cloned entry
+            newEntry.querySelectorAll('input, select, textarea').forEach(input => {
+                const name = input.name.replace(`-${totalForms - 1}-`, `-${totalForms}-`);
+                const id = input.id.replace(`-${totalForms - 1}-`, `-${totalForms}-`);
+                input.name = name;
+                input.id = id;
+                input.value = ''; // Clear any existing value
+                if (input.classList.contains("activity-select")) {
+                    input.addEventListener("change", function() {
+                        toggleFields(this);
+                    });
+                }
+            });
+
+            // Append the new entry to the formset container
+            container.appendChild(newEntry);
+
+            // Update the total forms count
+            totalFormsInput.value = totalForms + 1;
+        });
+    });
+
+    // Function to remove a formset entry
+    window.removeEntry = function(button) {
+        const entry = button.closest('.class-schedule-entry');
+        entry.remove();
+    };
+
+    // Show/hide fields based on activity type
+    document.querySelectorAll(".activity-select").forEach(select => {
+        toggleFields(select);
+        select.addEventListener("change", function() {
+            toggleFields(this);
+        });
+    });
+
+    function toggleFields(activitySelect) {
+        const parentForm = activitySelect.closest('.class-schedule-entry');
+        const subjectField = parentForm.querySelector('.subject-field');
+        const staffField = parentForm.querySelector('.staff-field');
+        const descriptionField = parentForm.querySelector('.description-field');
+
+        // Show/hide fields based on selected activity type
+        if (activitySelect.value === 'study') {
+            subjectField.classList.remove("hidden-field");
+            staffField.classList.remove("hidden-field");
+            descriptionField.classList.add("hidden-field");
+        } else if (activitySelect.value === 'event') {
+            subjectField.classList.add("hidden-field");
+            staffField.classList.add("hidden-field");
+            descriptionField.classList.remove("hidden-field");
+        } else if (activitySelect.value === 'break') {
+            subjectField.classList.add("hidden-field");
+            staffField.classList.add("hidden-field");
+            descriptionField.classList.add("hidden-field");
+        }
+    }
+});
+</script>
+{% endblock %}

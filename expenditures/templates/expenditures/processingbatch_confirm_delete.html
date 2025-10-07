@@ -1,0 +1,43 @@
+{# ================== processingbatch_confirm_delete.html ================== #}
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root{--primary:#1e3a8a;--danger:#dc2626;--bg:#f1f5f9;--radius:25px;}
+body{background:var(--bg);font-family:'Inter',sans-serif;margin:0;}
+.card{background:#fff;border-radius:0 0 15px 15px;box-shadow:0 3px 8px rgba(0,0,0,.05);
+      overflow:hidden;opacity:0;transform:translateY(20px);transition:.5s;}
+.card-header{background:#fff;padding:.6rem 1rem;border-bottom:1px solid #e5e7eb;}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--danger);}
+.card-body{padding:.6rem 1rem;display:flex;flex-direction:column;gap:.6rem;}
+.detail-box{background:#f8fafc;border-radius:var(--radius);padding:.45rem .75rem;font-size:.9rem;}
+.btn{border:none;border-radius:var(--radius);padding:.4rem .9rem;font-weight:600;font-size:.8rem;
+     cursor:pointer;transition:background .15s,transform .15s;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{opacity:.9;transform:translateY(-2px);}
+.btn-secondary{background:#6b7280;color:#fff;}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const card=document.querySelector('.card');if(card){setTimeout(()=>{card.style.opacity='1';card.style.transform='translateY(0)';},80);}
+});
+</script>
+
+<div class="card">
+  <div class="card-header"><h2>🗑️ Delete Processing Batch</h2></div>
+  <div class="card-body">
+    <div class="detail-box">
+      Processed: {{ object.processed_product.name }} on {{ object.date }}<br>
+      Output: {{ object.output_quantity|floatformat:2 }} {{ object.processed_product.unit }}
+    </div>
+    <p>Are you sure you want to delete this processing batch? This action cannot be undone.</p>
+    <form method="post">{% csrf_token %}
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+        <button type="submit" class="btn btn-danger">Yes, delete</button>
+        <a href="{% url 'processingbatch_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

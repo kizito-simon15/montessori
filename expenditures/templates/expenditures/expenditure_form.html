@@ -1,0 +1,144 @@
+{# templates/expenditures/expenditure_form.html #}
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#1e3a8a; --amber:#fbbf24; --rose:#e11d48;
+  --bg:#f8fafc; --card:#ffffff; --radius:24px;
+}
+body{background:var(--bg);font-family:Inter,sans-serif;margin:0}
+.card{background:var(--card);border-radius:0 0 18px 18px;
+      box-shadow:0 4px 12px rgba(0,0,0,.06);opacity:0;transform:translateY(26px);
+      transition:.5s cubic-bezier(.25,.8,.25,1)}
+.card.show{opacity:1;transform:translateY(0)}
+.card-header{padding:.6rem 1.4rem;border-bottom:1px solid #e2e8f0}
+.card-header h2{margin:0;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:700;color:var(--indigo)}
+.card-body{padding:1rem 1.4rem;display:flex;flex-direction:column;gap:1rem}
+.grid{display:grid;gap:1rem}
+@media(min-width:720px){.cols-2{grid-template-columns:1fr 1fr}}
+.label{font-weight:600;font-size:.9rem;margin-bottom:.25rem;color:#334155}
+.star{color:var(--rose)}
+.form-control,.form-select{width:100%;padding:.55rem 1rem;font-size:.9rem;
+  border:1px solid #cbd5e1;border-radius:var(--radius);background:#fff}
+.form-control:focus,.form-select:focus{border-color:var(--indigo);
+  box-shadow:0 0 0 3px rgba(30,64,175,.15);outline:none}
+.text-danger{color:var(--rose);font-size:.8rem;margin-top:.25rem}
+.btn{border:none;border-radius:var(--radius);padding:.45rem 1.1rem;font-weight:600;
+     font-size:.85rem;cursor:pointer;transition:background .15s,transform .15s}
+.btn-primary{background:var(--indigo);color:#fff}
+.btn-primary:hover{background:#0f172a;transform:translateY(-2px)}
+.btn-secondary{background:#64748b;color:#fff}
+.total-preview{font-size:.85rem;font-weight:600;color:var(--indigo)}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded',() => {
+  // reveal
+  const card=document.querySelector('.card');
+  if(card) setTimeout(()=>card.classList.add('show'),80);
+
+  // live total preview
+  const price   = document.getElementById('id_price_per_unit');
+  const qty     = document.getElementById('id_quantity');
+  const out     = document.getElementById('total_out');
+  function fmt(n){return (+n || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function calc(){
+    const p = parseFloat(price.value.replace(/,/g,'')) || 0;
+    const q = parseFloat(qty.value.replace(/,/g,''))   || 1;
+    out.textContent = fmt(p*q);
+  }
+  if(price)  price.addEventListener('input',calc);
+  if(qty)    qty.addEventListener('input',calc);
+  calc();
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>{% if form.instance.pk %}✏️&nbsp;Edit Expenditure{% else %}➕&nbsp;Add Expenditure{% endif %}</h2>
+  </div>
+
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="text-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <!-- 1 ▸ envelope, line, name -->
+      <div class="grid cols-2">
+        <div>
+          <label class="label" for="id_budget">Budget envelope <span class="star">✶</span></label>
+          {{ form.budget }}
+          {% if form.budget.errors %}<div class="text-danger">{{ form.budget.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_budget_line">Budget line <span class="star">✶</span></label>
+          {{ form.budget_line }}
+          {% if form.budget_line.errors %}<div class="text-danger">{{ form.budget_line.errors.0 }}</div>{% endif %}
+        </div>
+        <div style="grid-column:1/-1">
+          <label class="label" for="id_item_name">Item name <span class="star">✶</span></label>
+          {{ form.item_name }}
+          {% if form.item_name.errors %}<div class="text-danger">{{ form.item_name.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- 2 ▸ money & qty -->
+      <div class="grid cols-2">
+        <div>
+          <label class="label" for="id_price_per_unit">Price @ unit&nbsp;(TZS) <span class="star">✶</span></label>
+          {{ form.price_per_unit }}
+          {% if form.price_per_unit.errors %}<div class="text-danger">{{ form.price_per_unit.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_quantity">Quantity</label>
+          {{ form.quantity }}
+          {% if form.quantity.errors %}<div class="text-danger">{{ form.quantity.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <p class="total-preview">Total (TZS): <span id="total_out">0.00</span></p>
+
+      <!-- 3 ▸ unit & date -->
+      <div class="grid cols-2">
+        <div>
+          <label class="label" for="id_unit">Unit</label>
+          {{ form.unit }}
+          {% if form.unit.errors %}<div class="text-danger">{{ form.unit.errors.0 }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="label" for="id_date">Date</label>
+          {{ form.date }}
+          {% if form.date.errors %}<div class="text-danger">{{ form.date.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- 4 ▸ description & attachment -->
+      <div>
+        <label class="label" for="id_description">Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}<div class="text-danger">{{ form.description.errors.0 }}</div>{% endif %}
+      </div>
+      <div>
+        <label class="label" for="id_attachment">Attachment</label>
+        {{ form.attachment }}
+        {% if form.attachment.errors %}<div class="text-danger">{{ form.attachment.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- submit -->
+      <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:.9rem">
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+        <a href="{% url 'expenditure_list' %}" class="btn btn-secondary">❌ Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

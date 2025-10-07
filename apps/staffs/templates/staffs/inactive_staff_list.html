@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+    <h2>Inactive Staff Members</h2>
+    <p>Total Male: {{ total_male }}, Total Female: {{ total_female }}, Overall Total: {{ overall_total }}</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Occupation</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff in staff_list %}
+            <tr>
+                <td>{{ staff.firstname }} {{ staff.middle_name }} {{ staff.surname }}</td>
+                <td>{{ staff.get_occupation_display }}</td>
+                <td>{{ staff.current_status }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No inactive staff found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

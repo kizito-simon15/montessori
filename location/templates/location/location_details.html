@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Location Details</h2>
+<p>Name: {{ location.name }}</p>
+<p>Latitude: {{ location.latitude }}</p>
+<p>Longitude: {{ location.longitude }}</p>
+<p>Access Days: {{ location.start_day }} to {{ location.end_day }}</p>
+<p>Access Time: {{ location.start_time }} to {{ location.end_time }}</p>
+<a href="{% url 'update_location' location.pk %}">Update Location</a>
+{% endblock %}

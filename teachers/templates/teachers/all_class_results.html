@@ -1,0 +1,163 @@
+{% extends 'teachers/base_teacher.html' %}
+{% block content %}
+<div class="container mt-4 p-4" style="background: linear-gradient(to bottom, #ffffff, #e3f2fd); border-radius: 15px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);">
+    <h2 class="text-center mb-4" style="color: #2c3e50; font-weight: bold; text-transform: uppercase;">
+        <i class="fas fa-graduation-cap" style="color: #1abc9c;"></i> Student Results
+    </h2>
+
+    <!-- Filters -->
+    <div class="filters mb-5 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+        <h4 class="mb-4" style="color: #34495e; font-weight: bold;">
+            <i class="fas fa-filter"></i> Filter Results
+        </h4>
+        <div class="row g-4">
+            <div class="col-md-4 col-sm-6">
+                <label for="sessionFilter" class="form-label" style="font-weight: bold; color: #3498db;">
+                    <i class="fas fa-calendar-alt"></i> Session:
+                </label>
+                <select id="sessionFilter" class="form-select p-3" onchange="filterResults()" style="background: #f0f8ff; border: 2px solid #3498db; border-radius: 10px;">
+                    <option value="">All Sessions</option>
+                    {% for session in sessions %}
+                    <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>{{ session }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <label for="termFilter" class="form-label" style="font-weight: bold; color: #27ae60;">
+                    <i class="fas fa-clock"></i> Term:
+                </label>
+                <select id="termFilter" class="form-select p-3" onchange="filterResults()" style="background: #ecfdf5; border: 2px solid #27ae60; border-radius: 10px;">
+                    <option value="">All Terms</option>
+                    {% for term in terms %}
+                    <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>{{ term }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <label for="examFilter" class="form-label" style="font-weight: bold; color: #e67e22;">
+                    <i class="fas fa-edit"></i> Exam Type:
+                </label>
+                <select id="examFilter" class="form-select p-3" onchange="filterResults()" style="background: #fdf5e6; border: 2px solid #e67e22; border-radius: 10px;">
+                    <option value="">All Exams</option>
+                    {% for exam in exams %}
+                    <option value="{{ exam.id }}" {% if exam.id == current_exam.id %}selected{% endif %}>{{ exam }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {% for session_term_exam_data in data %}
+    <div class="results-section mb-5 p-4" data-session="{{ session_term_exam_data.session.id }}" data-term="{{ session_term_exam_data.term.id }}" data-exam="{{ session_term_exam_data.exam.id }}" style="background: #ffffff; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <h3 class="text-center" style="color: #1abc9c; font-weight: bold;">
+            <i class="fas fa-school"></i> {{ session_term_exam_data.session }} - {{ session_term_exam_data.term }}
+        </h3>
+        <h4 class="text-center" style="color: #3498db; font-weight: bold;">
+            <i class="fas fa-book"></i> {{ session_term_exam_data.exam }}
+        </h4>
+
+        <!-- Results Table -->
+        <div class="results-table table-responsive mt-4">
+            <table class="table table-bordered table-hover" style="border-radius: 10px; overflow: hidden;">
+                <thead style="background: linear-gradient(to right, #1abc9c, #16a085); color: white; text-transform: uppercase;">
+                <tr>
+                    <th>#</th>
+                    <th><i class="fas fa-user"></i> Student</th>
+                    <th><i class="fas fa-chalkboard"></i> Class</th>
+                    {% for subject in subjects %}
+                    <th colspan="3">{{ subject }}</th>
+                    {% endfor %}
+                    <th><i class="fas fa-calculator"></i> Total</th>
+                    <th><i class="fas fa-percent"></i> Avg</th>
+                    <th><i class="fas fa-flag"></i> Status</th>
+                    <th><i class="fas fa-trophy"></i> Pos</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student_data in session_term_exam_data.results %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student_data.student }}</td>
+                    <td>{{ student_data.student_class }}</td>
+                    {% for subject, subject_data in student_data.subjects.items %}
+                    <td>{{ subject_data.test_score|default:"-" }}</td>
+                    <td>{{ subject_data.exam_score|default:"-" }}</td>
+                    <td>{{ subject_data.average|default:"-" }}</td>
+                    {% endfor %}
+                    <td>{{ student_data.total }}</td>
+                    <td>{{ student_data.overall_average|floatformat:"2" }}</td>
+                    <td class="{% if student_data.overall_status == 'PASS' %}text-success{% else %}text-danger{% endif %}">{{ student_data.overall_status }}</td>
+                    <td>{{ student_data.position }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Subject Rankings -->
+        <div class="rankings-table mt-5">
+            <h5 class="text-center" style="color: #34495e; font-weight: bold; margin-bottom: 20px;">
+                <i class="fas fa-chart-bar"></i> Subject Rankings
+            </h5>
+            <table class="table table-bordered table-hover" style="border-radius: 10px; overflow: hidden;">
+                <thead style="background: linear-gradient(to right, #3498db, #2980b9); color: white; text-transform: uppercase;">
+                <tr>
+                    <th>#</th>
+                    <th><i class="fas fa-book"></i> Subject</th>
+                    <th><i class="fas fa-chart-line"></i> Avg</th>
+                    <th><i class="fas fa-graduation-cap"></i> Grade</th>
+                    <th><i class="fas fa-star"></i> GPA</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subject_data in session_term_exam_data.subject_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ subject_data.subject }}</td>
+                    <td>{{ subject_data.average|floatformat:"2" }}</td>
+                    <td>{{ subject_data.grade }}</td>
+                    <td>{{ subject_data.gpa|floatformat:"3" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Buttons -->
+    <div class="text-center mt-4">
+        <button type="button" class="btn btn-success btn-lg m-2" onclick="window.print()" style="border-radius: 50px; padding: 10px 30px;">
+            <i class="fas fa-print"></i> Print
+        </button>
+        <a href="{% url 'class-list' %}" class="btn btn-primary btn-lg m-2" style="border-radius: 50px; padding: 10px 30px;">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<script>
+function filterResults() {
+    var sessionFilter = document.getElementById('sessionFilter').value;
+    var termFilter = document.getElementById('termFilter').value;
+    var examFilter = document.getElementById('examFilter').value;
+
+    var sections = document.querySelectorAll('.results-section');
+    sections.forEach(function(section) {
+        var session = section.getAttribute('data-session');
+        var term = section.getAttribute('data-term');
+        var exam = section.getAttribute('data-exam');
+
+        if ((sessionFilter === "" || sessionFilter === session) &&
+            (termFilter === "" || termFilter === term) &&
+            (examFilter === "" || examFilter === exam)) {
+            section.style.display = '';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', filterResults);
+</script>
+{% endblock %}

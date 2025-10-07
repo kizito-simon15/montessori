@@ -1,0 +1,294 @@
+{% extends 'academic/academic_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4 animate__animated animate__fadeIn">
+    <!-- Filters -->
+    <div class="filters mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="sessionFilter" class="form-label">Select Session:</label>
+                    <select id="sessionFilter" class="form-select" onchange="filterResults()">
+                        <option value="">All Sessions</option>
+                        {% for session in sessions %}
+                        <option value="{{ session.id }}" {% if session.id == current_session.id %}selected{% endif %}>{{ session }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="termFilter" class="form-label">Select Term:</label>
+                    <select id="termFilter" class="form-select" onchange="filterResults()">
+                        <option value="">All Terms</option>
+                        {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term.id == current_term.id %}selected{% endif %}>{{ term }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="examFilter" class="form-label">Select Exam Type:</label>
+                    <select id="examFilter" class="form-select" onchange="filterResults()">
+                        <option value="">All Exam Types</option>
+                        {% for exam in exams %}
+                        <option value="{{ exam.id }}" {% if exam.id == current_exam.id %}selected{% endif %}>{{ exam }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for session_term_exam_data in data %}
+    <div class="results-section" data-session="{{ session_term_exam_data.session.id }}" data-term="{{ session_term_exam_data.term.id }}" data-exam="{{ session_term_exam_data.exam.id }}">
+        <h2 class="text-center" style="color:var(--clr-primary);"><u>MARIA MONTESSORI NURSERY, PRE & PRIMARY SCHOOL</u></h2>
+        <h2 class="text-center" style="color:var(--clr-primary);"><u>RESULTS OF {{ session_term_exam_data.session }}-{{ session_term_exam_data.term }}</u></h2>
+        <h2 class="text-center" style="color:var(--clr-primary);"><u>{{ session_term_exam_data.exam }} RESULTS</u></h2>
+        <h3 class="text-center" style="color:var(--clr-primary);"><u>Class: {{ selected_class }}</u></h3>
+
+        <div class="results-table">
+            <table class="table table-bordered">
+                <thead style="background-color: var(--clr-complementary); color: #fff;">
+                <tr>
+                    <th class="serial-number" rowspan="2">Serial Number</th>
+                    <th class="student-name" rowspan="2">Student</th>
+                    <th class="student-class" rowspan="2">Student Class</th>
+                    {% for subject in subjects %}
+                    <th class="subject-name" colspan="3">{{ subject }}</th>
+                    {% endfor %}
+                    <th class="total" rowspan="2">Total</th>
+                    <th class="overall-average" rowspan="2">Overall Average</th>
+                    <th class="overall-status-header" rowspan="2">Overall Status</th>
+                    <th class="position" rowspan="2">Position</th>
+                </tr>
+                <tr>
+                    {% for subject in subjects %}
+                    <th class="score">Test Score</th>
+                    <th class="score">Exam Score</th>
+                    <th class="average">Average</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for student_data in session_term_exam_data.results %}
+                <tr>
+                    <td class="serial-number">{{ forloop.counter }}</td>
+                    <td class="student-name"><a href="{% url 'student_infos_form_view' student_data.student.id %}" class="text-decoration-none">{{ student_data.student }}</a></td>
+                    <td class="student-class">{{ student_data.student_class }}</td>
+                    {% for subject, subject_data in student_data.subjects.items %}
+                    <td class="score">{{ subject_data.test_score|default:"None" }}</td>
+                    <td class="score">{{ subject_data.exam_score|default:"None" }}</td>
+                    <td class="average">{{ subject_data.average|default:"None" }}</td>
+                    {% endfor %}
+                    <td class="total">{{ student_data.total }}</td>
+                    <td class="overall-average">{{ student_data.overall_average|floatformat:"2" }}</td>
+                    <td class="{% if student_data.overall_status == 'PASS' %}status-pass{% else %}status-fail{% endif %}">{{ student_data.overall_status }}</td>
+                    <td class="position">{{ student_data.position }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rankings-table">
+            <p style="color: var(--clr-primary);"><u>Subjects Rankings:</u></p>
+            <table class="table table-bordered">
+                <thead style="background-color: var(--clr-complementary); color: #fff;">
+                <tr>
+                    <th class="subject-position">Subject Position</th>
+                    <th class="subject-column">Subject</th>
+                    <th class="subject-average">Subject Average</th>
+                    <th class="subject-grade">Subject Grade</th>
+                    <th class="subject-gpa">Subject GPA</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subject_data in session_term_exam_data.subject_data %}
+                <tr>
+                    <td class="subject-position">{{ forloop.counter }}</td>
+                    <td class="subject-column">{{ subject_data.subject }}</td>
+                    <td class="subject-average">{{ subject_data.average|floatformat:"2" }}</td>
+                    <td class="subject-grade">{{ subject_data.grade }}</td>
+                    <td class="subject-gpa">{{ subject_data.gpa|floatformat:"3" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="no-print">
+        <button type="button" class="btn btn-primary btn-lg me-2" onclick="window.print()">Print</button>
+        <a href="{% url 'class-list' %}" class="btn btn-primary btn-lg" role="button">Back</a>
+        <a href="{% url 'academic_form_results_view' selected_class.id %}" class="btn btn-complementary btn-lg" role="button">
+            Go to the class forms <i class="fa fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+@media print {
+    .results-table {
+        page-break-after: always;
+    }
+    .rankings-table {
+        page-break-before: always;
+    }
+    .no-print {
+        display: none;
+    }
+}
+
+table {
+    border-collapse: collapse;
+    border: 2px solid var(--clr-neutral);
+}
+
+th, td {
+    border: 2px solid var(--clr-neutral);
+    padding: 8px;
+}
+
+.form-select {
+    width: 100%;
+    background-color: var(--clr-light);
+    border: 2px solid var(--clr-accent);
+    border-radius: 5px;
+    padding: 5px;
+    color: var(--clr-primary);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.25);
+}
+
+.filters .col-md-4 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.form-label {
+    color: var(--clr-neutral);
+    font-weight: 600;
+}
+
+.serial-number, .subject-position, .position {
+    color: var(--clr-neutral);
+}
+
+.student-name {
+    color: var(--clr-primary);
+}
+
+.student-name a {
+    color: var(--clr-primary);
+}
+
+.student-name a:hover {
+    color: var(--clr-complementary);
+}
+
+.subject-name {
+    color: var(--clr-complementary);
+}
+
+.score, .average {
+    color: var(--clr-complementary);
+}
+
+.student-class {
+    color: var(--clr-accent);
+}
+
+.total {
+    color: var(--clr-primary);
+}
+
+.overall-average {
+    color: var(--clr-accent);
+}
+
+.overall-status-header {
+    color: var(--clr-complementary);
+}
+
+.status-pass {
+    color: var(--clr-complementary);
+}
+
+.status-fail {
+    color: #dc2626;
+}
+
+.subject-column {
+    color: var(--clr-primary);
+}
+
+.subject-average {
+    color: var(--clr-complementary);
+}
+
+.subject-grade {
+    color: var(--clr-accent);
+}
+
+.subject-gpa {
+    color: var(--clr-primary);
+}
+
+.btn-primary {
+    background-color: var(--clr-primary);
+    border-color: var(--clr-primary);
+}
+
+.btn-primary:hover {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.btn-complementary {
+    background-color: var(--clr-complementary);
+    border-color: var(--clr-complementary);
+    color: #fff;
+}
+
+.btn-complementary:hover {
+    background-color: #5eead4;
+    border-color: #5eead4;
+}
+</style>
+
+<script>
+function filterResults() {
+    var sessionFilter = document.getElementById('sessionFilter').value;
+    var termFilter = document.getElementById('termFilter').value;
+    var examFilter = document.getElementById('examFilter').value;
+
+    var sections = document.querySelectorAll('.results-section');
+    sections.forEach(function(section) {
+        var session = section.getAttribute('data-session');
+        var term = section.getAttribute('data-term');
+        var exam = section.getAttribute('data-exam');
+
+        if ((sessionFilter === "" || sessionFilter === session) &&
+            (termFilter === "" || termFilter === term) &&
+            (examFilter === "" || examFilter === exam)) {
+            section.style.display = '';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Trigger the filter function to apply the initial filter
+    filterResults();
+});
+</script>
+{% endblock %}

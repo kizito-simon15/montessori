@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}
+  {% if form.instance.pk %}Edit Salary Slip{% else %}New Salary Slip{% endif %}
+{% endblock %}
+
+{#────────────────────────  Custom styles  ────────────────────────#}
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#4f46e5; --rose:#ef4444; --emerald:#10b981; --amber:#f59e0b;
+  --purple:#7c3aed; --slate:#64748b; --paper:#f9fafb; --border:#e5e7eb;
+}
+/* ---- base ---- */
+body{font-family:Inter,system-ui,sans-serif;background:var(--paper);color:#111827}
+a{color:var(--indigo)}
+/* ---- card ---- */
+.card{background:hsla(0,0%,100%,.55);backdrop-filter:blur(28px);
+      border:1px solid rgba(255,255,255,.45);border-radius:22px;
+      max-width:1024px;margin:1.8rem auto;box-shadow:0 8px 30px rgba(0,0,0,.08);overflow:hidden}
+.card-head{padding:1.15rem 1.6rem;background:linear-gradient(90deg,var(--indigo),var(--purple));color:#fff}
+.card-body{padding:2rem;display:grid;row-gap:1.75rem}
+/* ---- form groups ---- */
+fieldset{border:1px solid var(--border);border-radius:1.1rem;background:#f1f5f9;
+         padding:1.3rem 1.4rem;margin-bottom:.1rem}
+legend{font-size:.9rem;font-weight:700;color:#475569;padding:0 .4rem}
+.grid-2{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.form-group{display:flex;flex-direction:column;gap:.38rem}
+label{font-size:.8rem;font-weight:600}
+input,select,textarea{
+  width:100%;padding:.58rem .75rem;font-size:.88rem;border:1px solid var(--border);
+  border-radius:.7rem;background:#fff;color:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--indigo)}
+/* ---- deductions ---- */
+.ded-row{display:flex;gap:.7rem;align-items:center;margin-top:.55rem}
+.ded-desc{flex:2} .ded-amt{flex:1;min-width:110px}
+.ded-row button{background:none;border:none;font-size:1.35rem;color:var(--rose);
+                cursor:pointer;line-height:1}
+/* ---- summary ---- */
+.summary{display:grid;gap:1rem;margin-top:1.3rem;
+         grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
+.sum{padding:.75rem .9rem;border-radius:1.2rem;font-size:.74rem;font-weight:600;text-align:center}
+.sum strong{font-size:1.05rem;line-height:1.25}
+.bg-rose{background:#fee2e2;color:var(--rose)} .bg-amber{background:#fef3c7;color:#b45309}
+.bg-mint{background:#d1fae5;color:#047857}
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;gap:.35rem;font-weight:700;font-size:.9rem;
+     padding:.6rem 1.55rem;border:none;border-radius:26px;cursor:pointer}
+.btn-indigo{background:var(--indigo);color:#fff}.btn-indigo:hover{filter:brightness(.94)}
+.btn-slate {background:var(--slate); color:#fff}.btn-slate:hover {filter:brightness(.92)}
+.alert{background:#fee2e2;border-left:4px solid var(--rose);color:var(--rose);
+       padding:1rem 1.1rem;border-radius:1.1rem;margin-bottom:1.1rem;font-size:.85rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Alpine.js -->
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+/* Shared Alpine store for deduction rows */
+document.addEventListener('alpine:init', () => {
+  Alpine.store('deductions', {
+    rows: [],                                  // {idx,reason,amount,id,delete}
+    get total(){ return this.rows.reduce((t,r)=>t+(r.delete?0:(+r.amount||0)),0); }
+  });
+});
+</script>
+
+<div class="card" x-data="slip()">
+  <div class="card-head text-lg font-semibold flex items-center gap-2">
+    {% if form.instance.pk %}✏️ Edit Salary Slip{% else %}➕ New Salary Slip{% endif %}
+  </div>
+
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ deduction_formset.management_form }}
+
+      {#────────────── Basic fields ──────────────#}
+      <fieldset>
+        <legend>Basics</legend>
+        <div class="grid-2">
+          <div class="form-group"><label>Budget</label>{{ form.budget }}</div>
+          <div class="form-group"><label>Staff</label>{{ form.staff }}</div>
+          <div class="form-group"><label>Month</label>{{ form.month }}</div>
+        </div>
+      </fieldset>
+
+      {#────────────── Pay inputs ───────────────#}
+      <fieldset>
+        <legend>Pay Elements</legend>
+        <div class="grid-2">
+          <div class="form-group"><label>Basic salary</label>{{ form.basic_salary }}</div>
+          <div class="form-group"><label>Special allowance</label>{{ form.special_allowance }}</div>
+          <div class="form-group"><label>Allowance</label>{{ form.allowance }}</div>
+          <div class="form-group"><label>PAYE amount</label>{{ form.paye_amount }}</div>
+        </div>
+
+        {#──────────── Extra deductions (inline formset) ────────────#}
+        <div class="form-group mt-4" x-data="deductions()" x-init="init()">
+          <label class="font-semibold text-sm">Extra deductions</label>
+
+          <template x-for="(row, idx) in storeRows" :key="idx">
+            <div class="ded-row" x-show="!row.delete">
+              <input class="ded-desc" type="text"
+                     :name="`deduction-${idx}-reason`"
+                     x-model="row.reason" placeholder="Reason" required>
+              <input class="ded-amt" type="number" min="0" step="0.01"
+                     :name="`deduction-${idx}-amount`"
+                     x-model.number="row.amount" required>
+              <!-- hidden mgmt -->
+              <input type="hidden" :name="`deduction-${idx}-id`"     :value="row.id || ''">
+              <input type="checkbox" class="hidden"
+                     :name="`deduction-${idx}-DELETE`"
+                     x-model="row.delete">
+              <button type="button" @click="remove(idx)">×</button>
+            </div>
+          </template>
+
+          <button type="button" class="btn btn-slate mt-2" @click="add">➕ Add deduction</button>
+        </div>
+      </fieldset>
+
+      {#──────────── Remarks ─────────────#}
+      <fieldset><legend>Remarks</legend>{{ form.remarks }}</fieldset>
+
+      {#──────────── Summary tiles ────────────#}
+      <div class="summary">
+        <div class="sum bg-rose">NSSF<br><strong x-text="fmt(nssf)"></strong></div>
+        <div class="sum bg-amber">WCF<br><strong x-text="fmt(wcf)"></strong></div>
+        <div class="sum bg-rose">PAYE<br><strong x-text="fmt(paye)"></strong></div>
+        <div class="sum bg-amber">HELSB<br><strong x-text="hasHelsb?fmt(helsb):'—'"></strong></div>
+        <div class="sum" :class="net<0?'bg-rose':'bg-mint'">
+          Net&nbsp;Pay<br><strong x-text="fmt(net)"></strong>
+        </div>
+      </div>
+
+      {#──────────── Actions ────────────#}
+      <div class="flex flex-wrap justify-end gap-3 mt-6">
+        <button class="btn btn-indigo">💾 Save</button>
+        <a href="{% url 'salary-invoice-list' %}" class="btn btn-slate">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{#────────────────────── Alpine logic (unchanged maths) ─────────────────────#}
+<script>
+const NSSF = 0.10, WCF = 0.00;
+
+/* Deduction form‑set helper */
+function deductions(){
+  const storeRows = Alpine.store('deductions').rows,
+        total     = document.querySelector('[name="deduction-TOTAL_FORMS"]'),
+        initial   = document.querySelector('[name="deduction-INITIAL_FORMS"]');
+  return{
+    get storeRows(){ return storeRows },
+    init(){
+      /* bootstrap from existing bound formset data (on GET or invalid POST) */
+      storeRows.length = 0;
+      const tot = +total.value || 0, init = +initial.value || 0;
+      for(let i=0;i<tot;i++){
+        const reason  = document.querySelector(`[name="deduction-${i}-reason"]`)?.value || "";
+        const amount  = +(document.querySelector(`[name="deduction-${i}-amount"]`)?.value || 0);
+        const id      = document.querySelector(`[name="deduction-${i}-id"]`)?.value || "";
+        const del     = document.querySelector(`[name="deduction-${i}-DELETE"]`)?.checked || false;
+        if(reason || amount || id || i < init){ storeRows.push({idx:i,reason,amount,id,delete:del}); }
+      }
+      if(storeRows.length===0 && init===0){ this.add(); }
+      total.value = storeRows.length;
+    },
+    add(){
+      const idx = storeRows.length;
+      storeRows.push({idx,reason:"",amount:0,id:"",delete:false});
+      total.value = storeRows.length;
+      if(+initial.value > +total.value){ initial.value = total.value; }
+    },
+    remove(i){ storeRows[i].delete = true; }
+  }
+}
+
+/* Payslip maths – reactive to store + inputs */
+function slip(){
+  return{
+    basic:0,spec:0,allow:0,paye:0,hasHelsb:false,helsbRate:0,
+    init(){
+      const bind = (id,prop,fmtZero=false)=>{
+        const el=document.getElementById(id); if(!el) return;
+        this[prop]=+el.value||0;
+        el.addEventListener('input',e=>{
+          this[prop]=+e.target.value||0;
+          if(fmtZero && !e.target.value){ el.value="0.00"; }
+        });
+        if(fmtZero && !el.value){ el.value="0.00"; }
+      };
+      bind("id_basic_salary","basic");
+      bind("id_special_allowance","spec");
+      bind("id_allowance","allow",true);
+      bind("id_paye_amount","paye");
+
+      /* auto defaults from staff selector */
+      const staffSel=document.getElementById("id_staff");
+      if(staffSel){
+        staffSel.addEventListener("change",()=>this._fetchDefaults(staffSel.value));
+        if(staffSel.value){ this._fetchDefaults(staffSel.value); }
+      }
+    },
+    async _fetchDefaults(id){
+      if(!id) return;
+      try{
+        const r=await fetch(`/finance/api/staff/${id}/defaults/`);
+        if(!r.ok) return;
+        const d=await r.json();
+        ["basic_salary","special_allowance"].forEach(k=>{
+          const el=document.getElementById("id_"+k);
+          if(el){ el.value=d[k]; el.dispatchEvent(new Event("input")); }
+        });
+        this.hasHelsb=d.has_helsb; this.helsbRate=+d.helsb_rate||0;
+      }catch(e){ console.error(e); }
+    },
+    taxable(){ return this.basic+this.spec; },
+    get nssf(){  return +(this.taxable()*NSSF).toFixed(2); },
+    get wcf(){   return +(this.taxable()*WCF ).toFixed(2); },
+    get helsb(){ return this.hasHelsb ? +(this.taxable()*this.helsbRate).toFixed(2) : 0; },
+    get net(){
+      const ded = Alpine.store('deductions').total;
+      return +(this.taxable() - (this.nssf+this.wcf+this.paye+this.helsb) + this.allow - ded).toFixed(2);
+    },
+    fmt(v){ return Number(v).toLocaleString(); }
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "bursor/bursor_base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="container d-flex justify-content-center">
+    <div class="receipt" style="width: 60%; max-width: 400px;">
+        <div class="receipt-header text-center">
+            <h1 style="color: #007bff; font-family: 'Georgia', serif;"><u>RECEIPT</u></h1>
+            <!-- Display the logo here -->
+            <h3 style="color: #6c757d; font-family: 'Arial', sans-serif;"><u>ELEMENTS LAKEZONE PRE & PRIMARY SCHOOL</u></h3>
+            <!-- Display the student's name here -->
+            <img src="{% static 'images/lake.png' %}" alt="School Logo" style="width: 80px; height: auto; margin: 10px auto;">
+            <h4 style="color: carrot; font-family: 'Verdana', sans-serif;">Student Name: <i>{{ invoice.student.firstname }} {{ invoice.student.middle_name }} {{ invoice.student.surname }}</i></h4>
+            <h4 style="color: #28a745; font-family: 'Verdana', sans-serif;">Session: <i>{{ invoice.session.name }}</i></h4>
+            <h4 style="color: #17a2b8; font-family: 'Verdana', sans-serif;">Installment: <i>{{ invoice.installment.name }}</i></h4>
+        </div>
+        <hr style="border-top: 2px solid #007bff;">
+        <div class="receipt-body">
+            <table class="table table-bordered">
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Student Class</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ invoice.class_for.name }}</i></td>
+                </tr>
+                <tr>
+                    <th>Payment For</th>
+                    <td><i>
+                        {% for item in invoice.invoiceitem_set.all %}
+                            {{ item.description }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </i></td>
+                </tr>
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Total Payable</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ invoice.total_amount_payable | intcomma }}</i></td>
+                </tr>
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Total Paid</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ invoice.total_amount_paid | intcomma }}</i></td>
+                </tr>
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Balance</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ invoice.balance | intcomma }}</i></td>
+                </tr>
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Date Paid</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ receipt.date_paid }}</i></td>
+                </tr>
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Payment Method</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ receipt.get_payment_method_display }}</i></td>
+                </tr>
+                <tr>
+                    <th style="font-family: 'Verdana', sans-serif;">Comments</th>
+                    <td style="font-family: 'Verdana', sans-serif;"><i>{{ receipt.comment }}</i></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Display the signatures -->
+        <div class="signature-section text-center mt-4">
+            <div class="signature-container mb-4">
+                <p style="font-family: 'Verdana', sans-serif;">Headmaster's Signature:</p>
+                {% if headmaster_signature %}
+                    <img src="{{ headmaster_signature.signature_image.url }}" alt="Headmaster's Signature" style="max-width: 150px; max-height: 80px; border: 1px solid #007bff; border-radius: 5px;">
+                {% else %}
+                    <p style="font-family: 'Verdana', sans-serif;">No Headmaster's signature found</p>
+                {% endif %}
+            </div>
+            <div class="signature-container">
+                <p style="font-family: 'Verdana', sans-serif;">Bursor's Signature:</p>
+                {% if bursor_signature %}
+                    <img src="{{ bursor_signature.signature_image.url }}" alt="Bursor's Signature" style="max-width: 150px; max-height: 80px; border: 1px solid #007bff; border-radius: 5px;">
+                {% else %}
+                    <p style="font-family: 'Verdana', sans-serif;">No Bursor's signature found</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="receipt-footer text-center mt-4">
+            <p style="color: #28a745; font-family: 'Verdana', sans-serif;">Thank you for your payment!</p>
+        </div>
+    </div>
+</div>
+
+<div class="container d-flex justify-content-center mt-4">
+    <button class="btn btn-primary print-button" onclick="window.print()" style="font-family: 'Verdana', sans-serif;">Print Receipt</button>
+</div>
+
+<style>
+    .receipt {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        border: 2px solid #007bff;
+    }
+    .receipt-header h1 {
+        margin-bottom: 8px;
+        font-size: 1.5rem;
+    }
+    .receipt-header h3 {
+        margin-bottom: 15px;
+        font-size: 1rem;
+    }
+    .receipt-header h4 {
+        font-size: 0.9rem;
+    }
+    .receipt-body {
+        margin-top: 15px;
+    }
+    .table th {
+        background-color: #007bff;
+        color: white;
+        font-size: 0.8rem;
+    }
+    .table td {
+        background-color: #e9f7fd;
+        font-size: 0.8rem;
+        font-style: italic;
+    }
+    .signature-container {
+        border: 2px dashed #007bff;
+        padding: 8px;
+        border-radius: 8px;
+        background-color: #f1f1f1;
+        max-width: 180px;
+        margin: 0 auto;
+    }
+    .receipt-footer {
+        margin-top: 15px;
+    }
+    .btn-primary {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+    @media print {
+        body {
+            background: white !important;
+            color: black !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .receipt {
+            box-shadow: none;
+            page-break-before: auto;
+        }
+        .table th {
+            background-color: #007bff !important;
+            color: white !important;
+        }
+        .table td {
+            background-color: #e9f7fd !important;
+            color: black !important;
+        }
+        .receipt-header h1 {
+            color: #007bff !important;
+        }
+        .receipt-header h3 {
+            color: #6c757d !important;
+        }
+        .receipt-header h4 {
+            color: #333 !important;
+        }
+        .receipt-footer p {
+            color: #28a745 !important;
+        }
+        .print-button {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock content %}

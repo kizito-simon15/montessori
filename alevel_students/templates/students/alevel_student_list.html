@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}A-Level Students{% endblock %}
+{% block breadcrumb %}
+    <a href="{% url 'dashboard' %}">Home</a> > A-Level Students
+{% endblock %}
+{% block content %}
+<div class="card shadow-sm" style="border-radius: 10px; overflow: hidden; background: #fff;">
+    <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+        <h3 class="card-title m-0">A-Level Students</h3>
+        <div class="card-tools">
+            <a href="{% url 'alevel_students:select-alevel-class' %}" class="btn btn-warning btn-sm mx-1">
+                <i class="fas fa-check-circle"></i> Mark Class
+            </a>
+            <a href="{% url 'alevel_students:alevel-student-create' %}" class="btn btn-success btn-sm mx-1">
+                <i class="fas fa-plus"></i> Add Student
+            </a>
+            <a href="{% url 'alevel_students:alevel-student-upload' %}" class="btn btn-info btn-sm mx-1">
+                <i class="fas fa-upload"></i> Bulk Upload
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-2">
+        <div class="mb-2">
+            <p class="text-muted small">
+                Total: <strong>{{ overall_total }}</strong> | 
+                Male: <strong>{{ total_male }}</strong> | 
+                Female: <strong>{{ total_female }}</strong>
+            </p>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th scope="col">S/N</th>
+                        <th scope="col">Registration</th>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Class</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Father's Mobile</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for class_name, students in grouped_students.items %}
+                        {% for student in students %}
+                            <tr class="clickable-row" data-href="{% url 'alevel_students:alevel-student-detail' student.pk %}">
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>{{ student.registration_number }}</td>
+                                <td>
+                                    <a href="{% url 'alevel_students:alevel-student-detail' student.pk %}" class="text-dark fw-medium">
+                                        {{ student.firstname }} {% if student.middle_name %}{{ student.middle_name }} {% endif %}{{ student.surname }}
+                                    </a>
+                                </td>
+                                <td class="text-center">{{ class_name }}</td>
+                                <td class="text-center">
+                                    <span class="badge {% if student.current_status == 'active' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ student.current_status|capfirst }}
+                                    </span>
+                                </td>
+                                <td class="text-center">{{ student.father_mobile_number }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'alevel_students:alevel-student-detail' student.pk %}" class="btn btn-info btn-sm mx-1" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'alevel_students:alevel-student-update' student.pk %}" class="btn btn-warning btn-sm mx-1" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'alevel_students:alevel-student-delete' student.pk %}" class="btn btn-danger btn-sm mx-1 delete-student" 
+                                       data-student="{{ student.firstname }} {% if student.middle_name %}{{ student.middle_name }} {% endif %}{{ student.surname }}" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-muted text-center py-3">No students found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08) !important;
+}
+.card-header {
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #0d6efd, #5096ff);
+}
+.table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.table thead th {
+    background: #f1faff;
+    color: #0d6efd;
+    font-weight: 500;
+    padding: 8px;
+    border-bottom: 2px solid #e3f2fd;
+}
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+.table tbody tr:hover {
+    background: #f1faff;
+    cursor: pointer;
+}
+.btn-sm {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.8rem;
+    border-radius: 5px;
+}
+.btn:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+.badge {
+    padding: 0.35em 0.7em;
+    font-size: 0.8em;
+    border-radius: 4px;
+}
+.text-muted {
+    font-size: 0.85rem;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    $('.clickable-row').click(function() {
+        window.location = $(this).data('href');
+    });
+    $('.delete-student').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const studentName = $(this).data('student');
+        if (confirm(`Are you sure you want to delete ${studentName}?`)) {
+            window.location = $(this).attr('href');
+        }
+    });
+});
+</script>
+{% endblock %}

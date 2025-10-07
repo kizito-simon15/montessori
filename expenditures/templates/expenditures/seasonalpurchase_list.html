@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#1e40af;--emerald:#059669;--amber:#b45309;--rose:#e11d48;
+  --bg:#f8fafc;--card:#fff;--rad:22px
+}
+body{background:var(--bg);font-family:Inter,sans-serif}
+.card{background:var(--card);border-radius:var(--rad);padding:1rem;
+      box-shadow:0 4px 12px rgba(0,0,0,.05)}
+h2{margin:.2rem 0 .8rem;font-weight:700;color:var(--indigo)}
+.badge{padding:.15rem .5rem;border-radius:12px;font-size:.72rem;font-weight:700}
+.badge.proc{background:var(--emerald);color:#ecfdf5}
+.badge.raw {background:var(--amber);color:#fffbeb}
+.table{width:100%;border-collapse:collapse;font-size:.85rem}
+.table th,.table td{padding:.5rem .6rem;border-bottom:1px solid #e2e8f0}
+.table thead{background:var(--indigo);color:#fff}
+.table tbody tr:nth-child(odd){background:#f9fafc}
+.table tbody tr:hover{background:#eef2ff}
+.right{text-align:right}
+.actions a{margin:0 .15rem}
+.filter{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 .8rem}
+.filter select{padding:.35rem .6rem;border:1px solid #cbd5e1;border-radius:var(--rad)}
+.btn{border:none;border-radius:var(--rad);padding:.4rem .9rem;font-weight:600;
+     font-size:.8rem;cursor:pointer}
+.btn-indigo{background:var(--indigo);color:#fff}
+.btn-rose  {background:var(--rose);color:#fff}
+.stats{font-size:.85rem;font-weight:600;margin-bottom:.6rem}
+.stats span{color:var(--indigo)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>🚚 Seasonal Purchases</h2>
+
+  <!-- filters -->
+  <form method="get" class="filter">
+    <select name="product">
+      <option value="">– all products –</option>
+      {% for p in products %}
+        <option value="{{ p.pk }}" {% if request.GET.product == p.pk|stringformat:"s" %}selected{% endif %}>
+          {{ p.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="status">
+      <option value="">– all statuses –</option>
+      <option value="unprocessed" {% if current_stat == "unprocessed" %}selected{% endif %}>Unprocessed</option>
+      <option value="partial"     {% if current_stat == "partial"     %}selected{% endif %}>Part-processed</option>
+      <option value="processed"   {% if current_stat == "processed"   %}selected{% endif %}>Processed</option>
+    </select>
+
+    <select name="budget">
+      <option value="">– all budgets –</option>
+      {% for b in budgets %}
+        <option value="{{ b.pk }}" {% if current_env == b.pk|stringformat:"s" %}selected{% endif %}>
+          {{ b.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <button class="btn btn-indigo">Filter</button>
+    <a href="{% url 'seasonalpurchase_list' %}" class="btn btn-rose">Reset</a>
+    <span style="flex:1"></span>
+    <a href="{% url 'seasonalpurchase_create' %}" class="btn btn-indigo">➕ New</a>
+  </form>
+
+  <!-- summary -->
+  <p class="stats">
+    Bags: <span>{{ total_bags }}</span> |
+    Kg: <span>{{ total_kg|floatformat:2|intcomma }}</span> |
+    Spent: <span>{{ total_spent|floatformat:0|intcomma }} TZS</span>
+  </p>
+
+  <!-- table -->
+  <div style="overflow-x:auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th><th>Date</th><th>Product</th>
+          <th class="right">Bags</th><th class="right">Kg</th>
+          <th class="right">Processed&nbsp;Kg</th><th class="right">Remaining&nbsp;Kg</th>
+          <th class="right">Price&nbsp;/&nbsp;unit</th><th class="right">Cost</th>
+          <th>Budget</th><th>Status</th><th>Doc</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>{{ r.date|date:"M j, Y" }}</td>
+            <td>
+              {{ r.product.name }}
+              {% if r.product.processable %}
+                <span class="badge proc">processable</span>
+              {% else %}
+                <span class="badge raw">raw</span>
+              {% endif %}
+            </td>
+            <td class="right">{{ r.bags_count }}</td>
+            <td class="right">
+              {% if r.bag_weight %}{{ r.quantity|floatformat:2 }}{% else %}—{% endif %}
+            </td>
+            <td class="right">{{ r.processed|floatformat:2 }}</td>
+            <td class="right">{{ r.remaining|floatformat:2 }}</td>
+            <td class="right">{{ r.price_per_unit|floatformat:0|intcomma }}</td>
+            <td class="right">{{ r.total_cost|floatformat:0|intcomma }}</td>
+            <td>{{ r.budget.name }}</td>
+            <td>
+              {% if r.status == "Processed" %}
+                ✅
+              {% elif r.status == "Unprocessed" %}
+                ⏳
+              {% else %}
+                ➗
+              {% endif %}
+            </td>
+            <td>{% if r.invoice_file %}<a href="{{ r.invoice_file.url }}" target="_blank">📄</a>{% endif %}</td>
+            <td class="actions">
+              <a href="{% url 'seasonalpurchase_update' r.pk %}">✏️</a>
+              <a href="{% url 'seasonalpurchase_delete' r.pk %}">🗑️</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="13">No purchases recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- paginator -->
+  {% if is_paginated %}
+    <p style="margin-top:.6rem">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{{ request.GET.urlencode|cut:'page=' }}">« Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{{ request.GET.urlencode|cut:'page=' }}">Next »</a>
+      {% endif %}
+    </p>
+  {% endif %}
+</div>
+{% endblock %}

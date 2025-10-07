@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg animate__animated animate__fadeIn">
+        <div class="card-header bg-primary text-white text-center">
+            <h2 class="mb-0">Add New Stationery</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Error:</strong> Please correct the following errors:
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field|title }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {% if message %}
+                    <div class="alert alert-success" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+
+                <div class="row g-4">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                            {{ form.name }}
+                            <div class="invalid-feedback">Please enter a valid stationery name.</div>
+                        </div>
+
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity</label>
+                            {{ form.quantity }}
+                            <div class="invalid-feedback">Please enter a valid quantity.</div>
+                        </div>
+
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">Type</label>
+                            {{ form.type }}
+                            <div class="invalid-feedback">Please select a type.</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.date_buyed.id_for_label }}" class="form-label">Date Bought</label>
+                            {{ form.date_buyed }}
+                            <div class="invalid-feedback">Please enter a valid date.</div>
+                        </div>
+
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.office_department.id_for_label }}" class="form-label">Office Department</label>
+                            {{ form.office_department }}
+                            <div class="invalid-feedback">Please select an office department.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-bar d-flex justify-content-between flex-wrap mt-4">
+                    <button type="submit" class="btn btn-save flex-fill me-2 mb-2">Save</button>
+                    <a href="{% url 'stationery_list' %}" class="btn btn-secondary flex-fill me-2 mb-2">
+                        <i class="fas fa-eye"></i> View Stationery
+                    </a>
+                    <a href="javascript:history.back()" class="btn btn-secondary flex-fill mb-2">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+:root {
+    --primary: #7c3aed; /* Vibrant Purple */
+    --accent: #2dd4bf; /* Fresh Teal */
+    --neutral: #1f2937; /* Dark Gray */
+    --light-bg: #f9fafb; /* Light Background */
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', sans-serif;
+    padding-top: 70px;
+    padding-bottom: 30px;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.card-header.bg-primary {
+    background: var(--primary) !important;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.form-group label {
+    color: var(--neutral);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+    outline: none;
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+    border-color: #ef4444;
+}
+
+.invalid-feedback {
+    font-size: 0.85rem;
+    color: #ef4444;
+}
+
+.btn-save {
+    background: var(--primary);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-save:hover {
+    background: #6d28d9;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: var(--accent);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #26a69a;
+    transform: translateY(-2px);
+}
+
+.alert-success {
+    background: rgba(45, 212, 191, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--neutral);
+    border-radius: 8px;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: var(--neutral);
+    border-radius: 8px;
+}
+
+.button-bar .btn {
+    flex: 1;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .row.g-4 {
+        flex-direction: column;
+    }
+    .button-bar {
+        flex-direction: column;
+    }
+    .button-bar .btn {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<!-- JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Button animations
+    const buttons = document.querySelectorAll('.button-bar .btn');
+    buttons.forEach(button => {
+        button.addEventListener('mouseover', () => {
+            button.classList.add('animate__pulse');
+        });
+        button.addEventListener('animationend', () => {
+            button.classList.remove('animate__pulse');
+        });
+    });
+
+    // Bootstrap form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock content %}

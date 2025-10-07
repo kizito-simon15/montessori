@@ -1,0 +1,80 @@
+<!-- templates/class_attendance.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Class Attendance</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS for styling */
+        .container {
+            text-align: center;
+        }
+        .attendances-heading {
+            color: magenta;
+        }
+        .class-info {
+            color: red;
+        }
+        .attendance-date {
+            color: blue; /* Updated to blue color */
+        }
+        /* New CSS class for changing colors */
+        .dynamic-color {
+            animation: changeColor 3s infinite; /* Change color every 3 seconds */
+        }
+
+        @keyframes changeColor {
+            0% { color: green; } /* Start with green color */
+            50% { color: orange; } /* Change to orange color */
+            100% { color: purple; } /* Change to purple color */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="attendances-heading">Attendance for {{ selected_class.name }}</h2>
+        <p class="class-info">Current Session: {{ current_session }}</p>
+        <p class="class-info">Current Term: {{ current_term }}</p>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="attendance-date">Attendance Date</th> <!-- Updated style to blue color -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances %}
+                <tr>
+                    <td>
+                        <a href="{% url 'view_attendance' class_id=selected_class.id attendance_date=attendance.attendance_date %}" class="attendance-date dynamic-color"> <!-- Added dynamic-color class -->
+                            {{ attendance.attendance_date }}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // JavaScript for changing colors every 3 seconds
+        setInterval(function() {
+            var elements = document.querySelectorAll('.dynamic-color');
+            elements.forEach(function(element) {
+                // Toggle between green, orange, and purple colors
+                if (element.style.color === 'green') {
+                    element.style.color = 'orange';
+                } else if (element.style.color === 'orange') {
+                    element.style.color = 'purple';
+                } else {
+                    element.style.color = 'green';
+                }
+            });
+        }, 3000); // Change color every 3 seconds (3000 milliseconds)
+    </script>
+</body>
+</html>
+{% endblock content %}

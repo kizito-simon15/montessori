@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="header-section">
+    <div class="header-content">
+        <h2 class="single-line-text">
+            <span class="emoji">✏️</span> Edit Academic Results
+        </h2>
+        <a href="{% url 'create_academic_results_view' %}?step=class_selection" class="btn btn-primary">
+            <i class="fas fa-arrow-right me-1"></i> Go to Create Results
+        </a>
+    </div>
+</div>
+
+<!-- Form Section -->
+<form method="post" class="form-section">
+    {% csrf_token %}
+    <div class="filter-section">
+        <div class="filter-group">
+            <input type="text" id="studentNameFilter" class="form-control custom-input" placeholder="Filter by Student Name">
+        </div>
+        <div class="filter-group">
+            <select id="studentClassFilter" class="form-control custom-input">
+                <option value="">None</option>
+                {% for student_class in student_classes %}
+                <option value="{{ student_class.name }}">{{ student_class.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <select id="subjectFilter" class="form-control custom-input">
+                <option value="">Filter by Subject</option>
+                {% for subject in subjects %}
+                <option value="{{ subject.name }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <select id="sessionFilter" class="form-control custom-input">
+                <option value="">Filter by Session</option>
+                {% for session in sessions %}
+                <option value="{{ session.name }}" {% if session == current_session %}selected{% endif %}>{{ session.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <select id="termFilter" class="form-control custom-input">
+                <option value="">Filter by Term</option>
+                {% for term in terms %}
+                <option value="{{ term.name }}" {% if term == current_term %}selected{% endif %}>{{ term.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <select id="examTypeFilter" class="form-control custom-input">
+                <option value="">Filter by Exam Type</option>
+                {% for exam_type in exam_types %}
+                <option value="{{ exam_type.name }}" {% if exam_type == current_exam_type %}selected{% endif %}>{{ exam_type.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-bordered" id="resultsTable">
+        <thead>
+            <tr>
+                <th>S/N</th>
+                <th>Student Name</th>
+                <th>Subject</th>
+                <th>Test Score</th>
+                <th>Exam Score</th>
+                <th>Student Class</th>
+                <th>Session</th>
+                <th>Term</th>
+                <th>Exam Type</th>
+            </tr>
+        </thead>
+        <tbody id="resultsTableBody">
+            {% for result, form in result_forms %}
+            <tr style="display: none;">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ result.student.firstname }} {{ result.student.middle_name }} {{ result.student.surname }}</td>
+                <td>{{ result.subject.name }}</td>
+                <td class="animated-field">{{ form.test_score }}</td>
+                <td class="animated-field">{{ form.exam_score }}</td>
+                <td>{{ result.current_class.name }}</td>
+                <td>{{ result.session.name }}</td>
+                <td>{{ result.term.name }}</td>
+                <td>{{ result.exam.name }}</td>
+                <input type="hidden" name="result_ids" value="{{ result.id }}">
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="submit-section">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save me-1"></i> Save Results
+        </button>
+    </div>
+</form>
+
+<!-- Additional CSS -->
+<style>
+    :root {
+        --carrot: #ff6f61;
+        --carrot-dark: #e65a50;
+        --gradient-start: #e0e7ff; /* Softer blue gradient start */
+        --gradient-end: #a5b4fc; /* Softer blue gradient end */
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: #343a40;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .dark-mode body {
+        background: linear-gradient(135deg, #2b2b2b, #1e1e1e);
+    }
+
+    .header-section, .form-section, .filter-section, .submit-section {
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .single-line-text {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--carrot);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .filter-section {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .filter-group {
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-control, .form-select {
+        border-radius: 25px;
+        padding: 0.5rem 1rem; /* Internal padding for better appearance */
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        border: 1px solid #ced4da;
+        width: 100%;
+        max-width: 300px; /* Wider form fields */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        color: tomato;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        outline: none;
+    }
+
+    .btn-primary, .btn-success {
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin: 0;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #0056b3, #004085);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+    }
+
+    .btn-success:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: 1px solid #dee2e6;
+    }
+
+    .dark-mode .table {
+        background: transparent;
+        border: 1px solid #444;
+    }
+
+    .table thead {
+        background: linear-gradient(135deg, var(--carrot), var(--carrot-dark));
+        color: white;
+    }
+
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        padding: 0.5rem; /* Internal padding for better appearance */
+        border: none;
+    }
+
+    .table td {
+        padding: 0.5rem; /* Internal padding for better appearance */
+        border-bottom: 1px solid #dee2e6;
+        border-right: none;
+        border-left: none;
+        border-top: none;
+        color: #212529;
+    }
+
+    .dark-mode .table td {
+        color: #d1d1d1;
+        border-bottom: 1px solid #444;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+
+    .dark-mode .table tbody tr:hover {
+        background-color: #343a40;
+    }
+
+    .table th:nth-child(1), .table td:nth-child(1) {
+        color: gray;
+    }
+
+    .table th:nth-child(2), .table td:nth-child(2) {
+        color: goldenrod;
+    }
+
+    .table th:nth-child(3), .table td:nth-child(3) {
+        color: deepskyblue;
+    }
+
+    .table th:nth-child(4), .table td:nth-child(4) {
+        color: goldenrod;
+    }
+
+    .table th:nth-child(5), .table td:nth-child(5) {
+        color: brown;
+    }
+
+    .table th:nth-child(6), .table td:nth-child(6) {
+        color: darkblue;
+    }
+
+    .animated-field input {
+        width: 80px;
+        font-size: 1rem;
+        padding: 0.25rem 0.5rem; /* Internal padding for better appearance */
+        color: orange;
+        border-radius: 15px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+    .animated-field input:focus {
+        border-color: var(--carrot);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        outline: none;
+    }
+
+    /* iPhone-like Interface Adjustments */
+    @media (max-width: 768px) {
+        .single-line-text {
+            font-size: 1.25rem;
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            max-width: 250px;
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .btn-primary, .btn-success {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .table th, .table td {
+            padding: 0.25rem;
+        }
+
+        .animated-field input {
+            font-size: 0.875rem;
+            padding: 0.2rem 0.4rem;
+        }
+    }
+</style>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentNameFilter = document.getElementById('studentNameFilter');
+        const studentClassFilter = document.getElementById('studentClassFilter');
+        const subjectFilter = document.getElementById('subjectFilter');
+        const sessionFilter = document.getElementById('sessionFilter');
+        const termFilter = document.getElementById('termFilter');
+        const examTypeFilter = document.getElementById('examTypeFilter');
+        const resultsTableBody = document.getElementById('resultsTableBody');
+        const rows = resultsTableBody.getElementsByTagName('tr');
+
+        studentNameFilter.addEventListener('input', filterResults);
+        studentClassFilter.addEventListener('change', filterResults);
+        subjectFilter.addEventListener('change', filterResults);
+        sessionFilter.addEventListener('change', filterResults);
+        termFilter.addEventListener('change', filterResults);
+        examTypeFilter.addEventListener('change', filterResults);
+
+        function filterResults() {
+            const nameValue = studentNameFilter.value.toLowerCase();
+            const classValue = studentClassFilter.value;
+            const subjectValue = subjectFilter.value;
+            const sessionValue = sessionFilter.value;
+            const termValue = termFilter.value;
+            const examTypeValue = examTypeFilter.value;
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const studentName = cells[1].textContent.toLowerCase();
+                const studentClass = cells[5].textContent;
+                const subject = cells[2].textContent;
+                const session = cells[6].textContent;
+                const term = cells[7].textContent;
+                const examType = cells[8].textContent;
+
+                const nameMatch = studentName.includes(nameValue);
+                const classMatch = !classValue || studentClass === classValue;
+                const subjectMatch = !subjectValue || subject === subjectValue;
+                const sessionMatch = !sessionValue || session === sessionValue;
+                const termMatch = !termValue || term === termValue;
+                const examTypeMatch = !examTypeValue || examType === examTypeValue;
+
+                if (nameMatch && classMatch && subjectMatch && sessionMatch && termMatch && examTypeMatch) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Animate form fields
+        const animatedFields = document.querySelectorAll('.animated-field input');
+        animatedFields.forEach(field => {
+            field.addEventListener('focus', () => {
+                field.style.transition = 'box-shadow 0.3s ease';
+                field.style.boxShadow = '0 0 10px rgba(0, 123, 255, 0.8)';
+            });
+            field.addEventListener('blur', () => {
+                field.style.transition = 'box-shadow 0.3s ease';
+                field.style.boxShadow = 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

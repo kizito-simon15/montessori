@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Event List{% endblock %}
+
+{% block content %}
+<!-- Load AOS library for animations -->
+<link href="{% static 'css/aos.css' %}" rel="stylesheet">
+<script src="{% static 'js/aos.js' %}"></script>
+
+<style>
+    /* General Styling */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        background-color: #f4f7fa;
+    }
+
+    /* Centered content and responsive list styling */
+    .center-content {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .event-list {
+        width: 100%;
+        max-width: 800px;
+    }
+
+    /* Event Card Styling */
+    .event-item {
+        margin: 15px 0;
+        padding: 0;
+        background-color: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .event-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-title {
+        font-size: 1.6em;
+        color: #ffffff;
+        background: linear-gradient(135deg, #007bff, #6f42c1);
+        padding: 15px;
+        text-align: center;
+        font-weight: 600;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .event-title a {
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    .event-title a:hover {
+        text-decoration: underline;
+    }
+
+    /* Event Details */
+    .event-details {
+        padding: 15px 20px;
+        color: #4a4a4a;
+        font-size: 1em;
+        line-height: 1.5;
+    }
+
+    .event-details li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .event-details span {
+        font-weight: 600;
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    .event-created {
+        color: #28a745;
+        font-size: 0.9em;
+        text-align: right;
+        font-style: italic;
+        margin-top: 10px;
+    }
+
+    /* Icon Styles */
+    .icon {
+        font-size: 1.1em;
+        margin-right: 8px;
+        color: #007bff;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        .event-title {
+            font-size: 1.4em;
+        }
+
+        .event-details {
+            font-size: 0.95em;
+        }
+
+        .event-list {
+            width: 90%;
+        }
+    }
+</style>
+
+<script>
+    // Initialize AOS for smooth animations
+    AOS.init({ once: true });
+</script>
+
+<div class="center-content">
+    <ul class="event-list list-group">
+        {% for event in events %}
+        <li class="event-item list-group-item" data-aos="fade-up" data-aos-duration="1000">
+            <!-- Event Title -->
+            <div class="event-title">
+                <a href="{% url 'event_detail' event.pk %}">
+                    {{ event.title }}
+                </a>
+            </div>
+
+            <!-- Event Details -->
+            <ul class="event-details">
+                <li>
+                    <span class="icon">📝</span><span>Description:</span> {{ event.description }}
+                </li>
+                <li>
+                    <span class="icon">📅</span><span>Date:</span> {{ event.date|date:"F d, Y" }}
+                </li>
+                <li>
+                    <span class="icon">📍</span><span>Location:</span> {{ event.location }}
+                </li>
+                <li>
+                    <span class="icon">👥</span><span>Participants:</span> {{ event.participants }}
+                </li>
+                <li class="event-created">
+                    Created: {{ event.time_since_creation }} ago
+                </li>
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

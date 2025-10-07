@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Upload New Passport Photo
+{% endblock title %}
+
+{% block content %}
+<div id="overlay">
+  <div id="decorative-box">
+    <form action="" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <h1 style="color: #333333; text-align: center; font-size: 2em; margin-bottom: 20px;">
+        Upload New Passport Photo
+      </h1>
+
+      <div class="form-group">
+        <label for="passport_photo">Choose a new passport photo:</label>
+        <input type="file" name="passport_photo" id="passport_photo" class="form-control" accept="image/*">
+      </div>
+
+      <!-- Image preview -->
+      <div class="form-group text-center">
+        <img id="imagePreview" src="#" alt="Your Image" style="display:none; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 10px rgba(0,0,0,0.2);" />
+      </div>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <input type="submit" class="btn btn-primary" value="Upload Photo">
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  #decorative-box {
+    background-color: #FFA07A;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.6s ease-out forwards;
+    max-width: 80%;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Preview image styling */
+  #imagePreview {
+    display: none;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%; /* Make the image a circle */
+    object-fit: cover; /* Ensure the image covers the entire circle */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+  }
+</style>
+
+<script>
+  document.getElementById('passport_photo').addEventListener('change', function(event) {
+      const imagePreview = document.getElementById('imagePreview');
+      const file = event.target.files[0];
+
+      if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function(e) {
+              imagePreview.src = e.target.result;
+              imagePreview.style.display = 'block';
+          }
+
+          reader.readAsDataURL(file);
+      } else {
+          imagePreview.src = '#';
+          imagePreview.style.display = 'none';
+      }
+  });
+</script>
+{% endblock content %}

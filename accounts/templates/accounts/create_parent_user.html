@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Parent User</title>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        }
+
+        .form-container {
+            width: 90%; /* Increased width */
+            max-width: 1000px; /* Maximum width to prevent it from becoming too wide */
+            padding: 40px;
+            border: 2px solid #007bff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            background: #fff;
+            opacity: 0; /* Start hidden */
+            animation: fadeIn 1s forwards; /* Animation applied */
+            background: linear-gradient(to right, #f0f4f7, #e9ecef);
+        }
+
+        .form-container h1 {
+            text-align: center;
+            color: #333;
+            text-decoration: underline;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container form label {
+            color: #007bff;
+            font-size: 16px;
+            margin-bottom: 5px;
+            text-align: left;
+            width: 100%;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .form-field {
+            width: 100%;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-container form input,
+        .form-container form select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .form-container form input:focus,
+        .form-container form select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+
+        .form-container form input.error,
+        .form-container form select.error {
+            border-color: red;
+            background-color: #ffe6e6;
+        }
+
+        .form-container form input.success,
+        .form-container form select.success {
+            border-color: green;
+            background-color: #e6ffe6;
+        }
+
+        .form-container .buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .form-container .buttons button {
+            margin-top: 15px;
+            padding: 12px 20px;
+            font-size: 18px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container .buttons button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .form-container .buttons button i {
+            margin-right: 8px;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .success-message {
+            color: green;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .show-password-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+
+        .show-password-icon:hover {
+            color: #007bff;
+        }
+
+        /* Search field styling */
+        #student-search {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #student-search:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Create Parent User</h1>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="{% if message.tags %}{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" id="parent-user-form">
+            {% csrf_token %}
+            <div class="form-field">
+                <label for="student-search">Search Student:</label>
+                <input type="text" id="student-search" placeholder="Search by student name...">
+            </div>
+            {% for field in form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.name == "password1" or field.name == "password2" %}
+                        <i class="fas fa-eye show-password-icon" onclick="togglePasswordVisibility('{{ field.name }}')"></i>
+                    {% endif %}
+                    <div class="error-message" id="error-{{ field.name }}"></div>
+                </div>
+            {% endfor %}
+            <div class="buttons">
+                <button type="submit">
+                    <i class="fas fa-user-plus"></i> Create User
+                </button>
+                <button type="button" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const formContainer = document.querySelector(".form-container");
+            formContainer.style.opacity = "1"; /* Show form */
+
+            const form = document.getElementById('parent-user-form');
+            const errorMessages = {};
+
+            form.addEventListener('submit', function(event) {
+                const errors = validateForm();
+                if (errors.length > 0) {
+                    event.preventDefault();
+                    displayErrors(errors);
+                    decorateFields(errors);
+                }
+            });
+
+            form.addEventListener('input', function(event) {
+                const errors = validateForm();
+                displayErrors(errors);
+                decorateFields(errors);
+            });
+
+            function validateForm() {
+                const errors = [];
+                const parentFirstName = form.querySelector('[name="parent_first_name"]');
+                const parentMiddleName = form.querySelector('[name="parent_middle_name"]');
+                const parentLastName = form.querySelector('[name="parent_last_name"]');
+                const student = form.querySelector('[name="student"]');
+                const username = form.querySelector('[name="username"]');
+                const password1 = form.querySelector('[name="password1"]');
+                const password2 = form.querySelector('[name="password2"]');
+
+                if (parentFirstName.value.trim() === '') {
+                    errors.push({field: parentFirstName, message: 'Parent First Name is required.'});
+                }
+                if (parentLastName.value.trim() === '') {
+                    errors.push({field: parentLastName, message: 'Parent Last Name is required.'});
+                }
+                if (student.value.trim() === '') {
+                    errors.push({field: student, message: 'Student selection is required.'});
+                }
+                if (username.value.trim() === '') {
+                    errors.push({field: username, message: 'Username is required.'});
+                }
+                if (password1.value.trim() === '') {
+                    errors.push({field: password1, message: 'Password is required.'});
+                }
+                if (password2.value.trim() !== password1.value.trim()) {
+                    errors.push({field: password2, message: 'Passwords do not match.'});
+                }
+
+                // Additional password validation
+                const personalInfo = [
+                    parentFirstName.value.trim(),
+                    parentMiddleName.value.trim(),
+                    parentLastName.value.trim(),
+                    username.value.trim()
+                ];
+
+                if (personalInfo.some(info => password1.value.includes(info))) {
+                    errors.push({field: password1, message: 'Your password can’t be too similar to your other personal information.'});
+                }
+                if (password1.value.length < 8) {
+                    errors.push({field: password1, message: 'Your password must contain at least 8 characters.'});
+                }
+                if (isCommonPassword(password1.value)) {
+                    errors.push({field: password1, message: 'Your password can’t be a commonly used password.'});
+                }
+                if (/^\d+$/.test(password1.value)) {
+                    errors.push({field: password1, message: 'Your password can’t be entirely numeric.'});
+                }
+
+                return errors;
+            }
+
+            function isCommonPassword(password) {
+                const commonPasswords = ['password', '123456', '123456789', 'qwerty', 'abc123'];
+                return commonPasswords.includes(password);
+            }
+
+            function displayErrors(errors) {
+                clearErrors();
+
+                errors.forEach((error, index) => {
+                    const errorField = document.getElementById(`error-${error.field.name}`);
+                    errorField.textContent = error.message;
+                    errorMessages[error.field.name] = error.message;
+                });
+            }
+
+            function clearErrors() {
+                for (const key in errorMessages) {
+                    const errorField = document.getElementById(`error-${key}`);
+                    errorField.textContent = '';
+                }
+            }
+
+            function decorateFields(errors) {
+                const fields = form.querySelectorAll('input, select');
+                fields.forEach(field => {
+                    field.classList.remove('error', 'success');
+                });
+
+                const errorFields = errors.map(error => error.field);
+                errorFields.forEach(field => {
+                    field.classList.add('error');
+                });
+
+                fields.forEach(field => {
+                    if (!errorFields.includes(field) && field.value.trim() !== '') {
+                        field.classList.add('success');
+                    }
+                });
+            }
+
+            // JavaScript for filtering the student dropdown
+            const studentSearch = document.getElementById('student-search');
+            const studentDropdown = document.querySelector('[name="student"]');
+
+            studentSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const options = studentDropdown.options;
+
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    const text = option.textContent.toLowerCase();
+
+                    if (text.includes(searchTerm)) {
+                        option.style.display = '';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                }
+            });
+        });
+
+        function togglePasswordVisibility(fieldName) {
+            const passwordField = document.querySelector(`[name="${fieldName}"]`);
+            const eyeIcon = passwordField.nextElementSibling;
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordField.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        }
+    </script>
+</body>
+</html>
+{% endblock content %}

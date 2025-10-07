@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Regression Trends</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        /* Global Styling */
+        body {
+            background-color: #f9fafc;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+        }
+
+        /* Main Container */
+        .container {
+            padding: 20px;
+        }
+
+        /* Header Styling */
+        h1 {
+            color: #007aff;
+            font-weight: 700;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h2, h3, h4 {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Floating Menu Icon */
+        .menu-icon {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background-color: #007aff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Floating Menu */
+        .floating-menu {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .floating-menu a {
+            background-color: #007aff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .floating-menu a:nth-child(1) { background-color: #ff4757; }
+        .floating-menu a:nth-child(2) { background-color: #1e90ff; }
+        .floating-menu a:nth-child(3) { background-color: #2ed573; }
+        .floating-menu a:nth-child(4) { background-color: #ffa502; }
+        .floating-menu a:nth-child(5) { background-color: #3742fa; }
+        .floating-menu a:nth-child(6) { background-color: #ff7f50; }
+
+        .floating-menu a:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .floating-menu a i {
+            font-size: 18px;
+        }
+
+        /* Class Card */
+        .class-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* Student Card */
+        .student-card {
+            background: linear-gradient(145deg, #e8ebf1, #ffffff);
+            border-radius: 15px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Graph Title */
+        .graph-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007aff;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Table Styling */
+        .trend-table {
+            margin-top: 20px;
+        }
+
+        .trend-table h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .trend-table .table {
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .trend-table .table th {
+            background-color: #007aff;
+            color: white;
+            text-align: center;
+        }
+
+        .trend-table .table td {
+            text-align: center;
+        }
+
+        /* Performance Categories */
+        .performance-category {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .danger-category {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .medium-category {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .excellent-category {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Menu Icon -->
+        <div class="menu-icon" id="menuIcon">⋮</div>
+
+        <!-- Floating Menu -->
+        <div class="floating-menu" id="floatingMenu">
+            <a href="{% url 'subject_trends' %}">
+                <i class="fas fa-book"></i> Subject Trends
+            </a>
+            <a href="{% url 'student_trends' %}">
+                <i class="fas fa-user-graduate"></i> Student Trends
+            </a>
+            <a href="{% url 'class_regression_trends' %}">
+                <i class="fas fa-chart-area"></i> Class Regression Trends
+            </a>
+            <a href="{% url 'performance_trends' %}">
+                <i class="fas fa-chart-line"></i> Performance Trends
+            </a>
+            <a href="{% url 'analytics-home' %}">
+                <i class="fas fa-dollar-sign"></i> Home
+            </a>
+        </div>
+
+        <h1>📈 Class Regression Trends</h1>
+
+        {% for class_name, class_data in regression_trends.items %}
+            <div class="class-card">
+                <h2 class="text-center">{{ class_name }}</h2>
+                <div class="row">
+                    {% for student_id, details in class_data.students.items %}
+                        <div class="col-md-6">
+                            <div class="student-card">
+                                <h3 class="graph-title">Student: {{ details.name }}</h3>
+                                <div class="text-center">
+                                    <img src="data:image/png;base64,{{ details.graph }}" alt="Trend Graph" class="img-fluid rounded">
+                                </div>
+                                <div class="text-section mt-3">
+                                    <p><strong>Trend:</strong> {{ details.slope_category }}</p>
+                                    <p><strong>Over-and-Over Average:</strong> {{ details.over_and_over_average|floatformat:2 }}</p>
+                                    <p><strong>Advice:</strong> {{ details.advice }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% if forloop.counter|divisibleby:2 %}
+                            </div><div class="row">
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Additional Sections for Danger, Medium, Excellent Students -->
+                <div class="performance-category danger-category">
+                    <h4>Danger (Below 25)</h4>
+                    {% if class_data.danger_students %}
+                        <p>{{ class_data.danger_students|join:", " }}</p>
+                    {% else %}
+                        <p>No students in this category.</p>
+                    {% endif %}
+                </div>
+
+                <div class="performance-category medium-category">
+                    <h4>Medium Performance (25 - 40)</h4>
+                    {% if class_data.medium_students %}
+                        <p>{{ class_data.medium_students|join:", " }}</p>
+                    {% else %}
+                        <p>No students in this category.</p>
+                    {% endif %}
+                </div>
+
+                <div class="performance-category excellent-category">
+                    <h4>Excellent Performance (41 and Above)</h4>
+                    {% if class_data.excellent_students %}
+                        <p>{{ class_data.excellent_students|join:", " }}</p>
+                    {% else %}
+                        <p>No students in this category.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        const menuIcon = document.getElementById('menuIcon');
+        const floatingMenu = document.getElementById('floatingMenu');
+
+        menuIcon.addEventListener('click', () => {
+            floatingMenu.classList.toggle('active');
+            floatingMenu.style.display = floatingMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menuIcon.contains(e.target) && !floatingMenu.contains(e.target)) {
+                floatingMenu.classList.remove('active');
+                floatingMenu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,7 @@
+{# Renders one <option> for StaffSelectWithData #}
+<option value="{{ widget.value|stringformat:'s' }}"
+        data-salary="{{ choice.instance.salary }}"
+        data-has-helsb="{{ choice.instance.has_helsb|yesno:'true,false' }}"
+        data-hrate="{{ choice.instance.helsb_rate }}">
+    {{ choice.label }}
+</option>

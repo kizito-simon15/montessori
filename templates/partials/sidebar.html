@@ -1,0 +1,235 @@
+{% load static %}
+<!--─────────────── MARIA-MONTESSORI-SIDEBAR (rev.12) ───────────────-->
+<div class="vs-shell">
+    <!-- top strip -->
+    <div class="vs-header">
+        <span class="vs-brand">🎓 Maria Montessori</span>
+        <button id="vsClose" class="vs-icon" aria-label="Close sidebar">❌</button>
+    </div>
+    <!-- circle logo -->
+    <div class="vs-logo-wrap">
+        <img src="{% static 'img/logo.png' %}" alt="Maria Montessori Logo" class="vs-logo" loading="lazy">
+    </div>
+    <!-- nav pills -->
+    <nav class="vs-links">
+        <!-- overview / academics -->
+        <a href="{% url 'dashboard' %}" class="vs-pill primary" aria-label="Overview Dashboard">📊 Overview</a>
+        <a href="{% url 'student-list' %}" class="vs-pill complementary" aria-label="Students List">🧑‍🎓 Students</a>
+        <a href="{% url 'staff-list' %}" class="vs-pill accent" aria-label="Staff List">👥 Staff</a>
+        <a href="{% url 'completed-students' %}" class="vs-pill primary" aria-label="Alumni List">🎓 Alumni</a>
+        <!-- finance -->
+        <a href="{% url 'invoice-list' %}" class="vs-pill complementary" aria-label="Invoices List">💰 Invoices</a>
+        <a href="{% url 'expenditure_dashboard' %}" class="vs-pill accent" aria-label="Expenditure Dashboard">💸 Expenditure</a>
+        <a href="{% url 'kitchen_dashboard' %}" class="vs-pill primary" aria-label="Kitchen Dashboard">🍽️ Kitchen</a>
+        <a href="{% url 'budget-dashboard' %}" class="vs-pill complementary" aria-label="Budgets Dashboard">🧮 Budgets</a>
+        <a href="{% url 'salary-invoice-list' %}" class="vs-pill accent" aria-label="Salaries List">💵 Salaries</a>
+        <a href="{% url 'school-fees-list' %}" class="vs-pill primary" aria-label="School Fees List">📑 Fees</a>
+        <!-- SMS / comms -->
+        <a href="{% url 'sms_history' %}" class="vs-pill complementary" aria-label="SMS History">📜 SMS History</a>
+        <!-- user management -->
+        <a href="{% url 'accounts_dashboard' %}" class="vs-pill accent" aria-label="Users Dashboard">👥 Users</a>
+        <!-- misc -->
+        <a href="{% url 'view_available_books' %}" class="vs-pill primary" aria-label="Library Books">📚 Library</a>
+        <a href="{% url 'management_home' %}" class="vs-pill complementary" aria-label="Settings">⚙️ Settings</a>
+        <!-- Results dropdown -->
+        <div class="vs-dropdown">
+            <a href="#" class="vs-pill primary vs-dropdown-toggle" aria-label="Results Dropdown" id="resultsDropdown">📋 Results</a>
+            <div class="vs-dropdown-content" id="resultsDropdownContent">
+                <a href="{% url 'create-result' %}" class="vs-pill sub-pill primary" aria-label="Create Result">➕ Create Result</a>
+                <a href="{% url 'edit-results' %}" class="vs-pill sub-pill complementary" aria-label="Edit Results">✏️ Edit Results</a>
+                <a href="{% url 'edit-now-results' %}" class="vs-pill sub-pill accent" aria-label="Edit Now Results">🔄 Edit Now Results</a>
+                <a href="{% url 'delete-page-results' %}" class="vs-pill sub-pill primary" aria-label="Delete Results">🗑️ Delete Results</a>
+                <a href="{% url 'class-list' %}" class="vs-pill sub-pill complementary" aria-label="Class List">📋 Class List</a>
+                <a href="{% url 'class-results' %}" class="vs-pill sub-pill accent" aria-label="Class Results">📊 Class Results</a>
+                <a href="{% url 'single-class' %}" class="vs-pill sub-pill primary" aria-label="Single Class">🎓 Single Class</a>
+                <a href="{% url 'single-results' %}" class="vs-pill sub-pill complementary" aria-label="Single Class Results">📈 Single Class Results</a>
+                <a href="{% url 'student-results' %}" class="vs-pill sub-pill accent" aria-label="Student Results">👤 Student Results</a>
+                <a href="{% url 'single-student' %}" class="vs-pill sub-pill primary" aria-label="Single Student Results">📝 Single Student Results</a>
+                <a href="{% url 'form_status' %}" class="vs-pill sub-pill complementary" aria-label="Form Status">📋 Form Status</a>
+                <a href="{% url 'admin_profile' %}" class="vs-pill sub-pill accent" aria-label="Admin Profile">👑 Admin Profile</a>
+            </div>
+        </div>
+        <!-- user actions -->
+        <hr class="vs-divider">
+        {% if request.user.is_authenticated %}
+            <!-- No profile or logout links as per previous request -->
+        {% else %}
+        <a href="{% url 'custom_login' %}" class="vs-pill primary user-action" aria-label="Login"><i class="bi bi-box-arrow-in-right me-2"></i> Login</a>
+        <span class="vs-auth-status">Not authenticated. Please log in.</span>
+        {% endif %}
+    </nav>
+</div>
+<!--─────────────── sidebar styles ───────────────-->
+<style>
+/* container */
+.vs-shell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+/* header strip */
+.vs-header {
+    width: 100%;
+    height: var(--h-topbar);
+    padding: 0 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--clr-primary), var(--clr-complementary));
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+.vs-brand {
+    font-weight: 700;
+    font-size: 16px;
+    color: #000000;
+}
+.vs-icon {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: var(--clr-accent);
+    color: #000000;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+.vs-icon:hover {
+    background: var(--clr-complementary);
+}
+/* logo */
+.vs-logo-wrap {
+    margin-top: 14px;
+}
+.vs-logo {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    border: 2px solid var(--clr-accent);
+}
+/* pill list */
+.vs-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 0 18px 24px;
+}
+/* pill styles */
+.vs-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 10px 0;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #000000;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+}
+.vs-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(135deg, #4b5563, #6b7280);
+}
+.vs-pill.primary {
+    background: linear-gradient(135deg, var(--clr-primary), #3b82f6);
+}
+.vs-pill.accent {
+    background: linear-gradient(135deg, var(--clr-accent), #bfdbfe);
+}
+.vs-pill.complementary {
+    background: linear-gradient(135deg, var(--clr-complementary), #5eead4);
+}
+.vs-pill.user-action {
+    font-size: 15px;
+    font-weight: 700;
+}
+.vs-pill.active {
+    outline: 3px solid rgba(255, 255, 255, 0.6);
+}
+/* dropdown styles */
+.vs-dropdown {
+    position: relative;
+    width: 100%;
+}
+.vs-dropdown-toggle {
+    width: 100%;
+    text-align: center;
+}
+.vs-dropdown-content {
+    display: none;
+    position: absolute;
+    background: var(--bg-light);
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 8px;
+    padding: 5px 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 100%;
+}
+.sub-pill {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-size: 13px;
+    color: #000000;
+    background: none;
+    transition: background 0.2s;
+}
+.sub-pill:hover {
+    background: rgba(79, 195, 247, 0.1); /* Light blue tint */
+    color: var(--clr-primary);
+}
+/* divider */
+.vs-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 12px 0;
+}
+.vs-auth-status {
+    font-size: 12px;
+    color: #000000;
+    text-align: center;
+    padding: 10px;
+    opacity: 0.8;
+}
+</style>
+<!--─────────────── close-sidebar and dropdown toggle hook ───────────────-->
+<script>
+document.getElementById('vsClose')?.addEventListener('click', () => {
+    document.getElementById('vsToggle')?.click();
+});
+
+// Toggle Results dropdown on click
+document.getElementById('resultsDropdown')?.addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent default anchor behavior
+    const dropdownContent = document.getElementById('resultsDropdownContent');
+    if (dropdownContent.style.display === 'block') {
+        dropdownContent.style.display = 'none';
+    } else {
+        dropdownContent.style.display = 'block';
+    }
+});
+
+// Close dropdown if clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('resultsDropdown');
+    const dropdownContent = document.getElementById('resultsDropdownContent');
+    if (!dropdown.contains(event.target)) {
+        dropdownContent.style.display = 'none';
+    }
+});
+</script>

@@ -1,0 +1,41 @@
+{% extends "parents/parent_base.html" %}
+
+{% block content-header %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-12 text-center">
+                <h1 class="h4 text-primary"><u>Help Guide for Using the System</u></h1>
+                <p class="h6 text-secondary">Guidance for Parents of {{ student.firstname }} {{ student.middle_name }} {{ student.surname }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content-header %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5>How to Use the System</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for guide in user_guide %}
+                        <li class="list-group-item">
+                            <h6 class="text-primary">{{ guide.title }}</h6>
+                            <p>{{ guide.description }}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="alert alert-info" role="alert">
+                <strong>Tip:</strong> Regularly check each section to stay updated on your child’s progress, payments, and any new school announcements.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
